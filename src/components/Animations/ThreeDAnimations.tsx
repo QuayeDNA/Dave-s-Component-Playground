@@ -36,6 +36,11 @@ const animations: Record<string, AnimationParams> = {
     animate: { rotateX: 30, rotateY: -30 },
     transition: { duration: 0.5 },
     description: "Tilted perspective effect"
+  },
+  interactive: {
+    animate: {}, // Empty object for interactive mode
+    transition: { type: "spring", stiffness: 300, damping: 30 },
+    description: "Interactive mode - move your mouse over the box"
   }
 };
 
@@ -65,6 +70,10 @@ const ThreeDAnimations = () => {
     mouseY.set(clientY - top - height / 2);
   };
 
+  const handleSliderChange = (param: string, value: number[]) => {
+    setCustomParams(prev => ({ ...prev, [param]: value[0] }));
+  };
+
   return (
     <Card className="w-full max-w-4xl mx-auto bg-gradient-to-br from-purple-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 shadow-xl">
       <CardHeader>
@@ -85,6 +94,7 @@ const ThreeDAnimations = () => {
               {animName === 'swing' && <RotateCcw className="w-4 h-4" />}
               {animName === 'pulse' && <Maximize2 className="w-4 h-4" />}
               {animName === 'tilt' && <Cuboid className="w-4 h-4" />}
+              {animName === 'interactive' && <MousePointer className="w-4 h-4" />}
               {animName}
             </Button>
           ))}
@@ -114,62 +124,34 @@ const ThreeDAnimations = () => {
         
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Customize 3D Transform</h3>
-          <div className="space-y-2">
-            <label className="text-sm text-gray-600 dark:text-gray-400">Rotate X: {customParams.rotateX}°</label>
-            <Slider
-              value={[customParams.rotateX]}
-              onValueChange={(value) => setCustomParams({ ...customParams, rotateX: value[0] })}
-              min={-180}
-              max={180}
-              step={1}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm text-gray-600 dark:text-gray-400">Rotate Y: {customParams.rotateY}°</label>
-            <Slider
-              value={[customParams.rotateY]}
-              onValueChange={(value) => setCustomParams({ ...customParams, rotateY: value[0] })}
-              min={-180}
-              max={180}
-              step={1}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm text-gray-600 dark:text-gray-400">Rotate Z: {customParams.rotateZ}°</label>
-            <Slider
-              value={[customParams.rotateZ]}
-              onValueChange={(value) => setCustomParams({ ...customParams, rotateZ: value[0] })}
-              min={-180}
-              max={180}
-              step={1}
-            />
-          </div>
+          {['rotateX', 'rotateY', 'rotateZ'].map((param) => (
+            <div key={param} className="space-y-2">
+              <label className="text-sm text-gray-600 dark:text-gray-400">{param}: {customParams[param as keyof typeof customParams]}°</label>
+              <Slider
+                value={[customParams[param as keyof typeof customParams]]}
+                onValueChange={(value) => handleSliderChange(param, value)}
+                min={-180}
+                max={180}
+                step={1}
+              />
+            </div>
+          ))}
           <div className="space-y-2">
             <label className="text-sm text-gray-600 dark:text-gray-400">Perspective: {customParams.perspective}px</label>
             <Slider
               value={[customParams.perspective]}
-              onValueChange={(value) => setCustomParams({ ...customParams, perspective: value[0] })}
+              onValueChange={(value) => handleSliderChange('perspective', value)}
               min={200}
               max={2000}
               step={10}
             />
           </div>
         </div>
-        
-        <Button 
-          onClick={() => setActiveAnimation('interactive')}
-          className="w-full flex items-center justify-center gap-2"
-        >
-          <MousePointer className="w-4 h-4" />
-          Enable Interactive Mode
-        </Button>
       </CardContent>
       <CardFooter className="flex justify-center">
         <p className="text-sm text-gray-600 dark:text-gray-400 text-center max-w-lg">
-          {activeAnimation === 'interactive' 
-            ? "Move your mouse over the 3D box to see it respond to your cursor position." 
-            : animations[activeAnimation].description}
-          Experiment with different animations and customize the 3D transform parameters to see how they affect the object in 3D space.
+          {animations[activeAnimation].description}
+          {" Experiment with different animations and customize the 3D transform parameters to see how they affect the object in 3D space."}
         </p>
       </CardFooter>
     </Card>
