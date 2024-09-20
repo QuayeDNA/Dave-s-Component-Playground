@@ -1,6 +1,6 @@
-import React, { useRef, useState, useEffect, Suspense } from 'react';
+import { useRef, useState, useEffect, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera, TorusKnot, Box, Sphere, Sky, Stars, useTexture } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera, TorusKnot, Box, Sphere, Sky, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

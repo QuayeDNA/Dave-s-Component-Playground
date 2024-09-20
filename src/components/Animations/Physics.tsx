@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState, useRef, useEffect } from 'react';
 import { useSpring, animated } from '@react-spring/web';
 import { useDrag } from '@use-gesture/react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,100 +16,79 @@ const PhysicsAnimations = () => {
   const [shape, setShape] = useState('circle');
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerDimensions, setContainerDimensions] = useState({ width: 0, height: 0 });
-  const objectSize = 64; // Size of the object (width and height)
+  const objectSize = 64;
 
   const [{ x, y }, api] = useSpring(() => ({ 
     x: 0, 
     y: 0,
+    vx: 0,
+    vy: 0,
     config: { 
       mass: mass,
-      tension: 120,
-      friction: 14,
+      tension: 0,
+      friction: 0,
     } 
   }));
 
   useEffect(() => {
     if (containerRef.current) {
-      setContainerDimensions({
-        width: containerRef.current.clientWidth,
-        height: containerRef.current.clientHeight
-      });
-      // Set initial position to center
+      const { clientWidth, clientHeight } = containerRef.current;
+      setContainerDimensions({ width: clientWidth, height: clientHeight });
       api.start({
-        x: containerRef.current.clientWidth / 2 - objectSize / 2,
-        y: containerRef.current.clientHeight / 2 - objectSize / 2,
+        x: clientWidth / 2 - objectSize / 2,
+        y: clientHeight / 2 - objectSize / 2,
       });
     }
   }, [api]);
 
   useEffect(() => {
-    api.start({
-      config: {
-        mass: mass,
-        tension: 120,
-        friction: 14 + airResistance * 1000,
-      }
-    });
-  }, [mass, airResistance, api]);
-
-  useEffect(() => {
-    let velocityX = 0;
-    let velocityY = 0;
     let lastTime = performance.now();
 
-    const updatePosition = () => {
+    const updatePhysics = () => {
       const now = performance.now();
       const deltaTime = (now - lastTime) / 1000; // Convert to seconds
       lastTime = now;
 
-      api.start((prevProps: { x: number; y: number }) => {
-        let newX = prevProps.x;
-        let newY = prevProps.y;
+      api.start((prevState: any) => {
+        const calculateNewPosition = (pos: number, vel: number, min: number, max: number) => {
+          let newPos = pos + vel * deltaTime;
+          let newVel = vel;
 
-        velocityY += gravity * deltaTime;
-        
-        newX += velocityX * deltaTime * 50;
-        newY += velocityY * deltaTime * 50;
+          if (newPos < min) {
+            newPos = min;
+            newVel = -newVel * elasticity;
+          } else if (newPos > max) {
+            newPos = max;
+            newVel = -newVel * elasticity;
+          }
 
-        // Apply boundaries
-        if (newX < 0) {
-          newX = 0;
-          velocityX = -velocityX * elasticity;
-        } else if (newX > containerDimensions.width - objectSize) {
-          newX = containerDimensions.width - objectSize;
-          velocityX = -velocityX * elasticity;
-        }
+          return [newPos, newVel];
+        };
 
-        if (newY < 0) {
-          newY = 0;
-          velocityY = -velocityY * elasticity;
-        } else if (newY > containerDimensions.height - objectSize) {
-          newY = containerDimensions.height - objectSize;
-          velocityY = -velocityY * elasticity;
-        }
+        const applyGravity = (vy: number) => vy + gravity * deltaTime;
+        const applyAirResistance = (v: number) => v * (1 - airResistance);
 
-        // Apply air resistance
-        velocityX *= (1 - airResistance);
-        velocityY *= (1 - airResistance);
+        let newVy = applyGravity(prevState.vy);
+        const [newX, newVx] = calculateNewPosition(prevState.x, prevState.vx, 0, containerDimensions.width - objectSize);
+        const [newY, tempVy] = calculateNewPosition(prevState.y, newVy, 0, containerDimensions.height - objectSize);
 
-        // Prevent NaN values
-        if (isNaN(newX) || isNaN(newY)) {
-          newX = containerDimensions.width / 2 - objectSize / 2;
-          newY = containerDimensions.height / 2 - objectSize / 2;
-          velocityX = 0;
-          velocityY = 0;
-        }
+        newVy = applyAirResistance(tempVy);
 
-        return { x: newX, y: newY };
+        return {
+          x: newX,
+          y: newY,
+          vx: applyAirResistance(newVx),
+          vy: newVy,
+        };
       });
 
-      requestAnimationFrame(updatePosition);
+      requestAnimationFrame(updatePhysics);
     };
 
-    const animationFrame = requestAnimationFrame(updatePosition);
+    const animationFrame = requestAnimationFrame(updatePhysics);
 
     return () => cancelAnimationFrame(animationFrame);
-  }, [api, gravity, elasticity, containerDimensions, airResistance]);
+  }, [api, gravity, elasticity, airResistance, containerDimensions]);
 
   const bind = useDrag(({ movement: [mx, my], velocity: [vx, vy], down }) => {
     if (down) {
@@ -117,31 +97,29 @@ const PhysicsAnimations = () => {
       api.start({ 
         x: mx, 
         y: my, 
-        config: { 
-          velocity: [vx * 16, vy * 16] // Scale up the throw velocity
-        } 
+        vx: vx * 16,
+        vy: vy * 16,
       });
     }
   });
 
   const reset = () => {
-    api.start({ x: containerDimensions.width / 2 - objectSize / 2, y: containerDimensions.height / 2 - objectSize / 2 });
+    api.start({ 
+      x: containerDimensions.width / 2 - objectSize / 2, 
+      y: containerDimensions.height / 2 - objectSize / 2,
+      vx: 0,
+      vy: 0,
+    });
   };
 
   const jump = () => {
-    api.start({ y: y.get() - 100, config: { velocity: -400 } });
+    api.start((state: any) => ({ ...state, vy: -400 }));
   };
 
   const randomForce = () => {
-    const randomX = (Math.random() - 0.5) * 400;
-    const randomY = -Math.random() * 400;
-    api.start({ 
-      x: x.get(),
-      y: y.get(),
-      config: { 
-        velocity: [randomX, randomY]
-      } 
-    });
+    const randomVx = (Math.random() - 0.5) * 800;
+    const randomVy = -Math.random() * 800;
+    api.start((state: any) => ({ ...state, vx: randomVx, vy: randomVy }));
   };
 
   const getShapeStyle = () => {
@@ -235,7 +213,7 @@ const PhysicsAnimations = () => {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm text-gray-600 dark:text-gray-400">Shape</label>
+            <label htmlFor="shape" className="text-sm text-gray-600 dark:text-gray-400">Shape</label>
             <Select value={shape} onValueChange={setShape}>
               <SelectTrigger>
                 <SelectValue placeholder="Select a shape" />

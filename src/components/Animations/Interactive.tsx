@@ -1,11 +1,11 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useSpring, animated, to } from '@react-spring/web';
 import { useDrag } from '@use-gesture/react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MousePointer, RotateCcw, Maximize } from 'lucide-react';
+import { RotateCcw } from 'lucide-react';
 
 const InteractiveAnimations = () => {
   const [dragConstraint, setDragConstraint] = useState(100);
@@ -19,7 +19,7 @@ const InteractiveAnimations = () => {
     scale: 1,
   }));
 
-  const bind = useDrag(({ offset: [ox, oy], vxvy: [vx, vy], down, movement: [mx, my] }) => {
+  const bind = useDrag(({ offset: [ox, oy], down, movement: [mx] }) => {
     api.start({
       x: down ? ox : 0,
       y: down ? oy : 0,
@@ -95,7 +95,7 @@ const InteractiveAnimations = () => {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm text-gray-600 dark:text-gray-400">Shape</label>
+            <label htmlFor='shape'  className="text-sm text-gray-600 dark:text-gray-400">Shape</label>
             <Select value={shape} onValueChange={setShape}>
               <SelectTrigger>
                 <SelectValue placeholder="Select a shape" />
