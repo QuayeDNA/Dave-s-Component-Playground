@@ -10,11 +10,20 @@ const Home = lazy(() => import('../pages/Home'));
 const Overview = lazy(() => import('../pages/Overview'));
 const NotFound = lazy(() => import('../pages/NotFound'));
 const Zones = lazy(() => import('@/components/Zone/ZoneManagementSystem'));
+const TwoDAnimation = lazy(() => import('@/components/Animations/TwoDAnimations'));
+const ThreeDAnimation = lazy(() => import('@/components/Animations/ThreeDAnimations'));
+const Physics = lazy(() => import('@/components/Animations/Physics'));
+const Tween = lazy(() => import('@/components/Animations/Tween'));
+const Interactive = lazy(() => import('@/components/Animations/Interactive'));
+const Morph = lazy(() => import('@/components/Animations/Morph'));
+const Interactive3D = lazy(() => import('@/components/3DInteractive/Basics'));
+const Interactive3DTorus = lazy(() => import('@/components/3DInteractive/Torus'));
 
 // Placeholder components for routes that don't exist yet
 const Buttons = lazy(() => import('@/components/placeholders/Button'));
 const Forms = lazy(() => import('@/components/placeholders/Forms'));
 const Cards = lazy(() => import('@/components/placeholders/Cards'));
+
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-screen bg-gray-900">
@@ -32,6 +41,15 @@ const AppRouter: React.FC = () => {
             <Route element={<Layout />}>
               <Route path="/overview" element={<Overview />} />
               <Route path="/zones" element={<Zones />} />
+              <Route path="/animations/2d" element={<TwoDAnimation />} />
+              <Route path="/animations/3d" element={<ThreeDAnimation />} />
+              <Route path="/animations/physics" element={<Physics />} />
+              <Route path="/animations/tween" element={<Tween />} />
+              <Route path="/animations/interactive" element={<Interactive />} />
+              
+              <Route path="/3d-interactive" element={<Interactive3D />} />
+              <Route path="/3d-interactive/torus" element={<Interactive3DTorus />} />
+              <Route path="/animations/morph" element={<Morph />} />
               <Route path="/components/buttons" element={<Buttons />} />
               <Route path="/components/forms" element={<Forms />} />
               <Route path="/components/cards" element={<Cards />} />
