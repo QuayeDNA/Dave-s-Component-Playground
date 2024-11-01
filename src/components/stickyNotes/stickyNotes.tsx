@@ -253,11 +253,7 @@ const ScheduleManager = () => {
     });
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gray-900 text-gray-100">
-      <div className="fixed inset-0 z-0">
-        <div className="absolute inset-0 bg-gray-900" />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+CjxyZWN0IHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgZmlsbD0iIzFhMWExYSI+PC9yZWN0Pgo8cGF0aCBkPSJNMzYgMTBMMjQgNTBMMzggNTBMMzYgMTBaIiBmaWxsPSIjMjIyIiBmaWxsLW9wYWNpdHk9IjAuMiIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiPjwvcGF0aD4KPC9zdmc+')] opacity-5" />
-      </div>
+    <div className="relative min-h-screen overflow-hidden text-gray-100">
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <motion.div
