@@ -92,6 +92,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         { name: "Torus", path: "/3d-interactive/torus" },
       ],
     },
+    { name: "Sticky Notes", path: "/sticky-notes", icon: Menu },
   ];
 
   return (

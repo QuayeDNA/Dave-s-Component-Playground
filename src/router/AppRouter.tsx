@@ -18,6 +18,7 @@ const Interactive = lazy(() => import('@/components/Animations/Interactive'));
 const Morph = lazy(() => import('@/components/Animations/Morph'));
 const Interactive3D = lazy(() => import('@/components/3DInteractive/Basics'));
 const Interactive3DTorus = lazy(() => import('@/components/3DInteractive/Torus'));
+const StickyNotes = lazy(() => import('@/components/stickyNotes/stickyNotes'));
 
 // Placeholder components for routes that don't exist yet
 const Buttons = lazy(() => import('@/components/placeholders/Button'));
@@ -46,6 +47,8 @@ const AppRouter: React.FC = () => {
               <Route path="/animations/physics" element={<Physics />} />
               <Route path="/animations/tween" element={<Tween />} />
               <Route path="/animations/interactive" element={<Interactive />} />
+
+              <Route path="/sticky-notes" element={<StickyNotes />} />
               
               <Route path="/3d-interactive" element={<Interactive3D />} />
               <Route path="/3d-interactive/torus" element={<Interactive3DTorus />} />
