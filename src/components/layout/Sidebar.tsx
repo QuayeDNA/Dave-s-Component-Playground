@@ -69,6 +69,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         { name: "Buttons", path: "/components/buttons" },
         { name: "Forms", path: "/components/forms" },
         { name: "Cards", path: "/components/cards" },
+        { name: "Notifications", path: "/components/notification"}
       ],
     },
     { name: "Zones Management", path: "/zones", icon: MapIcon },

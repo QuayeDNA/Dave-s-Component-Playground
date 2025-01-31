@@ -24,6 +24,7 @@ const StickyNotes = lazy(() => import('@/components/stickyNotes/stickyNotes'));
 const Buttons = lazy(() => import('@/components/placeholders/Button'));
 const Forms = lazy(() => import('@/components/placeholders/Forms'));
 const Cards = lazy(() => import('@/components/placeholders/Cards'));
+const Notifications = lazy(() => import('@/components/placeholders/NotificationUI'))
 
 
 const LoadingFallback = () => (
@@ -56,6 +57,7 @@ const AppRouter: React.FC = () => {
               <Route path="/components/buttons" element={<Buttons />} />
               <Route path="/components/forms" element={<Forms />} />
               <Route path="/components/cards" element={<Cards />} />
+              <Route path="/components/notification" element={<Notifications />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
