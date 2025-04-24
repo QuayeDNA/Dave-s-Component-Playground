@@ -988,7 +988,7 @@ export default function ChatGPTModelSelector() {
   );
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-gray-900 via-gray-800 to-black py-12 px-4 flex items-center justify-center">
+    <div className="min-h-screen w-full bg-black py-12 px-4 flex items-center justify-center">
       <div className="w-full max-w-4xl bg-[#0f0f0f] rounded-2xl p-6 mx-auto font-sans shadow-2xl border border-gray-800">
         <motion.div
           initial={{ y: -10, opacity: 0 }}
