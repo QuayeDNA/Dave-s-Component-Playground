@@ -94,6 +94,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
       ],
     },
     { name: "Sticky Notes", path: "/sticky-notes", icon: Menu },
+    { name: "Model Redesign", path: "/model-redesign", icon: Menu },
   ];
 
   return (

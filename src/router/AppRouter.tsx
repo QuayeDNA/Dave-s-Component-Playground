@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import ErrorBoundary from './ErrorBoundary';
 import { Layout } from '../components/layout/Layout';
+import ChatGPTModelSelector from '@/components/GPTModelRedesign/GptModel';
 
 // Lazy load components
 const Home = lazy(() => import('../pages/Home'));
@@ -59,6 +60,7 @@ const AppRouter: React.FC = () => {
               <Route path="/components/cards" element={<Cards />} />
               <Route path="/components/notification" element={<Notifications />} />
             </Route>
+            <Route path="/model-redesign" element={<ChatGPTModelSelector />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
