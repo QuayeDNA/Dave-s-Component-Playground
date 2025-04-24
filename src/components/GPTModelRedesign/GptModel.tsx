@@ -106,34 +106,6 @@ const Tooltip = ({
   );
 };
 
-// Define a metric bar component
-const MetricBar = ({
-  value,
-  label,
-  color,
-}: {
-  value: number;
-  label: string;
-  color: string;
-}) => {
-  const barWidth = `${value * 10}%`;
-
-  return (
-    <div className="mb-2">
-      <div className="flex justify-between mb-1">
-        <span className="text-xs font-medium text-gray-300">{label}</span>
-        <span className="text-xs font-medium text-gray-300">{value}/10</span>
-      </div>
-      <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
-        <div
-          className={`h-full rounded-full ${color}`}
-          style={{ width: barWidth }}
-        ></div>
-      </div>
-    </div>
-  );
-};
-
 // Search functionality component
 const ModelSearch = ({
   models,
@@ -283,7 +255,6 @@ export default function ChatGPTModelSelector() {
   const [selectedModelsForComparison, setSelectedModelsForComparison] =
     useState<ModelId[]>(["gpt4o", "gpt45"]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchKey, setSearchKey] = useState("");
 
   const tabs: Tab[] = [
     { id: "task", name: "By Task" },
