@@ -1,255 +1,120 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useRef, useEffect } from 'react';
-import { useSpring, animated } from '@react-spring/web';
-import { useDrag } from '@use-gesture/react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RotateCcw, ArrowDown, Wind } from 'lucide-react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { ShowcaseCard, SectionHeader } from './physics/shared';
+import { BouncingBalls, ProjectileLauncherFixed, SpringPendulum, NewtonsCradleWired } from './physics/Mechanics';
+import { VerletRope, ClothSim, FluidRipple, SoftBlob } from './physics/SoftBody';
+import { GravityWells, ElasticBilliards, DoublePendulum, OrbitalMechanics } from './physics/Fields';
+import { Boids, FallingSandWired, ReactionDiffusion, LangtonsAnt } from './physics/Emergence';
 
-const PhysicsAnimations = () => {
-  const [gravity, setGravity] = useState(9.8);
-  const [mass, setMass] = useState(1);
-  const [elasticity, setElasticity] = useState(0.7);
-  const [airResistance, setAirResistance] = useState(0.02);
-  const [shape, setShape] = useState('circle');
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [containerDimensions, setContainerDimensions] = useState({ width: 0, height: 0 });
-  const objectSize = 64;
+// ── Hero tag ──────────────────────────────────────────────────────────────────
+const HeroTag: React.FC<{ label: string }> = ({ label }) => (
+  <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full"
+    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.45)' }}>
+    {label}
+  </span>
+);
 
-  const [{ x, y }, api] = useSpring(() => ({ 
-    x: 0, 
-    y: 0,
-    vx: 0,
-    vy: 0,
-    config: { 
-      mass: mass,
-      tension: 0,
-      friction: 0,
-    } 
-  }));
+// ── Section config ─────────────────────────────────────────────────────────────
+const SECTIONS = [
+  {
+    id: 'mechanics', accent: '#4d8fc8', number: '01',
+    title: 'Newtonian Mechanics',
+    subtitle: 'Conservation laws, projectile motion, spring forces, and elastic collisions.',
+    demos: [
+      { title: 'Bouncing Ball Pit', description: 'Semi-implicit Euler gravity + ball–ball elastic collision. Click the canvas to spawn new balls.', useCase: 'physics engines, particle systems', component: <BouncingBalls /> },
+      { title: 'Projectile Launcher', description: 'Ballistic arc with air drag. Adjust launch angle & power, then fire to trace multiple trajectories.', useCase: 'game ballistics, trajectory prediction', component: <ProjectileLauncherFixed /> },
+      { title: 'Spring Pendulum', description: 'A bob on an elastic spring under gravity. Drag the bob and release to observe chaotic orbits.', useCase: 'structural engineering, oscillation modeling', component: <SpringPendulum /> },
+      { title: "Newton's Cradle", description: '5 steel pendulums with equal-mass elastic collision (angular velocity exchange). Lift 1–3 balls.', useCase: 'momentum conservation, kinetic art', component: <NewtonsCradleWired /> },
+    ],
+  },
+  {
+    id: 'softbody', accent: '#a78bfa', number: '02',
+    title: 'Soft Body & Fluid',
+    subtitle: 'Verlet integration, constraint relaxation, wave propagation, and deformable meshes.',
+    demos: [
+      { title: 'Verlet Rope', description: 'Chain of 28 particles with distance-constraint relaxation (6 iterations/frame). Drag any node; toggle wind.', useCase: 'rope physics, cloth anchors, soft robots', component: <VerletRope /> },
+      { title: 'Cloth Simulation', description: '22×14 verlet grid with structural + shear springs. Top row pinned. Cloth tears at 1.6× natural length.', useCase: 'fashion simulation, flag physics, cloth rendering', component: <ClothSim /> },
+      { title: 'Fluid Ripple Wave', description: '2D discrete wave equation on a 100×70 height field. Click or drag to create splashes; tune wave speed.', useCase: 'water surfaces, sound visualization', component: <FluidRipple /> },
+      { title: 'Soft Body Blob', description: '14 rim masses + central mass on springs. Deforms on wall impact; adjust stiffness live.', useCase: 'jelly physics, biological simulation, VFX', component: <SoftBlob /> },
+    ],
+  },
+  {
+    id: 'fields', accent: '#34d399', number: '03',
+    title: 'Forces & Fields',
+    subtitle: 'Gravitational fields, orbital mechanics, billiard collisions, and chaotic attractors.',
+    demos: [
+      { title: 'Gravity Wells', description: '3 massive bodies attract 60 test particles via F = G·M/r². Drag the wells to reshape the field.', useCase: 'N-body simulation, astrophysics, UI effects', component: <GravityWells /> },
+      { title: 'Elastic Billiards', description: '7 balls in a circular arena with mass-weighted 2D elastic collision. Click to impulse the cue ball.', useCase: 'game physics, collision detection, pool simulators', component: <ElasticBilliards /> },
+      { title: 'Double Pendulum', description: 'Lagrangian equations with sub-step RK4. Three pendulums with Δθ=0.01 rad diverge exponentially.', useCase: 'chaos theory, sensitivity analysis, research viz', component: <DoublePendulum /> },
+      { title: 'Orbital Mechanics', description: 'Five planets in Keplerian orbits (v=√(GM/r)). Drag a planet to perturb its orbit.', useCase: 'space simulations, educational astronomy', component: <OrbitalMechanics /> },
+    ],
+  },
+  {
+    id: 'emergence', accent: '#fb923c', number: '04',
+    title: 'Emergence & Automata',
+    subtitle: 'Complex global behavior arising from simple local rules — flocking, automata, reaction chemistry.',
+    demos: [
+      { title: 'Boids Flocking', description: '70 agents with separation, alignment, and cohesion. A red predator pursues the flock — tune three rule weights live.', useCase: 'crowd simulation, swarm robotics', component: <Boids /> },
+      { title: 'Falling Sand', description: 'Cellular automaton: sand slides diagonally, water flows laterally. Draw with mouse; switch materials; clear.', useCase: 'game mechanics, terrain erosion, artistic tools', component: <FallingSandWired /> },
+      { title: 'Reaction Diffusion', description: 'Gray-Scott model — du/dt = D·∇²u − uv² + f(1−u). Patterns self-organize. Click to seed; switch presets.', useCase: 'texture generation, morphogenesis, bio-inspired design', component: <ReactionDiffusion /> },
+      { title: "Langton's Ant", description: '4 ants each following a unique 4-color turning rule. Local steps yield global complexity.', useCase: 'AI visualization, cellular computation, generative art', component: <LangtonsAnt /> },
+    ],
+  },
+] as const;
 
-  useEffect(() => {
-    if (containerRef.current) {
-      const { clientWidth, clientHeight } = containerRef.current;
-      setContainerDimensions({ width: clientWidth, height: clientHeight });
-      api.start({
-        x: clientWidth / 2 - objectSize / 2,
-        y: clientHeight / 2 - objectSize / 2,
-      });
-    }
-  }, [api]);
-
-  useEffect(() => {
-    let lastTime = performance.now();
-
-    const updatePhysics = () => {
-      const now = performance.now();
-      const deltaTime = (now - lastTime) / 1000; // Convert to seconds
-      lastTime = now;
-
-      api.start((prevState: any) => {
-        const calculateNewPosition = (pos: number, vel: number, min: number, max: number) => {
-          let newPos = pos + vel * deltaTime;
-          let newVel = vel;
-
-          if (newPos < min) {
-            newPos = min;
-            newVel = -newVel * elasticity;
-          } else if (newPos > max) {
-            newPos = max;
-            newVel = -newVel * elasticity;
-          }
-
-          return [newPos, newVel];
-        };
-
-        const applyGravity = (vy: number) => vy + gravity * deltaTime;
-        const applyAirResistance = (v: number) => v * (1 - airResistance);
-
-        let newVy = applyGravity(prevState.vy);
-        const [newX, newVx] = calculateNewPosition(prevState.x, prevState.vx, 0, containerDimensions.width - objectSize);
-        const [newY, tempVy] = calculateNewPosition(prevState.y, newVy, 0, containerDimensions.height - objectSize);
-
-        newVy = applyAirResistance(tempVy);
-
-        return {
-          x: newX,
-          y: newY,
-          vx: applyAirResistance(newVx),
-          vy: newVy,
-        };
-      });
-
-      requestAnimationFrame(updatePhysics);
-    };
-
-    const animationFrame = requestAnimationFrame(updatePhysics);
-
-    return () => cancelAnimationFrame(animationFrame);
-  }, [api, gravity, elasticity, airResistance, containerDimensions]);
-
-  const bind = useDrag(({ movement: [mx, my], velocity: [vx, vy], down }) => {
-    if (down) {
-      api.start({ x: mx, y: my, immediate: true });
-    } else {
-      api.start({ 
-        x: mx, 
-        y: my, 
-        vx: vx * 16,
-        vy: vy * 16,
-      });
-    }
-  });
-
-  const reset = () => {
-    api.start({ 
-      x: containerDimensions.width / 2 - objectSize / 2, 
-      y: containerDimensions.height / 2 - objectSize / 2,
-      vx: 0,
-      vy: 0,
-    });
-  };
-
-  const jump = () => {
-    api.start((state: any) => ({ ...state, vy: -400 }));
-  };
-
-  const randomForce = () => {
-    const randomVx = (Math.random() - 0.5) * 800;
-    const randomVy = -Math.random() * 800;
-    api.start((state: any) => ({ ...state, vx: randomVx, vy: randomVy }));
-  };
-
-  const getShapeStyle = () => {
-    switch (shape) {
-      case 'square':
-        return { width: `${objectSize}px`, height: `${objectSize}px` };
-      case 'triangle':
-        return { 
-          width: 0, 
-          height: 0, 
-          borderLeft: `${objectSize / 2}px solid transparent`,
-          borderRight: `${objectSize / 2}px solid transparent`,
-          borderBottom: `${objectSize}px solid #10b981`,
-          background: 'none'
-        };
-      default:
-        return { width: `${objectSize}px`, height: `${objectSize}px`, borderRadius: '50%' };
-    }
-  };
-
+// ── Main page ─────────────────────────────────────────────────────────────────
+const Physics: React.FC = () => {
   return (
-    <Card className="w-full max-w-4xl mx-auto bg-gradient-to-br from-green-50 to-teal-100 dark:from-gray-900 dark:to-teal-950 shadow-xl">
-      <CardHeader>
-        <CardTitle className="text-3xl font-bold text-center text-green-800 dark:text-green-300">
-          Enhanced Physics Animations
-        </CardTitle>
-        <CardDescription className="text-center text-gray-600 dark:text-gray-400">
-          Explore advanced physics-based animations with react-spring
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div 
-          ref={containerRef}
-          className="h-96 flex items-center justify-center bg-white dark:bg-gray-800 rounded-lg shadow-inner overflow-hidden relative"
-        >
-          <animated.div
-            {...bind()}
-            style={{
-              x,
-              y,
-              touchAction: 'none',
-              background: '#10b981',
-              ...getShapeStyle(),
-              position: 'absolute',
-            }}
-          />
-          <div 
-            className="absolute bottom-0 left-0 right-0 h-2 bg-gray-300 dark:bg-gray-600"
-            style={{ boxShadow: '0 -2px 10px rgba(0,0,0,0.1)' }}
-          />
+    <div className="max-w-6xl mx-auto px-4 py-10 space-y-20">
+      {/* Hero */}
+      <motion.div initial={{opacity:0,y:24}} animate={{opacity:1,y:0}} transition={{duration:0.55,ease:'easeOut'}} className="space-y-5">
+        <div className="flex items-center gap-2 text-xs" style={{color:'rgba(255,255,255,0.25)'}}>
+          <span>Components</span><span>›</span><span>Animations</span><span>›</span>
+          <span style={{color:'rgba(255,255,255,0.55)'}}>Physics</span>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-sm text-gray-600 dark:text-gray-400">Gravity: {gravity.toFixed(1)}</label>
-            <Slider
-              value={[gravity]}
-              onValueChange={(value) => setGravity(value[0])}
-              min={0}
-              max={20}
-              step={0.1}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm text-gray-600 dark:text-gray-400">Mass: {mass.toFixed(1)}</label>
-            <Slider
-              value={[mass]}
-              onValueChange={(value) => setMass(value[0])}
-              min={0.1}
-              max={5}
-              step={0.1}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm text-gray-600 dark:text-gray-400">Elasticity: {elasticity.toFixed(2)}</label>
-            <Slider
-              value={[elasticity]}
-              onValueChange={(value) => setElasticity(value[0])}
-              min={0}
-              max={1}
-              step={0.01}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm text-gray-600 dark:text-gray-400">Air Resistance: {airResistance.toFixed(3)}</label>
-            <Slider
-              value={[airResistance]}
-              onValueChange={(value) => setAirResistance(value[0])}
-              min={0}
-              max={0.1}
-              step={0.001}
-            />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="shape" className="text-sm text-gray-600 dark:text-gray-400">Shape</label>
-            <Select value={shape} onValueChange={setShape}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a shape" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="circle">Circle</SelectItem>
-                <SelectItem value="square">Square</SelectItem>
-                <SelectItem value="triangle">Triangle</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <div>
+          <h1 className="text-4xl font-extrabold tracking-tight mb-3" style={{color:'rgba(255,255,255,0.92)'}}>Physics Simulations</h1>
+          <p className="text-base max-w-2xl leading-relaxed" style={{color:'rgba(255,255,255,0.4)'}}>
+            Sixteen real-time physics engines running entirely in-browser — no WebGL library, no physics SDK.
+            Pure canvas + requestAnimationFrame with semi-implicit Euler, Verlet integration, Lagrangian mechanics, and cellular automata.
+          </p>
         </div>
-        <div className="flex justify-center space-x-4">
-          <Button onClick={jump}>
-            <ArrowDown className="mr-2 h-4 w-4 rotate-180" />
-            Jump
-          </Button>
-          <Button onClick={randomForce}>
-            <Wind className="mr-2 h-4 w-4" />
-            Random Force
-          </Button>
-          <Button onClick={reset}>
-            <RotateCcw className="mr-2 h-4 w-4" />
-            Reset
-          </Button>
+        <div className="flex flex-wrap gap-2">
+          {['canvas 2D','Verlet integration','Euler method','RK4','Lagrangian mechanics','Boids','Gray-Scott','cellular automata','N-body gravity','elastic collisions'].map(t=>(
+            <HeroTag key={t} label={t} />
+          ))}
         </div>
-      </CardContent>
-      <CardFooter className="flex justify-center">
-        <p className="text-sm text-gray-600 dark:text-gray-400 text-center max-w-lg">
-          Adjust gravity, mass, elasticity, and air resistance to see how they affect the object's motion. 
-          Drag the object to throw it, or use the buttons to apply forces.
-          The object is now confined within the white space.
-        </p>
-      </CardFooter>
-    </Card>
+        <div className="flex flex-wrap gap-6 pt-2">
+          {[{value:'16',label:'simulations'},{value:'4',label:'physics domains'},{value:'0',label:'physics libs used'},{value:'60',label:'fps target'}].map(s=>(
+            <div key={s.label}>
+              <div className="text-2xl font-black tabular-nums" style={{color:'rgba(255,255,255,0.85)'}}>{s.value}</div>
+              <div className="text-[10px] mt-0.5 uppercase tracking-widest" style={{color:'rgba(255,255,255,0.25)'}}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Sections */}
+      {SECTIONS.map((sec)=>(
+        <motion.section key={sec.id}
+          initial={{opacity:0,y:32}} whileInView={{opacity:1,y:0}}
+          viewport={{once:true,margin:'-80px'}} transition={{duration:0.5,delay:0.05,ease:'easeOut'}}>
+          <SectionHeader number={sec.number} title={sec.title} subtitle={sec.subtitle} accent={sec.accent} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {sec.demos.map((demo,di)=>(
+              <motion.div key={demo.title}
+                initial={{opacity:0,y:18}} whileInView={{opacity:1,y:0}}
+                viewport={{once:true,margin:'-40px'}} transition={{duration:0.4,delay:di*0.07,ease:'easeOut'}}>
+                <ShowcaseCard title={demo.title} description={demo.description} useCase={demo.useCase}>
+                  {demo.component}
+                </ShowcaseCard>
+              </motion.div>
+            ))}
+          </div>
+        </motion.section>
+      ))}
+    </div>
   );
 };
 
-export default PhysicsAnimations;
+export default Physics;

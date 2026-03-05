@@ -8,6 +8,7 @@ import {
   Home,
   Menu,
   MapIcon,
+  Layers,
 } from "lucide-react";
 import { CubeIcon } from "@radix-ui/react-icons";
 
@@ -61,6 +62,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
   };
 
   const menuItems = [
+    { name: "Home", path: "/", icon: Home },
+    { name: "Apps", path: "/apps", icon: Layers },
     { name: "Overview", path: "/overview", icon: Home },
     {
       name: "Components",
@@ -69,16 +72,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         { name: "Buttons", path: "/components/buttons" },
         { name: "Forms", path: "/components/forms" },
         { name: "Cards", path: "/components/cards" },
-        { name: "Notifications", path: "/components/notification"}
+        { name: "Notifications", path: "/components/notification" }
       ],
     },
-    { name: "Zones Management", path: "/zones", icon: MapIcon },
+    { name: "Zones", path: "/zones", icon: MapIcon },
     {
       name: "Animations",
       icon: CubeIcon,
       subItems: [
-        { name: "2D Animations", path: "/animations/2d" },
-        { name: "3D Animations", path: "/animations/3d" },
+        { name: "2D", path: "/animations/2d" },
+        { name: "3D", path: "/animations/3d" },
         { name: "Physics", path: "/animations/physics" },
         { name: "Tween", path: "/animations/tween" },
         { name: "Interactive", path: "/animations/interactive" },
@@ -95,6 +98,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
     },
     { name: "Sticky Notes", path: "/sticky-notes", icon: Menu },
     { name: "Model Redesign", path: "/model-redesign", icon: Menu },
+    {
+      name: "Games",
+      icon: Menu,
+      subItems: [
+        { name: "Index", path: "/games" },
+        { name: "Irregular", path: "/games/irregular" },
+        { name: "Abode", path: "/games/abode" },
+        { name: "Gold & Iron", path: "/games/gold-and-iron" },
+      ],
+    },
   ];
 
   return (
