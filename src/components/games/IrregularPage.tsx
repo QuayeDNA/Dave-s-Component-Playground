@@ -1,18 +1,64 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  GamePageShell,
-  Section,
-  InfoGrid,
-  MechanicItem,
-  ActBlock,
-  Callout,
-} from './GamePageShell';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 
 const ACCENT = '#7eb8e8';
 const A10 = `${ACCENT}1a`;
 const A20 = `${ACCENT}33`;
 const A05 = `${ACCENT}0d`;
+const VOID  = '#07101a';
+const CHAOS = '#f0a8c8';
+const TEXT  = '#f5f0e8';
+
+// ─── STYLES ────────────────────────────────────────────────
+const IRREGULAR_CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap');
+  .irr-grid-bg {
+    background-image:
+      linear-gradient(rgba(126,184,232,0.022) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(126,184,232,0.022) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  @keyframes irr-cursor  { 0%,100%{opacity:1} 50%{opacity:0} }
+  .irr-cursor::after { content:'_'; animation: irr-cursor 1.1s step-end infinite; }
+  @keyframes irr-flicker { 0%,100%{opacity:1} 88%{opacity:1} 90%{opacity:0.5} 92%{opacity:1} 95%{opacity:0.72} 97%{opacity:1} }
+  .irr-flicker { animation: irr-flicker 16s infinite; }
+  .irr-glow:hover { box-shadow: 0 0 22px ${ACCENT}16, 0 0 44px ${ACCENT}08; }
+  .irr-scroll-hide  { scrollbar-width: none; }
+  .irr-scroll-hide::-webkit-scrollbar { display: none; }
+`;
+
+// ─── SECTION REGISTRY ─────────────────────────────────────
+const SECTIONS = [
+  { id: 'overview',   label: 'OVERVIEW',   num: '01' },
+  { id: 'narrative',  label: 'NARRATIVE',  num: '02' },
+  { id: 'world-map',  label: 'WORLD MAP',  num: '03' },
+  { id: 'characters', label: 'CHARACTERS', num: '04' },
+  { id: 'timeline',   label: 'TIMELINE',   num: '05' },
+  { id: 'mechanics',  label: 'MECHANICS',  num: '06' },
+  { id: 'acts',       label: 'ACT STRUCT', num: '07' },
+  { id: 'art',        label: 'ART DIR',    num: '08' },
+  { id: 'audio',      label: 'AUDIO',      num: '09' },
+  { id: 'lore',       label: 'LORE',       num: '10' },
+];
+
+// ─── HOOKS ─────────────────────────────────────────────────
+const useSectionObserver = () => {
+  const [activeId, setActiveId] = useState('overview');
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter(e => e.isIntersecting);
+        if (visible.length > 0) setActiveId(visible[0].target.id);
+      },
+      { rootMargin: '-15% 0px -75% 0px', threshold: 0 }
+    );
+    SECTIONS.forEach(({ id }) => { const el = document.getElementById(id); if (el) observer.observe(el); });
+    return () => observer.disconnect();
+  }, []);
+  return activeId;
+};
 
 // ─────────────────────────────────────────────────────────────
 // 1. INTERACTIVE WORLD MAP
@@ -85,101 +131,126 @@ const ZONES = [
   },
 ];
 
-const ShapeIcon: React.FC<{ shape: string; color: string; size: number }> = ({ shape, color, size }) => {
-  const s = size * 0.55;
-  if (shape === 'circle') return <circle cx={size/2} cy={size/2} r={s/2} fill={color} fillOpacity={0.18} stroke={color} strokeWidth={1.5} />;
-  if (shape === 'triangle') {
-    const cx = size/2, cy = size/2;
-    return <polygon points={`${cx},${cy-s/2} ${cx+s/2},${cy+s/2} ${cx-s/2},${cy+s/2}`} fill={color} fillOpacity={0.18} stroke={color} strokeWidth={1.5} />;
+// ─── DECORATIVE SHAPE OUTLINE (atmospheric, not interactive) ─
+const GeomShape: React.FC<{ type: string; size: number; opacity?: number }> = ({ type, size, opacity = 0.07 }) => {
+  const r = size / 2;
+  if (type === 'hexagon') {
+    const outer = Array.from({length:6}, (_,i) => { const a=(Math.PI/3)*i-Math.PI/6; return `${r+r*0.9*Math.cos(a)},${r+r*0.9*Math.sin(a)}`; }).join(' ');
+    const inner = Array.from({length:6}, (_,i) => { const a=(Math.PI/3)*i-Math.PI/6; return `${r+r*0.6*Math.cos(a)},${r+r*0.6*Math.sin(a)}`; }).join(' ');
+    return (<svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{overflow:'visible'}}><polygon points={outer} fill="none" stroke={ACCENT} strokeWidth="1" opacity={opacity} /><polygon points={inner} fill="none" stroke={ACCENT} strokeWidth="0.5" opacity={opacity*0.5} strokeDasharray="2 3" /></svg>);
   }
-  if (shape === 'square') {
-    const off = (size - s) / 2;
-    return <rect x={off} y={off} width={s} height={s} fill={color} fillOpacity={0.18} stroke={color} strokeWidth={1.5} />;
+  if (type === 'triangle') {
+    return (<svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}><polygon points={`${r},${r*0.12} ${size-r*0.08},${size-r*0.12} ${r*0.08},${size-r*0.12}`} fill="none" stroke={ACCENT} strokeWidth="1" opacity={opacity} /></svg>);
   }
-  if (shape === 'hexagon') {
-    const cx = size/2, cy = size/2, r = s/2;
-    const pts = Array.from({length:6},(_,i)=>{const a=(Math.PI/3)*i-Math.PI/6;return`${cx+r*Math.cos(a)},${cy+r*Math.sin(a)}`;}).join(' ');
-    return <polygon points={pts} fill={color} fillOpacity={0.18} stroke={color} strokeWidth={1.5} />;
+  if (type === 'square') {
+    const p = size * 0.1;
+    return (<svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}><rect x={p} y={p} width={size-p*2} height={size-p*2} fill="none" stroke={ACCENT} strokeWidth="1" opacity={opacity} /></svg>);
   }
-  const cx = size/2, cy = size/2;
-  const pts = Array.from({length:8},(_,i)=>{const a=(Math.PI/4)*i,r=(s/2)*(0.6+0.4*Math.sin(i*2.3+1));return`${cx+r*Math.cos(a)},${cy+r*Math.sin(a)}`;}).join(' ');
-  return <polygon points={pts} fill={color} fillOpacity={0.18} stroke={color} strokeWidth={1.5} strokeDasharray="3 2" />;
+  return (<svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}><circle cx={r} cy={r} r={r*0.88} fill="none" stroke={ACCENT} strokeWidth="1" opacity={opacity} /></svg>);
 };
 
-const WorldMap: React.FC = () => {
-  const [selected, setSelected] = useState<string|null>(null);
-  const zone = ZONES.find(z=>z.id===selected);
-
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-5 gap-4" style={{minHeight:400}}>
-      <div className="lg:col-span-3 relative rounded-sm overflow-hidden" style={{background:'#07101a',border:`1px solid ${A20}`,minHeight:380}}>
-        <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
-          {Array.from({length:10}).map((_,i)=>(
-            <g key={i}>
-              <line x1={`${i*10}%`} y1="0%" x2={`${i*10}%`} y2="100%" stroke={ACCENT} strokeOpacity={0.04} strokeWidth={1}/>
-              <line x1="0%" y1={`${i*10}%`} x2="100%" y2={`${i*10}%`} stroke={ACCENT} strokeOpacity={0.04} strokeWidth={1}/>
-            </g>
-          ))}
-          {[[18+3.5,55+3.5,40+3.75,40+3.75],[62+3,18+3,40+3.75,40+3.75],[62+3.25,60+3.25,40+3.75,40+3.75],[20+2.9,20+2.9,40+3.75,40+3.75]].map(([x1,y1,x2,y2],i)=>(
-            <line key={i} x1={`${x1}%`} y1={`${y1}%`} x2={`${x2}%`} y2={`${y2}%`} stroke={ACCENT} strokeOpacity={0.1} strokeWidth={1} strokeDasharray="4 4"/>
-          ))}
-        </svg>
-        {ZONES.map(z=>(
-          <motion.button key={z.id} className="absolute flex flex-col items-center"
-            style={{left:`${z.x}%`,top:`${z.y}%`,transform:'translate(-50%,-50%)'}}
-            onClick={()=>setSelected(selected===z.id?null:z.id)}
-            whileHover={{scale:1.12}} whileTap={{scale:0.96}}>
-            <motion.svg width={z.size*0.7} height={z.size*0.7} viewBox={`0 0 ${z.size} ${z.size}`}
-              animate={{opacity:selected&&selected!==z.id?0.3:1}}>
-              <ShapeIcon shape={z.shape} color={z.color} size={z.size}/>
-            </motion.svg>
-            {selected===z.id&&(
-              <motion.div initial={{opacity:0,y:4}} animate={{opacity:1,y:0}}
-                className="absolute -bottom-6 whitespace-nowrap"
-                style={{fontFamily:'"Space Mono",monospace',fontSize:'0.48rem',letterSpacing:'0.2em',color:z.color}}>
-                {z.name.toUpperCase()}
-              </motion.div>
-            )}
-          </motion.button>
-        ))}
-        <div className="absolute bottom-3 left-3" style={{fontFamily:'"Space Mono",monospace',fontSize:'0.48rem',letterSpacing:'0.2em',color:ACCENT,opacity:0.35}}>
-          GEOMETRIA · WORLD MAP
-        </div>
+// ─── SECTION WRAPPER ──────────────────────────────────────
+const IrrSection: React.FC<{ id: string; num: string; label: string; children: React.ReactNode }> = ({ id, num, label, children }) => (
+  <section id={id} className="mb-28 scroll-mt-16">
+    <motion.div
+      initial={{ opacity: 0, y: 28 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <div className="flex items-center gap-3 mb-10">
+        <span style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.52rem', color: ACCENT, opacity: 0.28, letterSpacing: '0.15em' }}>{num}</span>
+        <span style={{ color: ACCENT, opacity: 0.2, fontFamily: '"Space Mono", monospace', fontSize: '0.6rem' }}>//──</span>
+        <span style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.58rem', color: ACCENT, opacity: 0.52, letterSpacing: '0.3em', textTransform: 'uppercase' }}>{label}</span>
+        <div className="flex-1 h-[1px]" style={{ background: `${ACCENT}0e` }} />
+        <div className="w-1.5 h-1.5 rotate-45 flex-shrink-0" style={{ background: ACCENT, opacity: 0.22 }} />
       </div>
+      {children}
+    </motion.div>
+  </section>
+);
 
-      <div className="lg:col-span-2">
-        <AnimatePresence mode="wait">
-          {zone ? (
-            <motion.div key={zone.id} initial={{opacity:0,x:16}} animate={{opacity:1,x:0}} exit={{opacity:0,x:-16}} transition={{duration:0.3}}
-              className="h-full p-5 flex flex-col gap-4" style={{background:`${zone.color}08`,border:`1px solid ${zone.color}30`,minHeight:380}}>
-              <div>
-                <div className="text-xs tracking-[0.25em] uppercase mb-1" style={{fontFamily:'"Space Mono",monospace',color:zone.color,opacity:0.6}}>Act {zone.act} Zone</div>
-                <h3 className="leading-none mb-1" style={{fontFamily:'"Bebas Neue",sans-serif',fontSize:'2rem',color:zone.color,letterSpacing:'0.04em'}}>{zone.name}</h3>
-                <div className="text-xs mb-3" style={{fontFamily:'"Space Mono",monospace',color:'#f5f0e8',opacity:0.35}}>{zone.status} · {zone.ruler}</div>
-                <p className="text-sm leading-relaxed" style={{fontFamily:'"Crimson Pro",Georgia,serif',color:'#f5f0e8',opacity:0.78}}>{zone.description}</p>
-              </div>
-              <div className="space-y-3 mt-auto">
-                {[{label:'Form Unlocked',val:zone.unlock},{label:'Enemy Types',val:zone.enemies}].map(item=>(
-                  <div key={item.label} style={{borderTop:`1px solid ${zone.color}22`,paddingTop:'0.75rem'}}>
-                    <div className="text-xs tracking-[0.2em] uppercase mb-1" style={{fontFamily:'"Space Mono",monospace',color:zone.color,opacity:0.5}}>{item.label}</div>
-                    <div className="text-sm" style={{fontFamily:'"Crimson Pro",serif',color:'#f5f0e8',opacity:0.8}}>{item.val}</div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div key="empty" initial={{opacity:0}} animate={{opacity:1}}
-              className="h-full flex items-center justify-center p-6" style={{border:`1px solid ${A20}`,minHeight:380}}>
-              <p className="text-center" style={{fontFamily:'"Crimson Pro",serif',color:'#f5f0e8',opacity:0.3,fontSize:'0.95rem'}}>
-                Select a zone on the map<br/>to explore its details
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+// ─── STICKY SIDE NAV ──────────────────────────────────────
+const StickyNav: React.FC<{ activeId: string }> = ({ activeId }) => (
+  <nav className="fixed left-4 top-1/2 -translate-y-1/2 z-50 hidden xl:flex flex-col gap-3.5">
+    {SECTIONS.map(s => {
+      const active = activeId === s.id;
+      return (
+        <motion.button
+          key={s.id}
+          onClick={() => document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+          className="flex items-center gap-2"
+          whileHover={{ x: 2 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+        >
+          <motion.div
+            animate={{ width: active ? 20 : 8, opacity: active ? 1 : 0.22 }}
+            transition={{ duration: 0.3 }}
+            style={{ height: 1, background: ACCENT, flexShrink: 0 }}
+          />
+          <motion.span
+            animate={{ opacity: active ? 0.82 : 0.22 }}
+            transition={{ duration: 0.3 }}
+            style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.46rem', color: ACCENT, letterSpacing: '0.2em', whiteSpace: 'nowrap' }}
+          >
+            {active ? s.label : s.num}
+          </motion.span>
+        </motion.button>
+      );
+    })}
+  </nav>
+);
+
+// ─── TODO PLACEHOLDER ─────────────────────────────────────
+const TodoPlaceholder: React.FC<{ title: string; description: string; module: string; notes?: string[] }> = ({ title, description, module, notes = [] }) => (
+  <div
+    className="relative min-h-[260px] sm:min-h-[300px] flex flex-col items-center justify-center text-center p-6 sm:p-10"
+    style={{ background: A05, border: `1px dashed ${ACCENT}22` }}
+  >
+    <div
+      className="absolute top-0 left-0 right-0 flex items-center gap-2 px-4 py-2.5"
+      style={{ borderBottom: `1px solid ${ACCENT}10`, background: `${ACCENT}04` }}
+    >
+      <div className="w-2 h-2 rounded-full" style={{ background: '#f0b8a8', opacity: 0.5 }} />
+      <div className="w-2 h-2 rounded-full" style={{ background: '#f0e898', opacity: 0.5 }} />
+      <div className="w-2 h-2 rounded-full" style={{ background: '#a8e8c8', opacity: 0.5 }} />
+      <span className="ml-2" style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.5rem', color: ACCENT, opacity: 0.32, letterSpacing: '0.15em' }}>{module}</span>
     </div>
-  );
-};
+    <motion.div
+      className="mb-4 mt-6"
+      animate={{ rotate: 360 }}
+      transition={{ duration: 80, repeat: Infinity, ease: 'linear' }}
+    >
+      <svg width="62" height="62" viewBox="0 0 62 62" style={{ opacity: 0.11 }}>
+        <polygon points="31,4 57,17.5 57,44.5 31,58 5,44.5 5,17.5" fill="none" stroke={ACCENT} strokeWidth="1.5" strokeDasharray="4 3" />
+        <polygon points="31,13 49,23 49,39 31,49 13,39 13,23" fill="none" stroke={ACCENT} strokeWidth="0.75" />
+        <circle cx="31" cy="31" r="7" fill="none" stroke={ACCENT} strokeWidth="0.75" />
+      </svg>
+    </motion.div>
+    <div className="mb-1" style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.52rem', color: ACCENT, opacity: 0.38, letterSpacing: '0.3em' }}>STATUS: PENDING</div>
+    <h3 className="mb-2" style={{ fontFamily: '"Bebas Neue", sans-serif', fontSize: 'clamp(1.2rem,3.5vw,1.65rem)', color: ACCENT, letterSpacing: '0.06em' }}>{title}</h3>
+    <p className="max-w-sm" style={{ fontFamily: '"Crimson Pro", Georgia, serif', color: TEXT, opacity: 0.4, fontSize: '0.95rem', lineHeight: 1.74 }}>{description}</p>
+    {notes.length > 0 && (
+      <div className="text-left w-full max-w-sm mt-5 space-y-1.5">
+        {notes.map((note, i) => (
+          <div key={i} className="flex gap-2 items-start">
+            <span style={{ color: ACCENT, fontFamily: '"Space Mono", monospace', fontSize: '0.48rem', opacity: 0.28, flexShrink: 0, paddingTop: '0.28rem' }}>// </span>
+            <span style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.5rem', color: TEXT, opacity: 0.26, letterSpacing: '0.04em', lineHeight: 1.8 }}>{note}</span>
+          </div>
+        ))}
+      </div>
+    )}
+    <div
+      className="absolute bottom-3.5 right-4 flex items-center gap-1.5 px-2.5 py-1"
+      style={{ background: `${CHAOS}12`, border: `1px solid ${CHAOS}28` }}
+    >
+      <div className="w-1.5 h-1.5 rounded-full" style={{ background: CHAOS }} />
+      <span style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.48rem', color: CHAOS, letterSpacing: '0.2em' }}>TODO</span>
+    </div>
+  </div>
+);
+
+
 
 // ─────────────────────────────────────────────────────────────
 // 2. CHARACTER ROSTER VIEWER
@@ -417,18 +488,19 @@ const ArtDirection: React.FC = () => {
       </div>
 
       <div>
-        <div className="text-xs tracking-[0.25em] uppercase mb-4 opacity-50" style={{fontFamily:'"Space Mono",monospace',color:ACCENT}}>Shape Language System</div>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-          {ZONES.map(z=>(
-            <div key={z.id} className="flex flex-col items-center p-4 gap-3" style={{background:`${z.color}08`,border:`1px solid ${z.color}20`}}>
-              <svg width={52} height={52} viewBox={`0 0 ${z.size} ${z.size}`}><ShapeIcon shape={z.shape} color={z.color} size={z.size}/></svg>
-              <div className="text-center">
-                <div className="text-xs font-mono" style={{color:z.color,opacity:0.8}}>{z.shape.toUpperCase()}</div>
-                <div className="text-xs mt-0.5 opacity-35" style={{fontFamily:'"Crimson Pro",serif',color:'#f5f0e8'}}>{z.ruler.split(' The ')[1]||z.ruler}</div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <div className="text-xs tracking-[0.25em] uppercase mb-4 opacity-42" style={{fontFamily:'"Space Mono",monospace',color:ACCENT}}>// Shape Language System</div>
+        <TodoPlaceholder
+          title="GEOMETRIA — SHAPE LANGUAGE"
+          description="Zone shape icons and the visual grammar of each shape-civilization pending finalization of Geometria's design language."
+          module="shape-language.sys"
+          notes={[
+            'Circle  →  flowing / safe / diplomatic',
+            'Triangle →  aggressive / directional / proud',
+            'Square   →  methodical / immovable / precise',
+            'Hexagon  →  archive / memory / protagonist',
+            'Irregular →  chaos / trauma / distortion',
+          ]}
+        />
       </div>
 
       <div>
@@ -600,82 +672,355 @@ const LorePanel: React.FC = () => {
 // MAIN PAGE
 // ─────────────────────────────────────────────────────────────
 const IrregularPage: React.FC = () => {
+  const navigate   = useNavigate();
+  const activeId   = useSectionObserver();
+  const heroRef    = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
+  const bgNumY     = useTransform(scrollYProgress, [0, 1], [0, 90]);
+  const heroFade   = useTransform(scrollYProgress, [0, 0.65], [1, 0]);
+
   return (
-    <GamePageShell
-      gameNumber="01"
-      title="Irregular"
-      subtitle="A world of perfect shapes. An invasion of chaos. One family torn apart."
-      hook="In a world built from clean geometry, the Irregulars arrived without warning — warping matter, corrupting order, and tearing families apart. Now one shape will transform into anything to get theirs back."
-      genre="Metroidvania · Puzzle · Exploration"
-      accentColor={ACCENT}
-      bgFrom="#0a0f18"
-      bgTo="#081525"
-    >
-      <Section label="Overview" accentColor={ACCENT}>
-        <InfoGrid accentColor={ACCENT} items={[
-          {label:'Genre',value:'Metroidvania / Action Platformer with puzzle-gating and environmental storytelling'},
-          {label:'Core Tone',value:'Melancholic but determined. Visually playful geometry hiding a surprisingly emotional story.'},
-          {label:'Primary Inspiration',value:'Metroid Prime (morph mechanics, atmospheric isolation), Hollow Knight (world-building through environment)'},
-          {label:'Visual Style',value:'Clean geometric shapes with glowing edges. Corrupted Irregular zones use jagged, fractured aesthetics — organic vs. pure.'},
-        ]}/>
-      </Section>
+    <div className="min-h-screen" style={{ background: VOID, color: TEXT }}>
+      <style>{IRREGULAR_CSS}</style>
 
-      <Section label="Story / Narrative" accentColor={ACCENT}>
-        <div className="space-y-5 leading-relaxed opacity-80" style={{fontFamily:'"Crimson Pro",Georgia,serif',color:'#f5f0e8',fontSize:'1.1rem'}}>
-          <p><strong style={{color:ACCENT,opacity:1}}>Geometria</strong> is a structured civilization of Shapes — Circles, Triangles, Squares, Hexagons — each with defined social roles tied to their geometry. Circles are diplomats, Triangles are warriors, Squares are builders, Hexagons are scholars. A beautiful, almost abstract utopia built on mathematical harmony.</p>
-          <p>The <strong style={{color:ACCENT,opacity:1}}>Irregulars</strong> are not evil by nature — they are unstable, undefined shapes that don't conform to geometric law. Outcast for centuries, a faction has weaponized their chaos, invading Geometria to "liberate" it from order. They are terrifying because they are <em>unpredictable</em> — their bodies shift, their attacks have no pattern.</p>
-          <p>During the invasion, the protagonist's family is taken in a raid. Not a soldier, not royalty — a cartographer with one unusual gift: the ability to become something else.</p>
+      {/* Persistent grid overlay */}
+      <div className="irr-grid-bg fixed inset-0 pointer-events-none z-0" />
+
+      {/* Sticky sidebar nav */}
+      <StickyNav activeId={activeId} />
+
+      {/* ─── HERO ──────────────────────────────────────────── */}
+      <div ref={heroRef} className="relative min-h-screen flex flex-col overflow-hidden">
+
+        {/* Floating atmospheric shapes */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {[
+            { type: 'hexagon',  size: 200, x: 4,  y: 8,  dur: 22, delay: 0,  r: 12  },
+            { type: 'triangle', size: 80,  x: 80, y: 18, dur: 28, delay: 3,  r: -18 },
+            { type: 'circle',   size: 120, x: 68, y: 60, dur: 20, delay: 6,  r: 0   },
+            { type: 'square',   size: 58,  x: 10, y: 68, dur: 32, delay: 9,  r: 32  },
+            { type: 'hexagon',  size: 52,  x: 46, y: 12, dur: 36, delay: 13, r: -8  },
+            { type: 'triangle', size: 40,  x: 88, y: 76, dur: 17, delay: 5,  r: 50  },
+            { type: 'circle',   size: 34,  x: 28, y: 84, dur: 25, delay: 8,  r: 0   },
+            { type: 'square',   size: 28,  x: 58, y: 88, dur: 29, delay: 16, r: 18  },
+          ].map((s, i) => (
+            <motion.div
+              key={i}
+              className="absolute"
+              style={{ left: `${s.x}%`, top: `${s.y}%` }}
+              animate={{ y: [0, -17, 0], rotate: [s.r, s.r + 7, s.r] }}
+              transition={{ duration: s.dur, delay: s.delay, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <GeomShape type={s.type} size={s.size} />
+            </motion.div>
+          ))}
         </div>
-        <Callout label="Thematic Core" accentColor={ACCENT} text="Identity is not fixed. The hero's power is literally the ability to become something else — and the question the game asks is: after shapeshifting through an entire world, do you know who you are anymore?"/>
-      </Section>
 
-      <Section label="Interactive World Map" accentColor={ACCENT}>
-        <p className="mb-5 text-sm opacity-45" style={{fontFamily:'"Space Mono",monospace',color:'#f5f0e8',letterSpacing:'0.1em'}}>Click a zone to explore →</p>
-        <WorldMap/>
-      </Section>
+        {/* Giant bg watermark with parallax */}
+        <motion.div
+          className="absolute pointer-events-none select-none"
+          style={{
+            fontFamily: '"Bebas Neue", sans-serif',
+            fontSize: 'clamp(14rem, 42vw, 36rem)',
+            color: `${ACCENT}04`,
+            right: '-0.05em',
+            top: '-0.05em',
+            lineHeight: 0.85,
+            y: bgNumY,
+          }}
+        >
+          01
+        </motion.div>
 
-      <Section label="Characters & Roster" accentColor={ACCENT}>
-        <CharacterRoster/>
-      </Section>
+        {/* Back button */}
+        <div className="relative z-10 px-5 sm:px-8 md:px-12 pt-6 sm:pt-8">
+          <motion.button
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4 }}
+            onClick={() => navigate('/games')}
+            className="flex items-center gap-2"
+            style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.56rem', letterSpacing: '0.25em', color: TEXT, opacity: 0.28 }}
+          >
+            <ArrowLeft size={10} />
+            BACK TO ALL GAMES
+          </motion.button>
+        </div>
 
-      <Section label="Story Timeline" accentColor={ACCENT}>
-        <p className="mb-4 text-sm opacity-45" style={{fontFamily:'"Space Mono",monospace',color:'#f5f0e8',letterSpacing:'0.1em'}}>Filter by act · Click a beat to expand →</p>
-        <StoryTimeline/>
-      </Section>
+        {/* Hero content */}
+        <motion.div
+          className="relative z-10 flex-1 flex flex-col justify-center px-5 sm:px-8 md:px-12 max-w-5xl py-10"
+          style={{ opacity: heroFade }}
+        >
+          {/* Genre tag */}
+          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.12 }} className="mb-5">
+            <span
+              className="inline-block text-[10px] sm:text-xs px-3 py-1 tracking-[0.3em] uppercase"
+              style={{ fontFamily: '"Space Mono", monospace', color: ACCENT, border: `1px solid ${ACCENT}35` }}
+            >
+              Metroidvania · Puzzle · Exploration
+            </span>
+          </motion.div>
 
-      <Section label="Core Mechanics" accentColor={ACCENT}>
-        {[
-          {title:'Form Shifting',description:'Hexa morphs between unlocked shapes. Circle = fast roll + tight tunnel access (Morph Ball equivalent). Triangle = dash-attack + wall piercing. Square = anchor + weight puzzles. Hexagon (base) = versatile, can talk to NPCs and interact with terminals.'},
-          {title:'Irregular Corruption Zones',description:"Some areas are corrupted — geometry breaks down and the rules change unpredictably. Hexa must learn Irregular patterns to navigate without succumbing to shapelessness. These zones have unique visual and audio design: jagged edges, distorted sound, unstable platforms."},
-          {title:'Shape Empathy System',description:"Defeated Irregular bosses don't die — Hexa absorbs their irregular geometry to unlock temporary chaos-forms that break normal puzzle rules. Late-game mechanic that adds moral complexity: using the enemy's own nature."},
-          {title:'Open World Zones',description:'Each region corresponds to a Shape civilization: Circle Plains (rolling loops), Triangle Peaks (vertical spike zones), Square Citadel (mechanical grid puzzles), Hexagon Archive (lore-heavy, terminal-driven). Gating is ability-based, not linear.'},
-          {title:'Family Trail System',description:"Hexa tracks their family through scattered notes, corrupted memories, and NPC testimony — assembling fragments into a hand-drawn map. Rewards exploration over waypoint-following."},
-        ].map((m,i)=><MechanicItem key={m.title} title={m.title} description={m.description} accentColor={ACCENT} index={i}/>)}
-      </Section>
+          {/* Title */}
+          <motion.h1
+            className="irr-flicker leading-none mb-3"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.85, delay: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              fontFamily: '"Bebas Neue", sans-serif',
+              fontSize: 'clamp(5.5rem, 20vw, 15rem)',
+              color: ACCENT,
+              letterSpacing: '0.02em',
+            }}
+          >
+            IRREGULAR
+          </motion.h1>
 
-      <Section label="Act Structure" accentColor={ACCENT}>
-        <ActBlock accentColor={ACCENT} number="I" title="The Raid" description="Opening sequence: the invasion. Hexa escapes but loses their family. The world is in chaos. Hexa begins navigating Circle Plains to reach the Circle Council and seek help. Tutorial disguised as desperation."/>
-        <ActBlock accentColor={ACCENT} number="II" title="The Alliance" description="Hexa earns the trust of each shape civilization. Each ruler unlocks a new form. The truth emerges: the Irregular leader was once a shape who was outcast and mutated. The family is found one by one in sub-zones."/>
-        <ActBlock accentColor={ACCENT} number="III" title="The Core" description="The Irregular stronghold — geometry fully collapsed. Hexa must use all forms fluidly. Final boss: the Irregular leader. Hexa's choice — destroy or absorb — and what that means for Geometria's future. Both endings are valid. Neither is simple."/>
-      </Section>
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.4 }}
+            transition={{ duration: 0.6, delay: 0.42 }}
+            className="mb-8 italic"
+            style={{ fontFamily: '"Crimson Pro", Georgia, serif', color: TEXT, fontSize: 'clamp(0.85rem, 2vw, 1rem)' }}
+          >
+            A world of perfect shapes. An invasion of chaos. One family torn apart.
+          </motion.p>
 
-      <Section label="Art Direction" accentColor={ACCENT}>
-        <ArtDirection/>
-      </Section>
+          {/* Hook quote */}
+          <motion.div
+            initial={{ opacity: 0, x: -16 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.65, delay: 0.58 }}
+            className="max-w-2xl mb-10 pl-5"
+            style={{ borderLeft: `2px solid ${ACCENT}45` }}
+          >
+            <p
+              className="italic leading-relaxed"
+              style={{ fontFamily: '"Crimson Pro", Georgia, serif', color: TEXT, opacity: 0.78, fontSize: 'clamp(1rem, 2.5vw, 1.2rem)' }}
+            >
+              In a world built from clean geometry, the Irregulars arrived without warning.
+              One shape will transform into anything to find their family.
+            </p>
+          </motion.div>
 
-      <Section label="Audio & Music Direction" accentColor={ACCENT}>
-        <AudioDirection/>
-      </Section>
+          {/* Metadata bar */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.78 }}
+            className="flex flex-wrap border-t border-b"
+            style={{ borderColor: `${ACCENT}0e` }}
+          >
+            {[
+              { label: 'STATUS',   value: 'DESIGN PHASE' },
+              { label: 'ACTS',     value: '3' },
+              { label: 'ENGINE',   value: 'TBD' },
+              { label: 'PLATFORM', value: 'PC / CONSOLE' },
+            ].map((item, i) => (
+              <div
+                key={item.label}
+                className="px-4 sm:px-6 py-3 flex flex-col gap-0.5"
+                style={{ borderRight: i < 3 ? `1px solid ${ACCENT}08` : 'none' }}
+              >
+                <div style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.48rem', color: ACCENT, opacity: 0.32, letterSpacing: '0.2em' }}>{item.label}</div>
+                <div style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.6rem', color: ACCENT, opacity: 0.82, letterSpacing: '0.1em' }}>{item.value}</div>
+              </div>
+            ))}
+          </motion.div>
+        </motion.div>
 
-      <Section label="Lore & Research" accentColor={ACCENT}>
-        <p className="mb-5 text-sm opacity-45" style={{fontFamily:'"Space Mono",monospace',color:'#f5f0e8',letterSpacing:'0.1em'}}>Locked entries revealed through gameplay →</p>
-        <LorePanel/>
-      </Section>
+        {/* Scroll indicator */}
+        <motion.div
+          className="relative z-10 flex justify-center pb-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.3, duration: 0.6 }}
+        >
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ color: ACCENT, opacity: 0.18 }}
+          >
+            <svg width="14" height="22" viewBox="0 0 14 22">
+              <rect x="4" y="1.5" width="6" height="10" rx="3" fill="none" stroke="currentColor" strokeWidth="1.5" />
+              <circle cx="7" cy="6.5" r="1.5" fill="currentColor" />
+              <line x1="7" y1="14.5" x2="7" y2="19.5" stroke="currentColor" strokeWidth="1.5" />
+              <polyline points="4.5,17.5 7,20.5 9.5,17.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </motion.div>
+        </motion.div>
+      </div>
 
-      {/* TODO: Boss design breakdowns — each boss reflects its zone's geometry rules */}
-      {/* TODO: Upgrade tree diagram — Hexa's base form growth across the journey */}
-      {/* TODO: Release strategy — episodic vs. full release */}
-    </GamePageShell>
+      {/* ─── CONTENT SECTIONS ──────────────────────────────── */}
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-24">
+
+        <IrrSection id="overview" num="01" label="OVERVIEW">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {[
+              { label: 'Genre',              value: 'Metroidvania / Action Platformer with puzzle-gating and environmental storytelling' },
+              { label: 'Core Tone',          value: 'Melancholic but determined. Visually playful geometry hiding a surprisingly emotional story.' },
+              { label: 'Primary Inspiration',value: 'Metroid Prime (morph mechanics, atmospheric isolation), Hollow Knight (world-building through environment)' },
+              { label: 'Visual Style',       value: 'Clean geometric shapes with glowing edges. Corrupted zones use jagged fractured aesthetics — mathematical beauty against organic chaos.' },
+            ].map((item, i) => (
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.07, duration: 0.5 }}
+                className="p-4 sm:p-5 irr-glow transition-all duration-300"
+                style={{ background: A05, border: `1px solid ${ACCENT}14` }}
+              >
+                <div className="text-xs tracking-[0.25em] uppercase mb-2 opacity-38" style={{ fontFamily: '"Space Mono", monospace', color: ACCENT }}>{item.label}</div>
+                <div className="leading-relaxed" style={{ fontFamily: '"Crimson Pro", Georgia, serif', color: TEXT, opacity: 0.82, fontSize: '1rem' }}>{item.value}</div>
+              </motion.div>
+            ))}
+          </div>
+        </IrrSection>
+
+        <IrrSection id="narrative" num="02" label="NARRATIVE">
+          <div className="space-y-5 mb-8">
+            {[
+              { key: 'Geometria',       tail: ' is a structured civilization of Shapes — each assigned social roles tied to their geometry. Circles are diplomats, Triangles are warriors, Squares are builders, Hexagons are scholars. A beautiful, nearly abstract utopia built on mathematical harmony.' },
+              { key: 'The Irregulars',  tail: " are not evil by nature — they are unstable, undefined shapes that don't conform to geometric law. Outcast for centuries, a faction has weaponized their chaos. They are terrifying because they are unpredictable — their bodies shift, their attacks have no pattern." },
+              { key: 'The protagonist', tail: " — a cartographer, not a soldier — has one unusual gift: the ability to become something else. When the invasion takes their family, this gift is all they have." },
+            ].map((p, i) => (
+              <motion.p
+                key={p.key}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.6 }}
+                style={{ fontFamily: '"Crimson Pro", Georgia, serif', color: TEXT, opacity: 0.8, fontSize: '1.1rem', lineHeight: 1.88 }}
+              >
+                <strong style={{ color: ACCENT, opacity: 1, fontStyle: 'normal' }}>{p.key}</strong>{p.tail}
+              </motion.p>
+            ))}
+          </div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="p-5 sm:p-6"
+            style={{ borderTop: `2px solid ${ACCENT}`, background: `${ACCENT}06` }}
+          >
+            <span style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.6rem', color: ACCENT, letterSpacing: '0.22em', textTransform: 'uppercase' }}>Thematic Core: </span>
+            <span className="italic" style={{ fontFamily: '"Crimson Pro", Georgia, serif', color: TEXT, opacity: 0.85, fontSize: '1.05rem' }}>
+              Identity is not fixed. The hero&apos;s power is literally the ability to become something else — and the question the game asks is: after shapeshifting through an entire world, do you know who you are anymore?
+            </span>
+          </motion.div>
+        </IrrSection>
+
+        <IrrSection id="world-map" num="03" label="WORLD MAP">
+          <TodoPlaceholder
+            title="GEOMETRIA — INTERACTIVE ZONE MAP"
+            description="Zone map, traversal boundaries, and inter-zone navigational infrastructure pending the cartography design phase."
+            module="world.cartography"
+            notes={ZONES.map(z => `Act ${z.act}  ·  ${z.name}  —  ${z.status}`)}
+          />
+        </IrrSection>
+
+        <IrrSection id="characters" num="04" label="CHARACTERS">
+          <CharacterRoster />
+        </IrrSection>
+
+        <IrrSection id="timeline" num="05" label="STORY TIMELINE">
+          <p className="mb-5 opacity-28" style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.58rem', color: TEXT, letterSpacing: '0.12em' }}>
+            // Filter by act · Click a beat to expand
+          </p>
+          <StoryTimeline />
+        </IrrSection>
+
+        <IrrSection id="mechanics" num="06" label="CORE MECHANICS">
+          {[
+            { title: 'Form Shifting',            description: 'Hexa morphs between unlocked shapes. Circle = fast roll + tight tunnel access (Morph Ball equivalent). Triangle = dash-attack + wall piercing. Square = anchor + weight puzzles. Hexagon (base) = versatile NPC interaction + terminal access.' },
+            { title: 'Irregular Corruption Zones',description: "Some areas have corrupted geometry — the rules break down unpredictably. Hexa must learn Irregular patterns to navigate without succumbing to shapelessness. Unique visual and audio design: jagged edges, distorted sound, unstable platforms." },
+            { title: 'Shape Empathy System',      description: "Defeated Irregular bosses don't die — Hexa absorbs their irregular geometry to unlock temporary chaos-forms that break normal puzzle rules. A late-game mechanic with moral weight: using the enemy's own nature against them." },
+            { title: 'Open World Zones',          description: 'Each region corresponds to a Shape civilization. Gating is ability-based, not linear. The world opens progressively through form unlocks, not locked doors.' },
+            { title: 'Family Trail System',       description: 'Hexa tracks their family through scattered notes, corrupted memories, and NPC testimony — assembling fragments into a hand-drawn map. Rewards exploration over waypoint-following.' },
+          ].map((m, i) => (
+            <motion.div
+              key={m.title}
+              initial={{ opacity: 0, x: -14 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.08, duration: 0.5 }}
+              className="flex gap-4 sm:gap-5 py-5 group"
+              style={{ borderBottom: `1px solid ${ACCENT}09` }}
+            >
+              <div style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.52rem', color: ACCENT, opacity: 0.25, flexShrink: 0, paddingTop: '0.38rem', minWidth: 26, textAlign: 'right' }}>
+                {String(i + 1).padStart(2, '0')}
+              </div>
+              <div>
+                <div className="mb-1" style={{ fontFamily: '"Crimson Pro", Georgia, serif', color: ACCENT, fontSize: '1.05rem', fontWeight: 600 }}>{m.title}</div>
+                <p style={{ fontFamily: '"Crimson Pro", Georgia, serif', color: TEXT, opacity: 0.7, fontSize: '1rem', lineHeight: 1.82 }}>{m.description}</p>
+              </div>
+            </motion.div>
+          ))}
+        </IrrSection>
+
+        <IrrSection id="acts" num="07" label="ACT STRUCTURE">
+          {[
+            { num: 'I',   title: 'THE RAID',     col: '#a8d8f0', description: 'Opening sequence: the invasion. Hexa escapes but loses their family. The world is in chaos. Hexa begins navigating Circle Plains to reach the Circle Council and seek help. Tutorial disguised as desperation.' },
+            { num: 'II',  title: 'THE ALLIANCE', col: ACCENT,    description: 'Hexa earns the trust of each shape civilization. Each ruler unlocks a new form. The truth emerges: the Irregular leader was once a shape who was outcast and mutated. The family is found one by one in sub-zones.' },
+            { num: 'III', title: 'THE CORE',     col: CHAOS,     description: "The Irregular stronghold — geometry fully collapsed. Hexa must use all forms fluidly. Final boss: the Irregular leader. The choice — destroy or absorb — and what that means for Geometria's future. Both endings are valid. Neither is simple." },
+          ].map(act => (
+            <motion.div
+              key={act.num}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="grid gap-4 mb-5"
+              style={{ gridTemplateColumns: '48px 1fr' }}
+            >
+              <div
+                className="text-right leading-none font-black"
+                style={{ fontFamily: '"Bebas Neue", sans-serif', fontSize: '3.2rem', color: act.col, lineHeight: 0.85, opacity: 0.11 }}
+              >
+                {act.num}
+              </div>
+              <div className="pt-0.5 pb-6" style={{ borderBottom: `1px solid ${act.col}12` }}>
+                <h4 className="mb-2 tracking-wider" style={{ fontFamily: '"Bebas Neue", sans-serif', fontSize: '1.2rem', color: TEXT, letterSpacing: '0.1em' }}>{act.title}</h4>
+                <div className="w-8 h-[1px] mb-3" style={{ background: act.col, opacity: 0.4 }} />
+                <p style={{ fontFamily: '"Crimson Pro", Georgia, serif', color: TEXT, opacity: 0.7, fontSize: '1rem', lineHeight: 1.82 }}>{act.description}</p>
+              </div>
+            </motion.div>
+          ))}
+        </IrrSection>
+
+        <IrrSection id="art" num="08" label="ART DIRECTION">
+          <ArtDirection />
+        </IrrSection>
+
+        <IrrSection id="audio" num="09" label="AUDIO & MUSIC">
+          <AudioDirection />
+        </IrrSection>
+
+        <IrrSection id="lore" num="10" label="LORE & RESEARCH">
+          <p className="mb-5 opacity-28" style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.58rem', color: TEXT, letterSpacing: '0.12em' }}>
+            // Locked entries revealed through gameplay
+          </p>
+          <LorePanel />
+        </IrrSection>
+
+        {/* TODO: Boss design breakdowns — each boss reflects its zone's geometry rules */}
+        {/* TODO: Upgrade tree diagram — Hexa's base form growth across the journey */}
+        {/* TODO: Release strategy — episodic vs. full release */}
+      </div>
+
+      {/* Footer */}
+      <div
+        className="relative z-10 text-center pb-10"
+        style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.5rem', letterSpacing: '0.3em', color: TEXT, opacity: 0.16 }}
+      >
+        DESIGN BIBLE · DRAFT 1 · IRREGULAR
+      </div>
+    </div>
   );
 };
 
