@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
@@ -35,15 +35,157 @@ const CSS = `
   /* Scratch marks on bars to look hand-filled */
   .abar-fill::after{content:'';position:absolute;inset:0;
     background:repeating-linear-gradient(90deg,transparent,transparent 6px,rgba(0,0,0,.25) 6px,rgba(0,0,0,.25) 7px);}
+  .ascan::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:98;
+    background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.045) 3px,rgba(0,0,0,0.045) 4px);}
 `;
+
+// ── SECTION REGISTRY ──────────────────────────────────────────
+
+const SECTIONS = [
+  { id: 'overview',    label: 'OVERVIEW' },
+  { id: 'situation',   label: 'SITUATION' },
+  { id: 'personnel',   label: 'PERSONNEL' },
+  { id: 'systems',     label: 'SYSTEMS' },
+  { id: 'incidents',   label: 'INCIDENTS' },
+  { id: 'opmap',       label: 'OP MAP' },
+  { id: 'comparison',  label: 'COMPARISON' },
+  { id: 'timeline',    label: 'TIMELINE' },
+  { id: 'art',         label: 'ART BRIEF' },
+  { id: 'audio',       label: 'AUDIO' },
+  { id: 'research',    label: 'RESEARCH' },
+];
+
+// ── HOOKS ─────────────────────────────────────────────────────
+
+function useSectionObserver() {
+  const [activeId, setActiveId] = useState<string>('');
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(e => { if (e.isIntersecting) setActiveId(e.target.id); });
+      },
+      { rootMargin: '-15% 0px -75% 0px' }
+    );
+    SECTIONS.forEach(s => {
+      const el = document.getElementById(s.id);
+      if (el) obs.observe(el);
+    });
+    return () => obs.disconnect();
+  }, []);
+  return activeId;
+}
+
+// ── STICKY NAV ────────────────────────────────────────────────
+
+const StickyNav: React.FC<{ activeId: string }> = ({ activeId }) => (
+  <nav className="fixed left-0 top-1/2 -translate-y-1/2 z-40 hidden xl:flex flex-col" style={{ gap: 0 }}>
+    {SECTIONS.map((s, i) => {
+      const isActive = activeId === s.id;
+      const num = String(i + 1).padStart(2, '0');
+      return (
+        <motion.button
+          key={s.id}
+          onClick={() => document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+          animate={{ x: isActive ? 5 : 0 }}
+          transition={{ duration: 0.18 }}
+          title={s.label}
+          style={{
+            width: 28, height: 26,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: isActive ? WARN : SURF,
+            borderRight: `2px solid ${isActive ? WARN : BORD}`,
+            borderBottom: `1px solid ${BORD}44`,
+            cursor: 'pointer',
+            transition: 'background 0.18s',
+          }}
+        >
+          <span className="am" style={{
+            fontSize: '0.48rem', letterSpacing: '0.04em',
+            color: isActive ? BG : PALE, opacity: isActive ? 1 : 0.32,
+          }}>{num}</span>
+        </motion.button>
+      );
+    })}
+  </nav>
+);
+
+// ── TODO PLACEHOLDER ──────────────────────────────────────────
+
+const TodoPlaceholder: React.FC<{ title: string; notes?: string[] }> = ({ title, notes = [] }) => (
+  <div style={{ background: SURF, border: `1px solid ${BORD}` }} className="relative overflow-hidden">
+    {/* Classification header bar */}
+    <div className="flex items-center justify-between px-4 py-2.5"
+      style={{ background: `${WARN}15`, borderBottom: `1px solid ${WARN}28` }}>
+      <span className="at" style={{ color: WARN, fontSize: '0.75rem', letterSpacing: '0.22em' }}>ACCESS RESTRICTED</span>
+      <span className="am" style={{ color: PALE, fontSize: '0.52rem', letterSpacing: '0.18em', opacity: 0.38 }}>
+        REF: {title.replace(/\s+/g, '-').toUpperCase().slice(0, 30)}
+      </span>
+    </div>
+    {/* Redacted content lines */}
+    <div className="p-6">
+      <div className="space-y-3 mb-6">
+        {[1, 0.62, 0.9, 0.68, 0.82].map((w, i) => (
+          <div key={i} style={{
+            height: i === 2 ? 20 : 11,
+            background: BG,
+            border: `1px solid ${BORD}44`,
+            width: `${Math.round(w * 100)}%`,
+          }} />
+        ))}
+      </div>
+      {/* Stamp */}
+      <div className="flex justify-center my-6">
+        <motion.div animate={{ opacity: [0.45, 0.7, 0.45] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}>
+          <div className="astamp" style={{ color: WARN, borderColor: WARN, fontSize: '0.8rem', letterSpacing: '0.28em', opacity: 1 }}>
+            ASSET PENDING CLEARANCE
+          </div>
+        </motion.div>
+      </div>
+      {/* Field reference data */}
+      {notes.length > 0 && (
+        <div className="pt-4" style={{ borderTop: `1px dashed ${BORD}` }}>
+          <div className="am mb-3" style={{ color: G, fontSize: '0.52rem', letterSpacing: '0.28em', opacity: 0.38 }}>
+            FIELD REFERENCE DATA:
+          </div>
+          <div className="space-y-1.5">
+            {notes.map((n, i) => (
+              <div key={i} className="flex gap-3 items-start">
+                <span className="am flex-shrink-0" style={{ color: WARN, fontSize: '0.58rem', opacity: 0.42 }}>
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span className="am" style={{ color: PALE, fontSize: '0.62rem', opacity: 0.38, lineHeight: 1.6 }}>{n}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+);
 
 // ── PRIMITIVES ────────────────────────────────────────────────
 
-const ASection: React.FC<{ label: string; stamp?: string; children: React.ReactNode }> = ({ label, stamp, children }) => (
-  <motion.div className="mb-16" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.4 }}>
-    <div className="flex items-center gap-4 mb-6" style={{ borderTop: `1px dashed ${BORD}`, paddingTop: '1.5rem' }}>
-      <span className="am" style={{ color: G, opacity: 0.7, fontSize: '0.85rem', letterSpacing: '0.3em', textTransform: 'uppercase' }}>{label}</span>
-      {stamp && <span className="astamp ml-auto">{stamp}</span>}
+const ASection: React.FC<{ id?: string; label: string; stamp?: string; children: React.ReactNode }> = ({ id, label, stamp, children }) => (
+  <motion.div id={id} className="mb-20 scroll-mt-20"
+    initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.5 }}>
+    {/* Document section header — left accent bar + warm tint */}
+    <div className="flex items-stretch mb-8">
+      <div style={{ width: 4, background: `${WARN}55`, flexShrink: 0 }} />
+      <div className="flex items-center flex-1 px-5 py-3"
+        style={{ background: `${WARN}07`, borderTop: `1px solid ${BORD}`, borderBottom: `1px solid ${BORD}` }}>
+        <span className="at" style={{ color: PALE, fontSize: '0.88rem', letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.82 }}>
+          {label}
+        </span>
+      </div>
+      {stamp && (
+        <div className="flex items-center px-5" style={{
+          borderTop: `1px solid ${BORD}`, borderBottom: `1px solid ${BORD}`,
+          borderRight: `1px solid ${BORD}`, flexShrink: 0,
+        }}>
+          <span className="astamp" style={{ fontSize: '0.62rem', opacity: 0.52 }}>{stamp}</span>
+        </div>
+      )}
     </div>
     {children}
   </motion.div>
@@ -162,123 +304,6 @@ const ZONES = [
   },
 ];
 
-const OperationalMap: React.FC = () => {
-  const [selected, setSelected] = useState<string | null>(null);
-  const zone = ZONES.find(z => z.id === selected);
-
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-      {/* SVG map panel */}
-      <div className="lg:col-span-3 relative" style={{ background: SURF, border: `1px dashed ${BORD}`, minHeight: 420, overflow: 'hidden' }}>
-        {/* Map background — rough Ghana silhouette in SVG */}
-        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-          {/* Grid lines — hand-drawn feel */}
-          {[20,40,60,80].map(v => (
-            <g key={v}>
-              <line x1={v} y1={0} x2={v} y2={100} stroke={BORD} strokeWidth={0.3} strokeDasharray="2 3" opacity={0.5}/>
-              <line x1={0} y1={v} x2={100} y2={v} stroke={BORD} strokeWidth={0.3} strokeDasharray="2 3" opacity={0.5}/>
-            </g>
-          ))}
-
-          {/* Rough Ghana coastline / landmass blob */}
-          <path d="M25,90 Q20,80 22,70 Q18,60 22,50 Q20,40 25,32 Q28,24 35,20 Q42,16 50,18 Q58,16 65,20 Q72,22 74,30 Q78,38 76,48 Q80,56 76,64 Q74,72 70,80 Q65,88 58,92 Q50,96 42,94 Q33,92 25,90Z"
-            fill={`${G}06`} stroke={`${G}18`} strokeWidth={0.5}/>
-
-          {/* Route lines between zones */}
-          {[
-            [ZONES[0].coords, ZONES[1].coords],
-            [ZONES[1].coords, ZONES[2].coords],
-            [ZONES[2].coords, ZONES[3].coords],
-          ].map(([a, b], i) => (
-            <line key={i} x1={a.x} y1={a.y} x2={b.x} y2={b.y}
-              stroke={i === 2 ? '#88888850' : `${G}40`} strokeWidth={0.6}
-              strokeDasharray={i === 2 ? '1.5 2' : '3 2'}/>
-          ))}
-
-          {/* Route labels */}
-          <text x="29" y="70" className="am" style={{ fontFamily: 'VT323, monospace' }} fontSize="2.2" fill={G} opacity={0.35}>CONFIRMED</text>
-          <text x="30" y="56" className="am" style={{ fontFamily: 'VT323, monospace' }} fontSize="2.2" fill={G} opacity={0.35}>CONFIRMED</text>
-          <text x="43" y="35" className="am" style={{ fontFamily: 'VT323, monospace' }} fontSize="2.2" fill="#888" opacity={0.35}>UNKNOWN</text>
-
-          {/* Zone nodes */}
-          {ZONES.map(z => (
-            <g key={z.id} style={{ cursor: 'pointer' }} onClick={() => setSelected(selected === z.id ? null : z.id)}>
-              {/* Pulse ring on selected */}
-              {selected === z.id && (
-                <circle cx={z.coords.x} cy={z.coords.y} r={4} fill="none" stroke={z.statusColor} strokeWidth={0.5} opacity={0.4}/>
-              )}
-              {/* Military cross-hair marker */}
-              <circle cx={z.coords.x} cy={z.coords.y} r={1.8}
-                fill={selected === z.id ? z.statusColor : SURF}
-                stroke={z.statusColor} strokeWidth={0.8} opacity={selected && selected !== z.id ? 0.3 : 1}/>
-              <line x1={z.coords.x - 3} y1={z.coords.y} x2={z.coords.x + 3} y2={z.coords.y} stroke={z.statusColor} strokeWidth={0.4} opacity={selected && selected !== z.id ? 0.2 : 0.5}/>
-              <line x1={z.coords.x} y1={z.coords.y - 3} x2={z.coords.x} y2={z.coords.y + 3} stroke={z.statusColor} strokeWidth={0.4} opacity={selected && selected !== z.id ? 0.2 : 0.5}/>
-              {/* Zone label */}
-              <text x={z.coords.x + 3} y={z.coords.y - 2} fontSize="2" fill={PALE} opacity={selected && selected !== z.id ? 0.2 : 0.6}
-                style={{ fontFamily: 'VT323, monospace', letterSpacing: '0.05em' }}>{z.label}</text>
-              <text x={z.coords.x + 3} y={z.coords.y + 1.5} fontSize="1.6" fill={z.statusColor} opacity={selected && selected !== z.id ? 0.15 : 0.5}
-                style={{ fontFamily: 'VT323, monospace' }}>{z.act}</text>
-            </g>
-          ))}
-        </svg>
-
-        {/* Map label */}
-        <div className="absolute bottom-3 left-3 am" style={{ color: G, fontSize: '0.7rem', opacity: 0.35, letterSpacing: '0.25em' }}>
-          OPERATIONAL THEATRE — GHANA
-        </div>
-        <div className="absolute top-3 right-3 am" style={{ color: PALE, fontSize: '0.6rem', opacity: 0.25, letterSpacing: '0.2em' }}>
-          CLICK ZONE TO EXPAND
-        </div>
-      </div>
-
-      {/* Zone detail panel */}
-      <div className="lg:col-span-2">
-        <AnimatePresence mode="wait">
-          {zone ? (
-            <motion.div key={zone.id} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}
-              style={{ background: SURF, border: `1px solid ${BORD}`, borderLeft: `3px solid ${zone.statusColor}`, padding: '1.25rem', minHeight: 420 }}>
-              <div className="am mb-1" style={{ color: zone.statusColor, fontSize: '0.7rem', letterSpacing: '0.3em', opacity: 0.7 }}>{zone.act} ZONE</div>
-              <h3 className="at mb-1" style={{ color: PALE, fontSize: '1.3rem' }}>{zone.label}</h3>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-2 h-2 rounded-full" style={{ background: zone.statusColor }}/>
-                <span className="am" style={{ color: zone.statusColor, fontSize: '0.75rem', letterSpacing: '0.2em', opacity: 0.8 }}>{zone.status}</span>
-              </div>
-
-              {[
-                { label: 'THREAT LEVEL', val: zone.threat },
-                { label: 'RESOURCES', val: zone.resources },
-                { label: 'INTEL SUMMARY', val: zone.intel },
-              ].map(item => (
-                <div key={item.label} className="mb-4" style={{ borderTop: `1px dashed ${BORD}`, paddingTop: '0.75rem' }}>
-                  <div className="am mb-1" style={{ color: G, fontSize: '0.7rem', letterSpacing: '0.25em', opacity: 0.5 }}>{item.label}</div>
-                  <div className="ab" style={{ color: PALE, opacity: 0.75, fontSize: '0.9rem', lineHeight: 1.7 }}>{item.val}</div>
-                </div>
-              ))}
-
-              <div style={{ borderTop: `1px dashed ${BORD}`, paddingTop: '0.75rem' }}>
-                <div className="am mb-2" style={{ color: G, fontSize: '0.7rem', letterSpacing: '0.25em', opacity: 0.5 }}>KEY LOCATIONS</div>
-                {zone.locations.map((loc, i) => (
-                  <div key={i} className="flex gap-2 mb-1">
-                    <span className="am" style={{ color: WARN, opacity: 0.4, fontSize: '0.75rem' }}>{'>'}</span>
-                    <span className="ab" style={{ color: PALE, opacity: 0.6, fontSize: '0.85rem' }}>{loc}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 0.4 }}
-              className="flex items-center justify-center" style={{ border: `1px dashed ${BORD}`, minHeight: 420 }}>
-              <div className="text-center">
-                <div className="am" style={{ color: G, fontSize: '0.8rem', letterSpacing: '0.3em' }}>SELECT A ZONE</div>
-                <div className="am mt-2" style={{ color: PALE, fontSize: '0.65rem', opacity: 0.5, letterSpacing: '0.2em' }}>CLICK MARKER ON MAP</div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </div>
-  );
-};
 
 // ─────────────────────────────────────────────────────────────
 // 07 — PERSONNEL COMPARISON
@@ -909,50 +934,138 @@ const ResearchPanel: React.FC = () => {
 // ─────────────────────────────────────────────────────────────
 const AbodePage: React.FC = () => {
   const navigate = useNavigate();
+  const activeSection = useSectionObserver();
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollY } = useScroll();
+  const heroOpacity = useTransform(scrollY, [0, 420], [1, 0]);
 
   return (
-    <div className="ag" style={{ background: BG, minHeight: '100vh', color: PALE }}>
+    <div className="ag ascan" style={{ background: BG, minHeight: '100vh', color: PALE }}>
       <style>{FONTS + CSS}</style>
 
-      {/* ── BACK NAV ── */}
-      <div style={{ borderBottom: `1px dashed ${BORD}`, padding: '1rem 1.5rem' }}>
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => navigate('/games')}
-            className="flex items-center gap-2 afl" style={{ color: G, opacity: 0.5 }}
-            onMouseEnter={e => (e.currentTarget.style.opacity = '0.9')}
-            onMouseLeave={e => (e.currentTarget.style.opacity = '0.5')}>
-            <ArrowLeft size={12} />
-            <span className="am" style={{ fontSize: '0.8rem', letterSpacing: '0.3em' }}>← BACK / GAME INDEX</span>
-          </motion.button>
-          <div className="am" style={{ color: G, fontSize: '0.75rem', opacity: 0.3, letterSpacing: '0.25em' }}>FILE: ABODE_DESIGN_BIBLE_v0.2</div>
-        </div>
-      </div>
+      <StickyNav activeId={activeSection} />
 
       {/* ── HERO ── */}
-      <div className="relative px-6 pt-12 pb-16 overflow-hidden"
-        style={{ background: `radial-gradient(ellipse 80% 60% at 20% 100%, ${WARN}08, transparent 60%), ${BG}` }}>
-        <div className="absolute right-0 top-0 at select-none pointer-events-none leading-none"
-          style={{ fontSize: 'clamp(10rem, 30vw, 24rem)', color: `${G}04`, right: '-0.05em', top: '-0.05em' }}>02</div>
-        <div className="max-w-4xl mx-auto relative z-10">
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <div className="flex items-center gap-4 mb-8 flex-wrap" style={{ borderBottom: `1px solid ${BORD}`, paddingBottom: '1rem' }}>
-              <div className="am" style={{ color: G, fontSize: '0.75rem', opacity: 0.45, letterSpacing: '0.3em' }}>GENRE: SURVIVAL · ACTION · NARRATIVE</div>
-              <span className="astamp ml-auto">DRAFT</span>
+      <div ref={heroRef} className="relative flex flex-col overflow-hidden" style={{ minHeight: '100vh' }}>
+
+        {/* Warm ambient glow — centered */}
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: `radial-gradient(ellipse 52% 52% at 50% 48%, ${WARN}0a, transparent 65%), ${BG}` }} />
+
+        {/* Radar / sonar rings — pulsing outward from center */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+          {[300, 220, 148, 82].map((r, i) => (
+            <motion.div key={`pulse-${i}`} className="absolute rounded-full"
+              style={{ width: r * 2, height: r * 2, border: `1px solid ${WARN}`, opacity: 0 }}
+              animate={{ opacity: [0, 0.055, 0], scale: [0.88, 1, 1.10] }}
+              transition={{ duration: 5.5, delay: i * 1.4, repeat: Infinity, ease: 'easeOut' }} />
+          ))}
+          {[340, 265, 188, 116, 52].map((r, i) => (
+            <div key={`ring-${i}`} className="absolute rounded-full"
+              style={{ width: r * 2, height: r * 2, border: `1px solid ${BORD}`, opacity: 0.1 }} />
+          ))}
+          <div className="absolute inset-x-0" style={{ top: '50%', height: 1, background: BORD, opacity: 0.07 }} />
+          <div className="absolute inset-y-0" style={{ left: '50%', width: 1, background: BORD, opacity: 0.07 }} />
+        </div>
+
+        {/* ── TOP CLASSIFICATION STRIP ── */}
+        <div className="relative z-10 flex-shrink-0"
+          style={{ borderBottom: `1px solid ${WARN}20`, background: `${WARN}08` }}>
+          <div className="max-w-5xl mx-auto px-6 py-2 flex items-center justify-between">
+            <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+              onClick={() => navigate('/games')}
+              className="flex items-center gap-2"
+              style={{ color: WARN, opacity: 0.42 }}
+              onMouseEnter={e => (e.currentTarget.style.opacity = '0.9')}
+              onMouseLeave={e => (e.currentTarget.style.opacity = '0.42')}>
+              <ArrowLeft size={10} />
+              <span className="am" style={{ fontSize: '0.58rem', letterSpacing: '0.3em' }}>RETURN TO GAME INDEX</span>
+            </motion.button>
+            <div className="am" style={{ color: WARN, fontSize: '0.52rem', letterSpacing: '0.35em', opacity: 0.38 }}>
+              TOP SECRET // SCI // NOFORN · REF: GH-ZB-MENSAH-02
             </div>
-            <h1 className="at" style={{ fontSize: 'clamp(4rem, 14vw, 10rem)', color: G, letterSpacing: '0.01em', lineHeight: 0.9, marginBottom: '0.5rem' }}>Abɔde</h1>
-            <div className="am mb-6" style={{ color: PALE, fontSize: '0.85rem', opacity: 0.4, letterSpacing: '0.3em' }}>[ TWARA: HOMELAND ] · GAME 02 OF 03</div>
-            <div className="ab italic leading-loose max-w-2xl" style={{ color: PALE, fontSize: '1.15rem', opacity: 0.8, borderLeft: `2px solid ${WARN}`, paddingLeft: '1.5rem' }}>
-              The dead walk through Accra's streets. Colonel Kwame Mensah has survived wars he chose. This one chose him — and his children are somewhere in it.
-            </div>
-            <div className="mt-6 am" style={{ color: PALE, fontSize: '0.75rem', opacity: 0.3, letterSpacing: '0.2em' }}>SETTING: NEAR-FUTURE GHANA · INCIDENT TYPE: OUTBREAK / SEPARATION / RECOVERY</div>
+          </div>
+        </div>
+
+        {/* ── HERO CONTENT — centered dossier cover ── */}
+        <motion.div style={{ opacity: heroOpacity }}
+          className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 py-16 text-center">
+
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.42 }} transition={{ delay: 0.1 }}
+            className="am mb-5" style={{ color: WARN, fontSize: '0.62rem', letterSpacing: '0.48em' }}>
+            OPERATION: HOMELAND · GAME 02 OF 03
           </motion.div>
+
+          <motion.h1 className="at afl"
+            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.2 }}
+            style={{ fontSize: 'clamp(3.5rem, 13vw, 7rem)', color: PALE, letterSpacing: '0.12em', lineHeight: 1, marginBottom: '0.35rem' }}>
+            Abɔde
+          </motion.h1>
+
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.52 }} transition={{ delay: 0.38 }}
+            className="am mb-8" style={{ color: G, fontSize: '0.68rem', letterSpacing: '0.45em' }}>
+            [ AKAN / TWI: HOMELAND ]
+          </motion.div>
+
+          <motion.div
+            initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
+            transition={{ delay: 0.52, duration: 0.55, ease: 'easeOut' }}
+            style={{ width: 88, height: 1, background: `${WARN}45`, marginBottom: '2rem', transformOrigin: 'center' }} />
+
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 0.72 }} transition={{ delay: 0.58, duration: 0.55 }}
+            className="ab italic leading-loose max-w-lg mb-10"
+            style={{ color: PALE, fontSize: '1.05rem' }}>
+            The dead walk through Accra's streets. Colonel Kwame Mensah has survived wars he chose.
+            This one chose him — and his children are somewhere in it.
+          </motion.p>
+
+          {/* Document metadata grid */}
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.72 }}
+            className="w-full max-w-md mb-10" style={{ border: `1px solid ${BORD}`, background: `${SURF}90` }}>
+            <div className="grid grid-cols-3">
+              {[
+                { label: 'SUBJECT',  value: 'COL. K. MENSAH'  },
+                { label: 'SETTING',  value: 'GHANA'            },
+                { label: 'STATUS',   value: 'DESIGN PHASE'     },
+              ].map((item, i) => (
+                <div key={i} className="px-3 py-2.5"
+                  style={{ borderRight: i < 2 ? `1px solid ${BORD}` : 'none' }}>
+                  <div className="am" style={{ color: G, fontSize: '0.46rem', letterSpacing: '0.25em', opacity: 0.42, marginBottom: '3px' }}>{item.label}</div>
+                  <div className="at" style={{ color: PALE, fontSize: '0.68rem', letterSpacing: '0.05em', opacity: 0.85 }}>{item.value}</div>
+                </div>
+              ))}
+            </div>
+            <div className="px-4 py-2" style={{ borderTop: `1px solid ${BORD}`, background: `${BG}60` }}>
+              <span className="am" style={{ color: PALE, fontSize: '0.46rem', letterSpacing: '0.18em', opacity: 0.2 }}>
+                SURVIVAL NARRATIVE · NEAR-FUTURE GHANA · OUTBREAK / SEPARATION / RECOVERY
+              </span>
+            </div>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.35 }} transition={{ delay: 1.0 }}
+            className="am flex items-center gap-2" style={{ color: G, fontSize: '0.6rem', letterSpacing: '0.38em' }}>
+            <motion.span animate={{ opacity: [0, 1, 0] }} transition={{ duration: 1.6, repeat: Infinity }}>|</motion.span>
+            SCROLL TO READ FIELD REPORT
+          </motion.div>
+        </motion.div>
+
+        {/* ── BOTTOM CLASSIFICATION STRIP ── */}
+        <div className="relative z-10 flex-shrink-0" style={{ borderTop: `1px solid ${BORD}28` }}>
+          <div className="max-w-5xl mx-auto px-6 py-2 flex items-center justify-between">
+            <span className="am" style={{ color: WARN, fontSize: '0.48rem', letterSpacing: '0.3em', opacity: 0.28 }}>
+              HANDLE VIA SI CHANNELS ONLY
+            </span>
+            <span className="am" style={{ color: PALE, fontSize: '0.48rem', letterSpacing: '0.2em', opacity: 0.16 }}>
+              DRAFT 0.2 · ALL 11 SECTIONS
+            </span>
+          </div>
         </div>
       </div>
 
       {/* ── CONTENT ── */}
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-4xl xl:max-w-5xl mx-auto px-6 py-12 xl:pl-28">
 
-        <ASection label="01 — Intelligence Overview" stamp="VERIFIED">
+        <ASection id="overview" label="01 — Intelligence Overview" stamp="VERIFIED">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {[
               { category: 'Classification', content: '2D Side-Scrolling Survival / Narrative Action — flat level design with resource management and scavenging loops.' },
@@ -963,14 +1076,14 @@ const AbodePage: React.FC = () => {
           </div>
         </ASection>
 
-        <ASection label="02 — Situation Report" stamp="SENSITIVE">
+        <ASection id="situation" label="02 — Situation Report" stamp="SENSITIVE">
           <FieldNote>A near-future Ghana. The outbreak began in the north and spread south within weeks, overwhelming NADMO and the Ghana Armed Forces. By the time Accra fell, communications were down. The government broadcast a single evacuation order — <span style={{ color: WARN, fontFamily: "'Special Elite', cursive" }}>D-Day</span> — and the country tried to move.</FieldNote>
           <FieldNote>The game's world cycles through recognizable Ghanaian locations: Osu neighborhoods with collapsed bars and chop shops. Tema Industrial Area with warehouses. The Cape Coast highway strewn with abandoned vehicles. Kumasi's market district. Each zone feels culturally specific — not a generic grey city.</FieldNote>
           <FieldNote>The story is not about the outbreak. It's about a father who spent his career protecting strangers, now having to navigate a collapsed world to protect the two people who actually matter.</FieldNote>
           <MissionBrief label="Thematic Core" text="What does a soldier become when there's no mission — only family? Kwame's entire skill set was built for other people's wars. This one is personal, and that changes everything." />
         </ASection>
 
-        <ASection label="03 — Personnel Files" stamp="RESTRICTED">
+        <ASection id="personnel" label="03 — Personnel Files" stamp="RESTRICTED">
           <DossierCard id="KM-001" name="COL. KWAME MENSAH (RET.)" role="Protagonist" status="Active"
             description="62 years old. Served in ECOMOG, UN peacekeeping in DRC, and two domestic crises. Retired to Tema with his two children after their mother died. On D-Day, separated from them at a checkpoint collapse. He is not a superhero — he moves deliberately, tires realistically, and every fight costs him. But he knows how to survive, how to read terrain, and how to keep his head while everything falls apart."
             details={['Age is a mechanic — experienced but not tireless', 'Military training: infantry, close-quarters, field medicine', 'Emotional blind spot: anything involving his children']} />
@@ -985,7 +1098,7 @@ const AbodePage: React.FC = () => {
             details={['Mirror of Kwame — same training, opposite choices', 'Believes he is doing the only rational thing', 'TODO: Name, specific rank, and shared history to be decided']} />
         </ASection>
 
-        <ASection label="04 — Systems Manual" stamp="OPERATIONAL">
+        <ASection id="systems" label="04 — Systems Manual" stamp="OPERATIONAL">
           <ManualEntry number="1.0" title="INVENTORY & EQUIPMENT SYSTEM"
             body="Scavenged weapons (machetes, shotguns, repurposed tools), medical supplies, food, fuel. Weight limits force real decisions. Kwame can modify weapons using found parts. Local items: palm oil tins, dried fish (high calorie), kenkey wraps, sachet water." />
           <ManualEntry number="2.0" title="ENDURANCE & INJURY MODEL"
@@ -1004,7 +1117,7 @@ const AbodePage: React.FC = () => {
             body="Helping or ignoring survivors affects the world state. Camps Kwame aided are different on a return pass. NPCs remember behavior. The world is a record of choices — not a score, but a quiet, accumulating consequence." />
         </ASection>
 
-        <ASection label="05 — Incident Log" stamp="CHRONOLOGICAL">
+        <ASection id="incidents" label="05 — Incident Log" stamp="CHRONOLOGICAL">
           <IncidentBlock phase="01" title="D-Day / The Separation" location="Tema Industrial Area, Accra"
             body="The separation. Tutorial-as-chaos. Kwame fights through collapsing Tema to reach the last known location of his children's school bus. He finds it empty — but finds the first clue: Ama's notebook with a handwritten note. The city is falling. He has to move before it fully goes dark." />
           <IncidentBlock phase="02" title="The Road North" location="Cape Coast Highway → Kumasi Outskirts"
@@ -1013,32 +1126,37 @@ const AbodePage: React.FC = () => {
             body="Kwame and Ama track Kofi together. The emotional weight of the full reunion is earned — each character has changed and the relationships have to be renegotiated, not just restored. The ending turns on a single choice: what Kwame does after the confrontation." />
         </ASection>
 
-        <ASection label="06 — Operational Map" stamp="FIELD ANNOTATED">
-          <div className="am mb-4" style={{ color: PALE, fontSize: '0.65rem', opacity: 0.4, letterSpacing: '0.2em' }}>CLICK A ZONE MARKER TO EXPAND FIELD REPORT →</div>
-          <OperationalMap />
+        <ASection id="opmap" label="06 — Operational Map" stamp="FIELD ANNOTATED">
+          <TodoPlaceholder
+            title="OPERATIONAL MAP · GHANA"
+            notes={ZONES.map(z => `${z.label} · ${z.act} · STATUS: ${z.status}`)}
+          />
         </ASection>
 
-        <ASection label="07 — Personnel Comparison" stamp="ASSESSMENT">
-          <div className="am mb-4" style={{ color: PALE, fontSize: '0.65rem', opacity: 0.4, letterSpacing: '0.2em' }}>SELECT PERSONNEL FILE TO VIEW CAPABILITY ASSESSMENT →</div>
+        <ASection id="comparison" label="07 — Personnel Comparison" stamp="ASSESSMENT">
+          <div className="am mb-4" style={{ color: PALE, fontSize: '0.65rem', opacity: 0.4, letterSpacing: '0.2em' }}>
+            SELECT PERSONNEL FILE TO VIEW CAPABILITY ASSESSMENT →
+          </div>
           <PersonnelComparison />
         </ASection>
 
-        <ASection label="08 — Event Timeline" stamp="DUAL TRACK">
-          <div className="ab italic mb-4" style={{ color: PALE, opacity: 0.55, fontSize: '0.95rem', borderLeft: `2px solid ${WARN}30`, paddingLeft: '1rem' }}>
+        <ASection id="timeline" label="08 — Event Timeline" stamp="DUAL TRACK">
+          <div className="ab italic mb-4"
+            style={{ color: PALE, opacity: 0.55, fontSize: '0.95rem', borderLeft: `2px solid ${WARN}30`, paddingLeft: '1rem' }}>
             Two tracks: what Kwame experienced, and what Ama experienced while he was searching. The gap between the tracks — everything she did that he didn't see — is the emotional engine of Act II. Select a beat to expand.
           </div>
           <DualTimeline />
         </ASection>
 
-        <ASection label="09 — Visual Directive" stamp="ART BRIEF">
+        <ASection id="art" label="09 — Visual Directive" stamp="ART BRIEF">
           <ArtDirective />
         </ASection>
 
-        <ASection label="10 — Audio Directive" stamp="SOUND BRIEF">
+        <ASection id="audio" label="10 — Audio Directive" stamp="SOUND BRIEF">
           <AudioDirective />
         </ASection>
 
-        <ASection label="11 — Research & Cultural Notes" stamp="REFERENCE">
+        <ASection id="research" label="11 — Research & Cultural Notes" stamp="REFERENCE">
           <MissionBrief label="Accuracy Commitment" text="This game is set in Ghana, made about Ghanaian people, and will be played by Ghanaian players. Every cultural detail — language, architecture, social dynamics, spiritual belief — must be treated with the same rigor as the gameplay systems. Cultural accuracy is not a polish step. It is foundational." />
           <ResearchPanel />
         </ASection>
