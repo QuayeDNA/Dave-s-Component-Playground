@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Layers, Zap, Box, Map, FileText, LayoutDashboard, Cpu } from 'lucide-react';
+import { PlaygroundBg, GamesBg } from './HomeBackgrounds';
 
 type World = 'playground' | 'games' | null;
 
@@ -81,21 +82,19 @@ const HomePage: React.FC = () => {
           Mobile:  stacked, each panel is auto-height, scrollable
           Desktop: side-by-side, full remaining viewport height, flex-grow animated
       */}
-      <div className="flex-1 flex flex-col lg:flex-row">
+      <div className="flex-1 flex flex-col lg:flex-row min-h-0">
 
         {/* ─── LEFT / TOP — The Playground ─── */}
         <motion.div
           className="relative flex flex-col overflow-hidden cursor-pointer"
           style={{
             background: 'linear-gradient(140deg, #071830 0%, #050d1c 60%, #030810 100%)',
-            // Desktop: animated expand; Mobile: auto height
-            ...(typeof window !== 'undefined' && window.innerWidth >= 1024
-              ? {
-                  flexGrow: hovered === 'playground' ? 1.55 : hovered === 'games' ? 0.6 : 1,
-                  transition: 'flex-grow 0.55s cubic-bezier(0.22, 1, 0.36, 1)',
-                }
-              : {}),
+            flexBasis: 0,
+            minWidth: 0,
+            minHeight: 0,
           }}
+          animate={{ flexGrow: hovered === 'playground' ? 1.55 : hovered === 'games' ? 0.6 : 1 }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           onHoverStart={() => setHovered('playground')}
           onHoverEnd={() => setHovered(null)}
           onClick={() => navigate('/overview')}
@@ -111,13 +110,14 @@ const HomePage: React.FC = () => {
             style={{ background: 'rgba(255,255,255,0.06)' }}
           />
 
+          <PlaygroundBg />
           <GridOverlay />
           <div
             className="absolute pointer-events-none"
             style={{ top: '-20%', left: '-10%', width: '70%', height: '70%', background: 'radial-gradient(circle, rgba(77,143,200,0.16) 0%, transparent 65%)' }}
           />
 
-          <div className="relative z-10 p-6 sm:p-8 lg:p-12 flex flex-col lg:justify-between lg:h-full lg:min-h-[calc(100vh-44px)]">
+          <div className="relative z-10 p-6 sm:p-8 lg:p-12 flex flex-col flex-1 justify-between overflow-y-auto">
             {/* Heading */}
             <div>
               <p className="text-[10px] tracking-[0.35em] uppercase mb-4" style={{ color: '#4d8fc8', opacity: 0.6, fontFamily: 'monospace' }}>
@@ -192,24 +192,24 @@ const HomePage: React.FC = () => {
           className="relative flex flex-col overflow-hidden cursor-pointer"
           style={{
             background: 'linear-gradient(140deg, #130c00 0%, #0c0800 60%, #07050a 100%)',
-            ...(typeof window !== 'undefined' && window.innerWidth >= 1024
-              ? {
-                  flexGrow: hovered === 'games' ? 1.55 : hovered === 'playground' ? 0.6 : 1,
-                  transition: 'flex-grow 0.55s cubic-bezier(0.22, 1, 0.36, 1)',
-                }
-              : {}),
+            flexBasis: 0,
+            minWidth: 0,
+            minHeight: 0,
           }}
+          animate={{ flexGrow: hovered === 'games' ? 1.55 : hovered === 'playground' ? 0.6 : 1 }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           onHoverStart={() => setHovered('games')}
           onHoverEnd={() => setHovered(null)}
           onClick={() => navigate('/games')}
         >
           <DiagonalOverlay />
+          <GamesBg />
           <div
             className="absolute pointer-events-none"
             style={{ top: '-15%', right: '-15%', width: '70%', height: '70%', background: 'radial-gradient(circle, rgba(201,150,43,0.14) 0%, transparent 65%)' }}
           />
 
-          <div className="relative z-10 p-6 sm:p-8 lg:p-12 flex flex-col lg:justify-between lg:h-full lg:min-h-[calc(100vh-44px)]">
+          <div className="relative z-10 p-6 sm:p-8 lg:p-12 flex flex-col flex-1 justify-between overflow-y-auto">
             {/* Heading */}
             <div>
               <p className="text-[10px] tracking-[0.35em] uppercase mb-4" style={{ color: '#c99142', opacity: 0.6, fontFamily: 'monospace' }}>

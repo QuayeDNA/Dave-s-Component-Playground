@@ -17,8 +17,6 @@ const TwoDAnimation = lazy(() => import('@/components/Animations/TwoDAnimations'
 const ThreeDAnimation = lazy(() => import('@/components/Animations/ThreeDAnimations'));
 const Physics = lazy(() => import('@/components/Animations/Physics'));
 const Tween = lazy(() => import('@/components/Animations/Tween'));
-const Interactive = lazy(() => import('@/components/Animations/Interactive'));
-const Morph = lazy(() => import('@/components/Animations/Morph'));
 const Interactive3D = lazy(() => import('@/components/3DInteractive/Basics'));
 const Interactive3DTorus = lazy(() => import('@/components/3DInteractive/Torus'));
 const StickyNotes = lazy(() => import('@/components/stickyNotes/stickyNotes'));
@@ -109,8 +107,6 @@ const AppRouter: React.FC = () => {
               <Route path="animations/3d" element={<Suspense fallback={<PlaygroundFallback />}><ThreeDAnimation /></Suspense>} />
               <Route path="animations/physics" element={<Suspense fallback={<PlaygroundFallback />}><Physics /></Suspense>} />
               <Route path="animations/tween" element={<Suspense fallback={<PlaygroundFallback />}><Tween /></Suspense>} />
-              <Route path="animations/interactive" element={<Suspense fallback={<PlaygroundFallback />}><Interactive /></Suspense>} />
-              <Route path="animations/morph" element={<Suspense fallback={<PlaygroundFallback />}><Morph /></Suspense>} />
 
               <Route path="3d-interactive" element={<Suspense fallback={<PlaygroundFallback />}><Interactive3D /></Suspense>} />
               <Route path="3d-interactive/torus" element={<Suspense fallback={<PlaygroundFallback />}><Interactive3DTorus /></Suspense>} />

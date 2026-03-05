@@ -24,8 +24,6 @@ const PLAYGROUND_SECTIONS = [
       { label: '3D Scenes', sub: 'Three.js scenes', path: '/animations/3d', Icon: Box },
       { label: 'Physics', sub: 'Simulated motion', path: '/animations/physics', Icon: Zap },
       { label: 'Tween', sub: 'Gsap tweens', path: '/animations/tween', Icon: Zap },
-      { label: 'Interactive', sub: 'Mouse-driven', path: '/animations/interactive', Icon: Zap },
-      { label: 'Morph', sub: 'SVG morphing', path: '/animations/morph', Icon: Zap },
     ],
   },
   {
