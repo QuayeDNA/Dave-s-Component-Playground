@@ -2174,7 +2174,6 @@ const LOG_TEMPLATES: { type: LogEntry['type']; msgs: string[] }[] = [
 const CombatLog: React.FC<{ t: Th }> = ({ t }) => {
   const [entries, setEntries] = useState<LogEntry[]>([]);
   const [paused, setPaused] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const ts = () => {
