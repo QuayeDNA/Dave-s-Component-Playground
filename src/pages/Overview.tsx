@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import {
   MousePointerClick, Type, CreditCard, Bell,
   Layers, Box, Cpu, StickyNote, Map,
-  Play, Waves, MoveRight, Blend, MoreHorizontal,
-  ArrowRight, Sparkles,
+  Play, Waves, MoreHorizontal,
+  ArrowRight, Sparkles, Gamepad2, Sword, Globe, Palette,
 } from 'lucide-react';
 
 // ── Animation helpers ─────────────────────────────────────
@@ -69,8 +69,6 @@ const SECTIONS: Section[] = [
       { label: '3D Animations', description: 'Perspective transforms and depth illusions in the browser.', path: '/animations/3d', Icon: Box, tag: 'CSS 3D' },
       { label: 'Physics', description: 'Spring dynamics, gravity, collision and momentum reactions.', path: '/animations/physics', Icon: Waves, tag: 'Spring' },
       { label: 'Tween', description: 'Easing curves, timeline choreography and sequenced playback.', path: '/animations/tween', Icon: Play, tag: 'Timeline' },
-      { label: 'Interactive', description: 'Gesture-driven animations: drag, hover and scroll triggers.', path: '/animations/interactive', Icon: MoveRight, tag: 'Gesture' },
-      { label: 'Morph', description: 'Path morphing and shape-shifting SVG experiments.', path: '/animations/morph', Icon: Blend, tag: 'SVG' },
     ],
   },
   {
@@ -93,9 +91,23 @@ const SECTIONS: Section[] = [
     bg: 'rgba(251,146,60,0.06)',
     borderColor: 'rgba(251,146,60,0.15)',
     items: [
-      { label: 'Zone Management', description: 'Drag-and-drop zone planning tool with live state management.', path: '/zones', Icon: Map, tag: 'State' },
-      { label: 'Sticky Notes', description: 'Freeform canvas of pinnable, colour-coded draggable notes.', path: '/sticky-notes', Icon: StickyNote, tag: 'Canvas' },
+      { label: 'Zone Management', description: 'Drag-and-draw zone planning tool with Leaflet maps and live state.', path: '/zones', Icon: Map, tag: 'State' },
+      { label: 'Sticky Notes', description: 'Filterable task board with categories, priorities and search.', path: '/sticky-notes', Icon: StickyNote, tag: 'Canvas' },
       { label: 'GPT Model Redesign', description: 'A visual redesign concept for the ChatGPT model selector UI.', path: '/model-redesign', Icon: Cpu, tag: 'UI concept' },
+    ],
+  },
+  {
+    id: 'games',
+    title: 'Three Worlds',
+    subtitle: 'Game design documents and interactive UI showcases for three original game concepts.',
+    accent: '#c9962b',
+    bg: 'rgba(201,150,43,0.06)',
+    borderColor: 'rgba(201,150,43,0.15)',
+    items: [
+      { label: 'Irregular', description: 'Sci-fi metroidvania — shapeshifting protagonist, geometric world, AI companions.', path: '/games/irregular', Icon: Sword, tag: 'Sci-Fi' },
+      { label: 'Abɔde', description: 'Survival strategy set in Ghana — family bonds, resource scarcity, dossier aesthetic.', path: '/games/abode', Icon: Globe, tag: 'Survival' },
+      { label: 'Gold & Iron', description: 'Historical epic across the Gold Coast — illuminated chronicle presentation.', path: '/games/gold-and-iron', Icon: Gamepad2, tag: 'Historical' },
+      { label: 'UI Showcase', description: '9 interactive game UI elements rendered in 6 distinct style directions.', path: '/games/ui', Icon: Palette, tag: '6 Styles' },
     ],
   },
 ];
@@ -248,9 +260,10 @@ const Overview: React.FC = () => {
           >
             {[
               { label: 'UI Components', count: 4, color: '#7eb8e8' },
-              { label: 'Animation demos', count: 6, color: '#a78bfa' },
+              { label: 'Animation demos', count: 4, color: '#a78bfa' },
               { label: '3D experiments', count: 2, color: '#34d399' },
               { label: 'Systems', count: 3, color: '#fb923c' },
+              { label: 'Game Worlds', count: 4, color: '#c9962b' },
             ].map(({ label, count, color }) => (
               <div
                 key={label}

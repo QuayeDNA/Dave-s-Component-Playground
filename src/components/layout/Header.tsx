@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Menu, X, Layers, Zap, Box, Map, FileText, LayoutDashboard, Cpu } from 'lucide-react';
+import { ChevronDown, Menu, X, Layers, Zap, Box, Map, FileText, LayoutDashboard, Cpu, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // ─── Navigation structure ──────────────────────────────────────────────────────
@@ -43,87 +43,121 @@ const GAME_ITEMS = [
   { label: 'Irregular', sub: 'Metroidvania · Shapeshifting', path: '/games/irregular', color: '#7eb8e8', num: '01' },
   { label: 'Abɔde', sub: 'Survival · Ghana · Family', path: '/games/abode', color: '#7ec87e', num: '02' },
   { label: 'Gold & Iron', sub: 'Historical · Gold Coast', path: '/games/gold-and-iron', color: '#c9962b', num: '03' },
+  { label: 'UI Showcase', sub: 'Game UI Elements · 6 Styles', path: '/games/ui', color: '#a080d0', num: '◈' },
 ];
 
 // ─── Playground mega-dropdown ──────────────────────────────────────────────────
 
-const PlaygroundMega: React.FC<{ isOpen: boolean }> = ({ isOpen }) => (
-  <AnimatePresence>
-    {isOpen && (
-      <motion.div
-        initial={{ opacity: 0, y: -10, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: -10, scale: 0.98 }}
-        transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute top-full left-0 mt-1 z-50"
-        style={{
-          background: 'linear-gradient(160deg, #07101f 0%, #050c18 100%)',
-          border: '1px solid rgba(77,143,200,0.14)',
-          boxShadow: '0 24px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(77,143,200,0.04)',
-          minWidth: '560px',
-        }}
-      >
-        {/* Header strip */}
-        <div
-          className="flex items-center gap-2.5 px-5 py-3"
-          style={{ borderBottom: '1px solid rgba(77,143,200,0.1)' }}
-        >
-          <div
-            className="w-1.5 h-1.5 rounded-full"
-            style={{ background: '#4d8fc8' }}
-          />
-          <span
-            className="text-[10px] tracking-[0.3em] uppercase"
-            style={{ color: '#4d8fc8', opacity: 0.6, fontFamily: 'monospace' }}
-          >
-            The Playground · UI Lab
-          </span>
-        </div>
+const PlaygroundMega: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
+  const [query, setQuery] = useState('');
 
-        {/* Sections */}
-        <div className="grid grid-cols-3 gap-0 p-4">
-          {PLAYGROUND_SECTIONS.map((section) => (
-            <div key={section.label} className="px-2">
-              <div
-                className="text-[9px] tracking-[0.28em] uppercase mb-3 px-2"
-                style={{ color: '#4d8fc8', opacity: 0.45, fontFamily: 'monospace' }}
-              >
-                {section.label}
-              </div>
-              {section.items.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className="group flex items-start gap-2.5 px-2 py-1.5 rounded-sm hover:bg-[#4d8fc8]/[0.07] transition-colors"
-                >
-                  <item.Icon
-                    size={12}
-                    className="mt-0.5 shrink-0 transition-colors group-hover:text-[#7eb8e8]"
-                    style={{ color: 'rgba(77,143,200,0.4)' }}
-                  />
-                  <div>
-                    <div
-                      className="text-[12px] font-medium leading-tight transition-colors group-hover:text-white"
-                      style={{ color: 'rgba(255,255,255,0.65)' }}
-                    >
-                      {item.label}
-                    </div>
-                    <div
-                      className="text-[10px] leading-tight mt-0.5"
-                      style={{ color: 'rgba(255,255,255,0.22)' }}
-                    >
-                      {item.sub}
-                    </div>
+  // Flatten all items for search
+  const allItems = useMemo(() =>
+    PLAYGROUND_SECTIONS.flatMap(s => s.items.map(item => ({ ...item, section: s.label }))),
+  []);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return null;
+    return allItems.filter(i =>
+      i.label.toLowerCase().includes(q) || i.sub.toLowerCase().includes(q) || i.section.toLowerCase().includes(q)
+    );
+  }, [query, allItems]);
+
+  // Reset search when dropdown closes
+  useEffect(() => { if (!isOpen) setQuery(''); }, [isOpen]);
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: -10, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -10, scale: 0.98 }}
+          transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute top-full left-0 mt-1 z-50"
+          style={{
+            background: 'linear-gradient(160deg, #07101f 0%, #050c18 100%)',
+            border: '1px solid rgba(77,143,200,0.14)',
+            boxShadow: '0 24px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(77,143,200,0.04)',
+            minWidth: '560px',
+          }}
+        >
+          {/* Header strip with search */}
+          <div
+            className="flex items-center gap-3 px-4 py-2.5"
+            style={{ borderBottom: '1px solid rgba(77,143,200,0.1)' }}
+          >
+            <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: '#4d8fc8' }} />
+            <span className="text-[10px] tracking-[0.3em] uppercase shrink-0" style={{ color: '#4d8fc8', opacity: 0.6, fontFamily: 'monospace' }}>
+              UI Lab
+            </span>
+            {/* Search input */}
+            <div className="flex items-center gap-1.5 ml-auto rounded-sm px-2 py-1" style={{ background: 'rgba(77,143,200,0.07)', border: '1px solid rgba(77,143,200,0.15)', minWidth: 160 }}>
+              <Search size={10} style={{ color: 'rgba(77,143,200,0.5)' }} />
+              <input
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder="Filter…"
+                className="bg-transparent outline-none w-full text-[11px]"
+                style={{ color: 'rgba(255,255,255,0.7)', fontFamily: 'monospace' }}
+                // Stop the dropdown's mouse-leave from closing on focus
+                onMouseEnter={e => e.stopPropagation()}
+              />
+            </div>
+          </div>
+
+          {/* Search results */}
+          {filtered !== null ? (
+            <div className="p-4">
+              {filtered.length === 0 ? (
+                <div className="text-[11px] px-2 py-3" style={{ color: 'rgba(255,255,255,0.25)', fontFamily: 'monospace' }}>No matches</div>
+              ) : (
+                <div className="grid grid-cols-2 gap-1">
+                  {filtered.map(item => (
+                    <Link key={item.path} to={item.path}
+                      className="group flex items-start gap-2.5 px-2 py-1.5 rounded-sm hover:bg-[#4d8fc8]/[0.07] transition-colors">
+                      <item.Icon size={12} className="mt-0.5 shrink-0" style={{ color: 'rgba(77,143,200,0.5)' }} />
+                      <div>
+                        <div className="text-[11px] font-medium leading-tight group-hover:text-white transition-colors" style={{ color: 'rgba(255,255,255,0.7)' }}>{item.label}</div>
+                        <div className="text-[9px] mt-0.5" style={{ color: 'rgba(77,143,200,0.5)', fontFamily: 'monospace' }}>{item.section}</div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Normal sections grid */
+            <div className="grid grid-cols-3 gap-0 p-4">
+              {PLAYGROUND_SECTIONS.map((section) => (
+                <div key={section.label} className="px-2">
+                  <div className="text-[9px] tracking-[0.28em] uppercase mb-3 px-2"
+                    style={{ color: '#4d8fc8', opacity: 0.45, fontFamily: 'monospace' }}>
+                    {section.label}
                   </div>
-                </Link>
+                  {section.items.map((item) => (
+                    <Link key={item.path} to={item.path}
+                      className="group flex items-start gap-2.5 px-2 py-1.5 rounded-sm hover:bg-[#4d8fc8]/[0.07] transition-colors">
+                      <item.Icon size={12} className="mt-0.5 shrink-0 transition-colors group-hover:text-[#7eb8e8]"
+                        style={{ color: 'rgba(77,143,200,0.4)' }} />
+                      <div>
+                        <div className="text-[12px] font-medium leading-tight transition-colors group-hover:text-white"
+                          style={{ color: 'rgba(255,255,255,0.65)' }}>{item.label}</div>
+                        <div className="text-[10px] leading-tight mt-0.5"
+                          style={{ color: 'rgba(255,255,255,0.22)' }}>{item.sub}</div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
               ))}
             </div>
-          ))}
-        </div>
-      </motion.div>
-    )}
-  </AnimatePresence>
-);
+          )}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
 
 // ─── Games dropdown ────────────────────────────────────────────────────────────
 

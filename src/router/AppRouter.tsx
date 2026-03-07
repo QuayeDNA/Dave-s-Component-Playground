@@ -24,6 +24,7 @@ const GamesIndex = lazy(() => import('@/components/games/GamesIndex'));
 const IrregularPage = lazy(() => import('@/components/games/IrregularPage'));
 const AbodePage = lazy(() => import('@/components/games/AbodePage'));
 const GoldAndIronPage = lazy(() => import('@/components/games/GoldAndIronPage'));
+const GameUIPage = lazy(() => import('@/components/games/GameUI/GameUIPage'));
 
 const Buttons = lazy(() => import('@/components/placeholders/Button'));
 const Forms = lazy(() => import('@/components/placeholders/Forms'));
@@ -121,6 +122,7 @@ const AppRouter: React.FC = () => {
               <Route path="games/irregular" element={<Suspense fallback={<GamesFallback />}><IrregularPage /></Suspense>} />
               <Route path="games/abode" element={<Suspense fallback={<GamesFallback />}><AbodePage /></Suspense>} />
               <Route path="games/gold-and-iron" element={<Suspense fallback={<GamesFallback />}><GoldAndIronPage /></Suspense>} />
+              <Route path="games/ui" element={<Suspense fallback={<GamesFallback />}><GameUIPage /></Suspense>} />
 
             </Route>
 
