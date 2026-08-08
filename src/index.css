@@ -1,8 +1,147 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap');
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* ────────────────────────────────────────────────────────────
+   DESIGN TOKENS — central, expandable colour system
+   ------------------------------------------------------------
+   Architecture
+   1. Primitive palette  — raw oklch values (`--t-*`),
+      the single source for every colour decision.
+   2. Base token layer   — semantic slots (`--background`,
+      `--primary`, etc.) that map primitives into Tailwind
+      utilities. Override these on a scoped selector to theme
+      a whole section (e.g. `[data-ui-theme="games"]`).
+   3. Utilities          — `@theme inline` re-exposes the base
+      vars so `bg-background`, `text-primary`, `border-border`
+      etc. resolve at runtime and stay themeable.
+   ------------------------------------------------------------
+   Future tokens: add a new `--t-*` primitive, wire it into a
+   `--color-*` theme slot, and every utility comes alive for
+   free — no rebuild or config edits needed.
+   ──────────────────────────────────────────────────────────── */
+
+:root {
+  /* ── Primitives · Playground identity (navy) ─────────────── */
+  --t-navy-900:  oklch(0.1242 0.0152 274.6); /* #05060c page deep */
+  --t-navy-800:  oklch(0.1356 0.0164 269.4); /* #06080f page */
+  --t-navy-700:  oklch(0.1537 0.0288 258.2); /* #050c18 panel deep */
+  --t-navy-600:  oklch(0.1731 0.0344 259.5); /* #07101f panel */
+  --t-navy-500:  oklch(0.1711 0.0353 264.8); /* #080f1f panel alt */
+
+  --t-ink-900:   oklch(0.9342 0.0104 247.9); /* #e4eaf0 ink */
+  --t-ink-700:   oklch(0.7933 0.0299 254.7); /* #afb9bd soft ink */
+  --t-ink-500:   oklch(0.7107 0.0331 256.8); /* #94a3b8 muted */
+
+  --t-accent:    oklch(0.6311 0.1097 246.7); /* #4d8fc8 */
+  --t-accent-b:  oklch(0.7609 0.0919 244.4); /* #7eb8e8 */
+
+  /* ── Primitives · Games / ember identity (bone · gold) ───── */
+  --t-ember-900: oklch(0.1331 0.0278 101.8); /* #0a0800 */
+  --t-ember-800: oklch(0.1457 0.0299 84.6);  /* #100900 */
+  --t-ember-700: oklch(0.1623 0.0332 91.4);  /* #130d00 */
+  --t-bone:      oklch(0.9568 0.0119 79.8);  /* #f5f0e8 bone ink */
+  --t-gold:      oklch(0.7042 0.1315 81.2);  /* #c9962b */
+  --t-gold-b:    oklch(0.8062 0.1358 84.7);  /* #e8b84b */
+  --t-gold-soft: oklch(0.6964 0.1167 73.0);  /* #c99142 */
+
+  /* ── Primitives · world accents (games) ──────────────────── */
+  --t-world-blue:   oklch(0.7609 0.0919 244.4); /* #7eb8e8 */
+  --t-world-green:  oklch(0.7657 0.1274 144.2); /* #7ec87e */
+  --t-world-gold:   oklch(0.7042 0.1315 81.2);  /* #c9962b */
+  --t-world-violet: oklch(0.6609 0.1189 301.9); /* #a080d0 */
+  --t-world-pink:   oklch(0.6254 0.1788 3.1);   /* #da4e7d */
+
+  /* ── Base layer · semantic slots ─────────────────────────── */
+  --background:            var(--t-navy-800);
+  --foreground:            var(--t-ink-900);
+  --card:                  var(--t-navy-600);
+  --card-foreground:       var(--t-ink-900);
+  --popover:               var(--t-navy-700);
+  --popover-foreground:    var(--t-ink-900);
+  --primary:               var(--t-accent);
+  --primary-foreground:    var(--t-navy-900);
+  --secondary:             var(--t-navy-500);
+  --secondary-foreground:  var(--t-ink-900);
+  --muted:                 var(--t-navy-500);
+  --muted-foreground:      var(--t-ink-500);
+  --accent:                var(--t-navy-500);
+  --accent-foreground:     var(--t-ink-900);
+  --destructive:           oklch(0.5785 0.2138 27.2);   /* danger */
+  --destructive-foreground: oklch(0.9889 0.0053 17.2);  /* near-white */
+  --border:                var(--t-navy-500);
+  --input:                 var(--t-navy-600);
+  --ring:                  var(--t-accent);
+  --chart-1:               var(--t-accent);
+  --chart-2:               var(--t-world-green);
+  --chart-3:               var(--t-world-gold);
+  --chart-4:               var(--t-world-violet);
+  --chart-5:               var(--t-world-pink);
+  --radius:                0.375rem;
+}
+
+/* ── Expose base slots as themeable utilities ─────────────── */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'Space Mono', monospace;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-serif: 'Crimson Pro', Georgia, serif;
+}
+
+/* ── Dark-variant support for existing `dark:` utilities ──── */
+@custom-variant dark (&:is(.dark *));
+
+/* ── Base styles ──────────────────────────────────────────── */
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  color-scheme: dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html, body, #root {
+    height: 100%;
+  }
+}
 
 /* Add this to your global CSS file */
 .leaflet-pane,
@@ -25,55 +164,4 @@
 .leaflet-top,
 .leaflet-bottom {
   z-index: auto !important;
-}
-
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  color-scheme: dark;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-@layer base {
-  :root {
-    --background: 222 47% 6%;
-    --foreground: 214 25% 88%;
-    --card: 222 40% 8%;
-    --card-foreground: 214 25% 88%;
-    --popover: 222 40% 7%;
-    --popover-foreground: 214 25% 88%;
-    --primary: 210 70% 56%;
-    --primary-foreground: 222 47% 6%;
-    --secondary: 222 30% 13%;
-    --secondary-foreground: 214 25% 75%;
-    --muted: 222 30% 11%;
-    --muted-foreground: 214 15% 48%;
-    --accent: 222 30% 13%;
-    --accent-foreground: 214 25% 88%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 222 25% 14%;
-    --input: 222 25% 12%;
-    --ring: 210 70% 56%;
-    --chart-1: 210 70% 56%;
-    --chart-2: 142 55% 55%;
-    --chart-3: 38 72% 50%;
-    --chart-4: 270 55% 60%;
-    --chart-5: 340 65% 58%;
-    --radius: 0.375rem;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-  html, body, #root {
-    height: 100%;
-  }
 }
