@@ -3,7 +3,7 @@ import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { useMemo, useRef, useState } from 'react';
 import { Scene } from '../shared/Scene';
-import { Dropdown } from "../../../ui/dropdown"
+import { Dropdown } from '@/components/ui/dropdown'
 
 // Geometry swap uses the "share a buffer geometry" API: each shape is built once
 // into a memoised THREE.BufferGeometry and passed via `geometry={}` — swapping
@@ -32,8 +32,7 @@ function GeoMesh({ geo }: { geo: GeoName }) {
   );
 }
 
-// Dropdown is anchored OUTSIDE the canvas card — it lives in the card column as
-// an overlay above the canvas, so the card's `overflow-hidden` clip never cuts it.
+// Geometry picker lives in a shared, viewport-aware Dropdown; the menu portals to body so the card's overflow-hidden slot can't clip it.
 const GeometryShowcase: React.FC = () => {
   const [geo, setGeo] = useState<GeoName>('Box');
   return (

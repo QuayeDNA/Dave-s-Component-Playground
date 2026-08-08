@@ -47,8 +47,8 @@ export function Dropdown<T extends string | number>({
       className={cn(
         "flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-semibold transition-colors",
         "border-border bg-background text-foreground hover:bg-accent",
-        isOpen && "bg-accent",
         triggerClassName,
+        isOpen && "bg-accent",
       )}
     >
       <span>{selected ? selected.label : ""}</span>
@@ -56,6 +56,8 @@ export function Dropdown<T extends string | number>({
     </button>
   )
 
+  // A custom `trigger` node is wrapped by the Radix Trigger `asChild`, so it must be a
+  // single element that forwards refs and accepts injected props (e.g. <button>).
   const triggerNode = trigger ?? defaultTrigger
 
   return (
@@ -71,7 +73,8 @@ export function Dropdown<T extends string | number>({
         <DropdownMenuRadioGroup
           value={String(value)}
           onValueChange={v => {
-            onChange(v as T)
+            const matched = options.find(o => String(o.value) === v)
+            if (matched) onChange(matched.value)
             setOpen(false)
           }}
         >
