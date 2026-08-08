@@ -52,6 +52,30 @@
   --t-world-violet: oklch(0.6609 0.1189 301.9); /* #a080d0 */
   --t-world-pink:   oklch(0.6254 0.1788 3.1);   /* #da4e7d */
 
+  /* ── Primitives · ink alpha ramp (playground) ────────────── */
+  --t-ink-strong:  oklch(1 0 0 / 0.68);   /* white @ 68% */
+  --t-ink-muted:   oklch(1 0 0 / 0.30);   /* white @ 30% */
+  --t-ink-faint:   oklch(1 0 0 / 0.22);   /* white @ 22% */
+  --t-ink-dim:     oklch(1 0 0 / 0.15);   /* white @ 15% */
+  --t-line:        oklch(1 0 0 / 0.06);   /* white @  6% */
+  --t-line-soft:   oklch(1 0 0 / 0.05);   /* white @  5% */
+  --t-line-faint:  oklch(1 0 0 / 0.04);   /* white @  4% */
+  --t-line-strong: oklch(1 0 0 / 0.10);   /* white @ 10% */
+
+  /* ── Primitives · bone alpha ramp (games) ────────────────── */
+  --t-bone-soft:  oklch(0.9568 0.0119 79.8 / 0.30);  /* bone @ 30% */
+  --t-bone-faint: oklch(0.9568 0.0119 79.8 / 0.26);  /* bone @ 26% */
+
+  /* ── Primitives · panel gradients (playground) ───────────── */
+  --t-panel-navy-top:  oklch(0.2098 0.0530 257.2);  /* #071830 */
+  --t-panel-navy-mid:  oklch(0.1599 0.0348 260.0);  /* #050d1c */
+  --t-panel-navy-deep: oklch(0.1319 0.0217 252.0);  /* #030810 */
+
+  /* ── Primitives · panel gradients (games) ────────────────── */
+  --t-panel-ember-top:  oklch(0.1594 0.0326 87.5);  /* #130c00 */
+  --t-panel-ember-mid:  oklch(0.1360 0.0279 94.2);  /* #0c0800 */
+  --t-panel-ember-deep: oklch(0.1220 0.0141 304.9); /* #07050a */
+
   /* ── Base layer · semantic slots ─────────────────────────── */
   --background:            var(--t-navy-800);
   --foreground:            var(--t-ink-900);
