@@ -38,6 +38,7 @@ Update `src/pages/Home.tsx` to use the brand-centralized token system defined in
 | `--t-ink-faint` | `oklch(1 0 0 / 0.22)` | `rgba(255,255,255,0.22)` |
 | `--t-ink-dim` | `oklch(1 0 0 / 0.15)` | `rgba(255,255,255,0.15)` |
 | `--t-line` | `oklch(1 0 0 / 0.06)` | `rgba(255,255,255,0.06)` |
+| `--t-line-soft` | `oklch(1 0 0 / 0.05)` | `rgba(255,255,255,0.05)` |
 | `--t-line-faint` | `oklch(1 0 0 / 0.04)` | `rgba(255,255,255,0.04)` |
 | `--t-line-strong` | `oklch(1 0 0 / 0.10)` | `rgba(255,255,255,0.10)` |
 
