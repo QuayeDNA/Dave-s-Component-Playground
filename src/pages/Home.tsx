@@ -25,28 +25,6 @@ const GAME_LINKS = [
 const stagger = { animate: { transition: { staggerChildren: 0.06, delayChildren: 0.04 } }, initial: {} };
 const fadeUp = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } } };
 
-const GridOverlay: React.FC = () => (
-  <svg className="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-    <defs>
-      <pattern id="pg-grid" width="50" height="50" patternUnits="userSpaceOnUse">
-        <path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(78,143,200,0.07)" strokeWidth="1" />
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#pg-grid)" />
-  </svg>
-);
-
-const DiagonalOverlay: React.FC = () => (
-  <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.04]" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-    <defs>
-      <pattern id="games-lines" width="60" height="60" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
-        <line x1="0" y1="0" x2="0" y2="60" stroke="#c9962b" strokeWidth="1" />
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#games-lines)" />
-  </svg>
-);
-
 const HomePage: React.FC = () => {
   const [hovered, setHovered] = useState<World>(null);
   const navigate = useNavigate();
@@ -111,11 +89,6 @@ const HomePage: React.FC = () => {
           />
 
           <PlaygroundBg />
-          <GridOverlay />
-          <div
-            className="absolute pointer-events-none"
-            style={{ top: '-20%', left: '-10%', width: '70%', height: '70%', background: 'radial-gradient(circle, rgba(77,143,200,0.16) 0%, transparent 65%)' }}
-          />
 
           <div className="relative z-10 p-6 sm:p-8 lg:p-12 flex flex-col flex-1 justify-between overflow-y-auto">
             {/* Heading */}
@@ -202,17 +175,12 @@ const HomePage: React.FC = () => {
           onHoverEnd={() => setHovered(null)}
           onClick={() => navigate('/games')}
         >
-          <DiagonalOverlay />
           <GamesBg />
-          <div
-            className="absolute pointer-events-none"
-            style={{ top: '-15%', right: '-15%', width: '70%', height: '70%', background: 'radial-gradient(circle, rgba(201,150,43,0.14) 0%, transparent 65%)' }}
-          />
 
           <div className="relative z-10 p-6 sm:p-8 lg:p-12 flex flex-col flex-1 justify-between overflow-y-auto">
             {/* Heading */}
             <div>
-              <p className="text-[10px] tracking-[0.35em] uppercase mb-4" style={{ color: '#c99142', opacity: 0.6, fontFamily: 'monospace' }}>
+              <p className="text-[10px] tracking-[0.35em] uppercase mb-4" style={{ color: '#c9962b', opacity: 0.6, fontFamily: 'monospace' }}>
                 Game Design · Narratives · Worlds
               </p>
               <h1
@@ -270,7 +238,7 @@ const HomePage: React.FC = () => {
             <div className="mt-6 lg:mt-8">
               <motion.div
                 className="inline-flex items-center gap-2 text-sm font-semibold"
-                style={{ color: '#c99142' }}
+                style={{ color: '#c9962b' }}
                 whileHover={{ x: 5 }}
                 transition={{ type: 'spring', stiffness: 420, damping: 22 }}
               >
