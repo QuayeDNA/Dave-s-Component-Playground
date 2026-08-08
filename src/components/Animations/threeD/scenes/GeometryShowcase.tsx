@@ -2,8 +2,8 @@ import { useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { useMemo, useRef, useState } from 'react';
-import { ChevronDown } from 'lucide-react';
 import { Scene } from '../shared/Scene';
+import { Dropdown } from "../../../ui/dropdown"
 
 // Geometry swap uses the "share a buffer geometry" API: each shape is built once
 // into a memoised THREE.BufferGeometry and passed via `geometry={}` — swapping
@@ -36,7 +36,6 @@ function GeoMesh({ geo }: { geo: GeoName }) {
 // an overlay above the canvas, so the card's `overflow-hidden` clip never cuts it.
 const GeometryShowcase: React.FC = () => {
   const [geo, setGeo] = useState<GeoName>('Box');
-  const [open, setOpen] = useState(false);
   return (
     <div className="flex flex-col h-full">
       <div className="relative" style={{ flex: 1 }}>
@@ -45,32 +44,15 @@ const GeometryShowcase: React.FC = () => {
           <OrbitControls enableZoom={false} enablePan={false} />
         </Scene>
 
-        {/* Dropdown — outside canvas (not clipped), float on the scene */}
+        {/* Dropdown — portals out of the canvas card, viewport-aware */}
         <div className="absolute top-2 right-2 z-20">
-          <button type="button" onClick={() => setOpen(o => !o)}
-            className="rounded-lg px-2.5 py-1 flex items-center gap-1.5"
-            style={{
-              background: open ? 'rgba(37,99,235,0.16)' : 'rgba(255,255,255,0.75)',
-              border: `1px solid ${open ? 'rgba(37,99,235,0.5)' : 'rgba(0,0,0,0.12)'}`,
-              backdropFilter: 'blur(6px)', cursor: 'pointer',
-            }}>
-            <span className="text-[10px] font-semibold" style={{ color: open ? '#2563eb' : '#334155' }}>{geo}</span>
-            <ChevronDown size={12} color={open ? '#2563eb' : '#64748b'} />
-          </button>
-          {open && (
-            <div className="absolute top-9 right-0 rounded-xl p-1.5 w-40"
-              style={{ background: 'rgba(255,255,255,0.96)', border: '1px solid rgba(0,0,0,0.1)',
-                backdropFilter: 'blur(12px)', boxShadow: '0 8px 24px rgba(0,0,0,0.12)' }}>
-              {GEO_OPTIONS.map(g => (
-                <button key={g} type="button" onClick={() => { setGeo(g); setOpen(false); }}
-                  className="w-full text-left text-[10px] font-semibold px-2.5 py-1.5 rounded-lg"
-                  style={{
-                    background: geo === g ? 'rgba(37,99,235,0.14)' : 'transparent',
-                    color: geo === g ? '#2563eb' : '#475569', cursor: 'pointer',
-                  }}>{g}</button>
-              ))}
-            </div>
-          )}
+          <Dropdown
+            value={geo}
+            onChange={setGeo}
+            options={GEO_OPTIONS.map(g => ({ value: g, label: g }))}
+            contentClassName="w-40 bg-white/95 border-slate-200 text-slate-600 shadow-lg"
+            triggerClassName="border-slate-300 bg-white/75 text-slate-700 backdrop-blur"
+          />
         </div>
       </div>
     </div>
