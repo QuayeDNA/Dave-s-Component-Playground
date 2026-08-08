@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo, Suspense, useEffect } from 'react';
+import React, { createContext, useContext, useRef, useState, useMemo, Suspense, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import {
   OrbitControls, PerspectiveCamera, Stars, Trail,
@@ -10,22 +10,32 @@ import { motion } from 'framer-motion';
 import { Settings2 } from 'lucide-react';
 
 // ── Lazy-mount: Canvas only renders when card is in view ─────────────────────
+// Once mounted, the card stays mounted (avoids shader recompiles on scroll-back)
+// but the context gates the render loop — `frameloop="always"` only while the
+// card is on-screen, `"never"` when it scrolls away, so off-screen canvases go idle.
+const SceneActive = createContext(false);
+
 const LazyCanvas: React.FC<{ children: React.ReactNode; bg?: string }> = ({ children, bg = '#04060c' }) => {
   const wrapRef = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [inView, setInView] = useState(false);
+
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
-      { rootMargin: '200px' }
-    );
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) setMounted(true);
+      setInView(entry.isIntersecting);
+    }, { rootMargin: '200px' });
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
+
   return (
     <div ref={wrapRef} style={{ width: '100%', height: '100%', background: bg }}>
-      {visible ? children : null}
+      <SceneActive.Provider value={mounted && inView}>
+        {mounted ? children : null}
+      </SceneActive.Provider>
     </div>
   );
 };
@@ -72,26 +82,30 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ number, title, subtitle, 
 // ── Scene: bare Canvas with standard lighting ────────────────────────────────
 const Scene: React.FC<{ children: React.ReactNode; camera?: [number, number, number]; lightBg?: boolean }> = ({
   children, camera = [0, 0, 5], lightBg,
-}) => (
-  <Canvas dpr={[1, 1.5]} gl={{ antialias: true, alpha: !lightBg }}
-    style={{ background: lightBg ? '#f0f4f8' : 'transparent' }}>
-    <PerspectiveCamera makeDefault position={camera} fov={50} />
-    {lightBg ? (
-      <>
-        <ambientLight intensity={1.2} />
-        <directionalLight position={[5, 8, 5]} intensity={1.4} castShadow />
-        <directionalLight position={[-4, -2, -4]} intensity={0.4} color="#c8d8f0" />
-      </>
-    ) : (
-      <>
-        <ambientLight intensity={0.4} />
-        <pointLight position={[10, 10, 10]} intensity={1.2} />
-        <pointLight position={[-8, -8, -8]} intensity={0.5} color="#7eb8e8" />
-      </>
-    )}
-    <Suspense fallback={null}>{children}</Suspense>
-  </Canvas>
-);
+}) => {
+  const active = useContext(SceneActive);
+  return (
+    <Canvas dpr={[1, 1.5]} frameloop={active ? 'always' : 'never'}
+      gl={{ antialias: true, alpha: !lightBg, powerPreference: 'high-performance' }}
+      style={{ background: lightBg ? '#f0f4f8' : 'transparent' }}>
+      <PerspectiveCamera makeDefault position={camera} fov={50} />
+      {lightBg ? (
+        <>
+          <ambientLight intensity={1.2} />
+          <directionalLight position={[5, 8, 5]} intensity={1.4} castShadow />
+          <directionalLight position={[-4, -2, -4]} intensity={0.4} color="#c8d8f0" />
+        </>
+      ) : (
+        <>
+          <ambientLight intensity={0.4} />
+          <pointLight position={[10, 10, 10]} intensity={1.2} />
+          <pointLight position={[-8, -8, -8]} intensity={0.5} color="#7eb8e8" />
+        </>
+      )}
+      <Suspense fallback={null}>{children}</Suspense>
+    </Canvas>
+  );
+};
 
 // ═══════════════════════════════════════════════════════
 // SECTION 1 — GEOMETRY & MATERIALS
@@ -155,7 +169,7 @@ function MatMesh({ mode, metalness, roughness }: { mode: MatMode; metalness: num
   const col = '#2563eb';
   return (
     <mesh ref={ref} key={mode}>
-      <sphereGeometry args={[1.1, 64, 64]} />
+      <sphereGeometry args={[1.1, 48, 48]} />
       {mode === 'Standard'  && <meshStandardMaterial color={col} metalness={metalness} roughness={roughness} />}
       {mode === 'Wireframe' && <meshStandardMaterial color={col} wireframe />}
       {mode === 'Distort'   && <MeshDistortMaterial  color={col} distort={0.45} speed={2} metalness={metalness} roughness={roughness} />}
@@ -401,7 +415,7 @@ function OrbitScene() {
           <meshStandardMaterial color="#7c3aed" metalness={0.5} roughness={0.2} />
         </Torus>
       </Float>
-      <ContactShadows opacity={0.3} scale={6} blur={2} far={4} position={[0, -1.8, 0]} />
+      <ContactShadows opacity={0.3} scale={6} blur={2} far={4} position={[0, -1.8, 0]} resolution={256} />
     </>
   );
 }
@@ -546,7 +560,7 @@ function DistortBlob({ speed, distort }: { speed: number; distort: number }) {
   useFrame((_, dt) => { ref.current.rotation.y += 0.3 * dt; });
   return (
     <mesh ref={ref}>
-      <sphereGeometry args={[1.3, 64, 64]} />
+      <sphereGeometry args={[1.3, 48, 48]} />
       <MeshDistortMaterial
         color="#a78bfa" distort={distort} speed={speed}
         metalness={0.2} roughness={0.1}
@@ -698,10 +712,12 @@ function WarpStarField({ warp }: { warp: boolean }) {
 }
 const StarWarp: React.FC = () => {
   const [warp, setWarp] = useState(false);
+  const active = useContext(SceneActive);
   return (
     // Full-bleed — no inner padding, canvas fills entire card slot
     <div className="relative" style={{ width: '100%', height: '100%' }}>
-      <Canvas dpr={[1, 1.5]} gl={{ antialias: false, alpha: false }}
+      <Canvas dpr={[1, 1.5]} frameloop={active ? 'always' : 'never'}
+        gl={{ antialias: false, alpha: false, powerPreference: 'high-performance' }}
         style={{ background: '#02040a', width: '100%', height: '100%' }}>
         {/* Camera sits at origin pointing down −Z; stars rush from −Z toward us */}
         <PerspectiveCamera makeDefault position={[0, 0, 0]} fov={80} near={0.05} far={200} />
@@ -738,7 +754,7 @@ function EnvBall({ preset }: { preset: EnvPreset }) {
     <>
       <Environment preset={preset} />
       <mesh ref={ref}>
-        <sphereGeometry args={[1.3, 64, 64]} />
+        <sphereGeometry args={[1.3, 48, 48]} />
         <meshStandardMaterial metalness={1} roughness={0.05} />
       </mesh>
     </>
@@ -803,7 +819,7 @@ function SceneObjects() {
         <torusGeometry args={[0.5, 0.2, 16, 50]} />
         <meshStandardMaterial color="#34d399" metalness={0.5} roughness={0.3} />
       </mesh>
-      <ContactShadows opacity={0.5} scale={8} blur={2.5} far={5} position={[0, -1, 0]} />
+      <ContactShadows opacity={0.5} scale={8} blur={2.5} far={5} position={[0, -1, 0]} resolution={256} />
     </>
   );
 }
@@ -893,7 +909,7 @@ const FloatingCrystals: React.FC = () => (
   <Scene camera={[0, 0.5, 4]} lightBg>
     <Environment preset="dawn" />
     <CrystalCluster />
-    <ContactShadows opacity={0.3} scale={5} blur={2} far={3} position={[0, -1.2, 0]} />
+    <ContactShadows opacity={0.3} scale={5} blur={2} far={3} position={[0, -1.2, 0]} resolution={256} />
     <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.9} />
   </Scene>
 );
