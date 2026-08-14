@@ -33,7 +33,7 @@ function Particles({ attracting }: { attracting: boolean }) {
     return arr;
   }, [initPos]);
 
-  const phase = useRef(0);
+  const phase: { current: number; _startTime?: number } = useRef(0);
 
   useEffect(() => {
     phase.current = attracting ? 1 : -1;
@@ -52,8 +52,8 @@ function Particles({ attracting }: { attracting: boolean }) {
 
       if (phase.current === 1) {
         const delay = initDist / 6;
-        const elapsed = t - (phase as any)._startTime;
-        if ((phase as any)._startTime === undefined || elapsed > delay) {
+        const elapsed = phase._startTime === undefined ? 0 : t - phase._startTime;
+        if (phase._startTime === undefined || elapsed > delay) {
           const strength = 0.9 * dt * 60;
           vels.current[ix] += (-px / dist) * strength * Math.min(dist * 0.4, 1.8);
           vels.current[iy] += (-py / dist) * strength * Math.min(dist * 0.4, 1.8);

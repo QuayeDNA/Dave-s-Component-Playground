@@ -770,7 +770,7 @@ function UpdateBanner({ onDismiss }: { onDismiss: () => void }) {
 /* ═══════════════════════════════════════════════════════════════════
    12. PERMISSION PROMPT — request camera / location
 ══════════════════════════════════════════════════════════════════════ */
-function PermissionPrompt({ onDismiss: _dismiss }: { onDismiss: () => void }) {
+function PermissionPrompt() {
   const [state, setState] = useState<'idle' | 'granted' | 'denied'>('idle');
 
   return (

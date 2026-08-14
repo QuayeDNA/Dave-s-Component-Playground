@@ -104,7 +104,7 @@ export const GamesBg: React.FC = () => {
       size: number; rgb: string;
     }
 
-    let embers: Ember[] = [];
+    const embers: Ember[] = [];
     let w = 0, h = 0;
     let raf = 0;
     let paused = false;
