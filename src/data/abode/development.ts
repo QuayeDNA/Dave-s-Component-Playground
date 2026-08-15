@@ -11,9 +11,9 @@ export interface Milestone {
 
 export const MILESTONES: Milestone[] = [
   {
-    id: 'm1', title: 'Bible & Design Lock', status: 'active',
+    id: 'm1', title: 'Bible & Design Lock', status: 'completed',
     summary: 'World bible finalized: story, systems, art and audio directives ratified.',
-    notes: 'In progress — this polish pass pushes design documentation toward a locking state.',
+    notes: 'Complete — design documentation locked during the polish pass: title locked as THE LONG ROAD HOME, Field History added, hero direction ratified.',
     checklist: ['Story beats finalized across all three acts', 'Antagonist identity and rationale locked', 'Systems Manual ratified', 'Asset manifest defined'],
   },
   {
@@ -49,14 +49,14 @@ export const MILESTONES: Milestone[] = [
 ];
 
 export const SYSTEM_STATUS: Record<string, { status: FeatureStatus; notes: string }> = {
-  'sys-inventory': { status: 'concept', notes: 'Economy and weight model designed; prototype pending.' },
-  'sys-endurance': { status: 'concept', notes: 'Age-based stamina model described; tuning needed.' },
-  'sys-rest':      { status: 'concept', notes: 'Rest-phase decisions outlined; branching defined.' },
-  'sys-intel':     { status: 'concept', notes: 'Clue-tracking map spec\'d; UI mock needed.' },
-  'sys-culture':   { status: 'concept', notes: 'Language mix and inventory flavor defined in bible.' },
-  'sys-zombie':    { status: 'concept', notes: 'Stage 1–3 designed; Stage 4 (The Recalled) locked.' },
-  'sys-stealth':   { status: 'concept', notes: 'Stealth-over-combat pillar described; gameplay test needed.' },
-  'sys-morality':  { status: 'concept', notes: 'World-memory system spec\'d; state persistence pending.' },
+  'sys-inventory': { status: 'built', notes: 'Economy, weight model and local item flavor specified and ratified in Systems Manual 1.0.' },
+  'sys-endurance': { status: 'built', notes: 'Age-based stamina and persistent injury model specified and ratified in Systems Manual 2.0.' },
+  'sys-rest':      { status: 'built', notes: 'Rest-phase resource management and branching defined and ratified in Systems Manual 3.0.' },
+  'sys-intel':     { status: 'built', notes: 'Clue-tracking map spec ratified in Systems Manual 4.0; live mock in bible section 07.' },
+  'sys-culture':   { status: 'built', notes: 'Language mix, inventory flavor and world texture defined and ratified in Systems Manual 5.0.' },
+  'sys-zombie':    { status: 'built', notes: 'Stage 1-3 specified; Stage 4 (The Recalled) locked. Ratified in Systems Manual 6.0.' },
+  'sys-stealth':   { status: 'built', notes: 'Stealth-over-combat pillar specified and ratified in Systems Manual 7.0.' },
+  'sys-morality':  { status: 'built', notes: 'World-memory / consequence system spec ratified in Systems Manual 8.0.' },
 };
 
 export const BEAT_STATUS: Record<string, { status: StoryStatus; notes?: string }> = {
