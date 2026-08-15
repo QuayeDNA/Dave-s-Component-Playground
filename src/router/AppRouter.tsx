@@ -1,9 +1,10 @@
 // src/router/AppRouter.tsx
-import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import React, { Suspense, lazy, useEffect, useRef } from 'react';
+import { BrowserRouter as Router, Route, Routes, useLocation, useNavigationType } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import ErrorBoundary from './ErrorBoundary';
 import { Layout } from '../components/layout/Layout';
+import { GameLayout } from '../components/layout/GameLayout';
 
 const ChatGPTModelSelector = lazy(() => import('@/components/GPTModelRedesign/GptModel'));
 
@@ -86,10 +87,53 @@ const GamesFallback = () => (
 
 // ── Router ────────────────────────────────────────────────────────
 
+/**
+ * Scroll manager. The browser's default scroll restoration (history.scrollRestoration
+ * = 'auto') fires after the page content mounts and overrides any scrollTo(0,0),
+ * which is why game pages used to land on their first section instead of the hero.
+ *
+ * We take over restoration manually:
+ *  - new navigations (PUSH/REPLACE) start at the top → hero/landing
+ *  - back/forward (POP) restores the exact position that route was scrolled to
+ */
+const ScrollManager: React.FC = () => {
+  const { pathname } = useLocation();
+  const navigationType = useNavigationType();
+  const scrollPositions = useRef<Map<string, number>>(new Map());
+
+  // Register on every render so the map key below is always the location.key.
+  const locationKey = useLocation().key;
+
+  useEffect(() => {
+    if (navigationType === 'POP') {
+      const saved = scrollPositions.current.get(locationKey);
+      window.scrollTo(0, saved ?? 0);
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname, navigationType, locationKey]);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const key = locationKey;
+      if (window.scrollY > 0) scrollPositions.current.set(key, window.scrollY);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [locationKey]);
+
+  useEffect(() => {
+    history.scrollRestoration = 'manual';
+  }, []);
+
+  return null;
+};
+
 const AppRouter: React.FC = () => {
   return (
     <Router>
       <ErrorBoundary>
+        <ScrollManager />
         {/* Outer Suspense catches Layout itself and the Home landing page */}
         <Suspense fallback={<PlaygroundFallback />}>
           <Routes>
@@ -117,6 +161,11 @@ const AppRouter: React.FC = () => {
               <Route path="components/forms" element={<Suspense fallback={<PlaygroundFallback />}><Forms /></Suspense>} />
               <Route path="components/cards" element={<Suspense fallback={<PlaygroundFallback />}><Cards /></Suspense>} />
               <Route path="components/notification" element={<Suspense fallback={<PlaygroundFallback />}><Notifications /></Suspense>} />
+
+            </Route>
+
+            {/* Games — bare layout, each game owns its full viewport (no root header) */}
+            <Route element={<GameLayout />}>
 
               {/* Games — warm amber loader */}
               <Route path="games" element={<Suspense fallback={<GamesFallback />}><GamesIndex /></Suspense>} />
