@@ -148,14 +148,14 @@ const HomePage: React.FC = () => {
 
           {/* Desktop accent sweep */}
           <motion.div
-            className="absolute bottom-0 left-0 h-[2px] hidden lg:block"
+            className="absolute bottom-0 left-0 h-0.5 hidden lg:block"
             style={{ background: 'linear-gradient(90deg, var(--t-accent), var(--t-accent-b))' }}
             animate={{ width: hovered === 'playground' ? '100%' : '0%' }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           />
           {/* Mobile top accent line */}
           <div
-            className="absolute top-0 left-0 w-full h-[2px] lg:hidden"
+            className="absolute top-0 left-0 w-full h-0.5 lg:hidden"
             style={{ background: 'linear-gradient(90deg, var(--t-accent) 0%, transparent 70%)' }}
           />
         </motion.div>
@@ -249,14 +249,14 @@ const HomePage: React.FC = () => {
 
           {/* Desktop accent sweep */}
           <motion.div
-            className="absolute bottom-0 right-0 h-[2px] hidden lg:block"
+            className="absolute bottom-0 right-0 h-0.5 hidden lg:block"
             style={{ background: 'linear-gradient(270deg, var(--t-gold), var(--t-gold-b))' }}
             animate={{ width: hovered === 'games' ? '100%' : '0%' }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           />
           {/* Mobile bottom accent */}
           <div
-            className="absolute bottom-0 left-0 w-full h-[2px] lg:hidden"
+            className="absolute bottom-0 left-0 w-full h-0.5 lg:hidden"
             style={{ background: 'linear-gradient(90deg, var(--t-gold) 0%, transparent 70%)' }}
           />
         </motion.div>
