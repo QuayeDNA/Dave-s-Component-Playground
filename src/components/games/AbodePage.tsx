@@ -14,6 +14,7 @@ import { EvidenceLocker } from './abode/EvidenceLocker';
 import { SECTIONS } from '@/data/abode/sections';
 import { useSectionObserver, StickyNav } from './abode/sections';
 import { ASection } from './abode/ASection';
+import { HistorySection } from './abode/HistorySection';
 import { DossierCard } from './abode/DossierCard';
 import { IncidentBlock } from './abode/IncidentBlock';
 import { PersonnelComparison } from './abode/PersonnelComparison';
@@ -44,7 +45,7 @@ const AbodePage: React.FC = () => {
 
         {/* ── HERO BACKGROUND — image + readability overlays ── */}
         <div className="absolute inset-0 overflow-hidden">
-          <img src={heroImg} alt="Accra under collapse — Abode" className="w-full h-full object-cover object-center"
+          <img src={heroImg} alt="Accra under collapse — The Long Road Home" className="w-full h-full object-cover object-center"
             style={{ filter: 'saturate(0.85) contrast(1.05) brightness(0.82)' }} />
 
           {/* Top scrim — darkens strip area for the classification bar */}
@@ -98,15 +99,20 @@ const AbodePage: React.FC = () => {
             {TITLE.operation}
           </motion.div>
 
-          <motion.h1 className="at afl"
+          <motion.h1 className="at"
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.2 }}
-            style={{ fontSize: 'clamp(3.5rem, 13vw, 7rem)', color: PALE, letterSpacing: '0.12em', lineHeight: 1, marginBottom: '0.35rem' }}>
-            {TITLE.name}
+            style={{ fontSize: 'clamp(2.6rem, 9vw, 5.5rem)', color: PALE, letterSpacing: '0.08em', lineHeight: 1, marginBottom: '0.35rem' }}>
+            <span className="astatic">
+              <span className="astatic-t">{TITLE.name}</span>
+              <span className="astatic-g" aria-hidden="true">{TITLE.name}</span>
+              <span className="astatic-o" aria-hidden="true">{TITLE.name}</span>
+              <span className="astatic-n" aria-hidden="true">{TITLE.name}</span>
+            </span>
           </motion.h1>
 
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.52 }} transition={{ delay: 0.38 }}
-            className="am mb-8" style={{ color: G, fontSize: '0.68rem', letterSpacing: '0.45em' }}>
-            [ {TITLE.translation} ]
+            className="am mb-5" style={{ color: G, fontSize: '0.68rem', letterSpacing: '0.45em' }}>
+            [ {TITLE.romanised} — {TITLE.translation} ]
           </motion.div>
 
           <motion.div
@@ -117,8 +123,7 @@ const AbodePage: React.FC = () => {
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 0.72 }} transition={{ delay: 0.58, duration: 0.55 }}
             className="ab italic leading-loose max-w-lg mb-10"
             style={{ color: PALE, fontSize: '1.05rem' }}>
-            The dead walk through Accra's streets. Colonel Kwame Mensah has survived wars he chose.
-            This one chose him — and his children are somewhere in it.
+            {TITLE.subtitle}
           </motion.p>
 
           {/* Document metadata grid */}
@@ -178,44 +183,48 @@ const AbodePage: React.FC = () => {
           </div>
         </ASection>
 
-        <ASection id="situation" label="02 — Situation Report" stamp="SENSITIVE">
+        <ASection id="history" label="02 — Field History" stamp="LORE">
+          <HistorySection />
+        </ASection>
+
+        <ASection id="situation" label="03 — Situation Report" stamp="SENSITIVE">
           <FieldNote>A near-future Ghana. The outbreak began in the north and spread south within weeks, overwhelming NADMO and the Ghana Armed Forces. By the time Accra fell, communications were down. The government broadcast a single evacuation order — <span style={{ color: WARN, fontFamily: "'Special Elite', cursive" }}>D-Day</span> — and the country tried to move.</FieldNote>
           <FieldNote>The game's world cycles through recognizable Ghanaian locations: Osu neighborhoods with collapsed bars and chop shops. Tema Industrial Area with warehouses. The Cape Coast highway strewn with abandoned vehicles. Kumasi's market district. Each zone feels culturally specific — not a generic grey city.</FieldNote>
           <FieldNote>The story is not about the outbreak. It's about a father who spent his career protecting strangers, now having to navigate a collapsed world to protect the two people who actually matter.</FieldNote>
           <MissionBrief label="Thematic Core" text="What does a soldier become when there's no mission — only family? Kwame's entire skill set was built for other people's wars. This one is personal, and that changes everything." />
         </ASection>
 
-        <ASection id="personnel" label="03 — Personnel Files" stamp="RESTRICTED">
+        <ASection id="personnel" label="04 — Personnel Files" stamp="RESTRICTED">
           {PERSONNEL.map(p => (
             <DossierCard key={p.id} id={p.id} name={p.name} role={p.role} status={p.status}
               description={p.description} details={p.details} />
           ))}
         </ASection>
 
-        <ASection id="systems" label="04 — Systems Manual" stamp="OPERATIONAL">
+        <ASection id="systems" label="05 — Systems Manual" stamp="OPERATIONAL">
           {SYSTEMS.map(s => (
             <ManualEntry key={s.id} number={s.number} title={s.title} body={s.body} />
           ))}
         </ASection>
 
-        <ASection id="incidents" label="05 — Incident Log" stamp="CHRONOLOGICAL">
+        <ASection id="incidents" label="06 — Incident Log" stamp="CHRONOLOGICAL">
           {INCIDENTS.map(inc => (
             <IncidentBlock key={inc.phase} phase={inc.phase} title={inc.title} location={inc.location} body={inc.body} />
           ))}
         </ASection>
 
-        <ASection id="opmap" label="06 — Operational Map" stamp="FIELD ANNOTATED">
+        <ASection id="opmap" label="07 — Operational Map" stamp="FIELD ANNOTATED">
           <OpMap />
         </ASection>
 
-        <ASection id="comparison" label="07 — Personnel Comparison" stamp="ASSESSMENT">
+        <ASection id="comparison" label="08 — Personnel Comparison" stamp="ASSESSMENT">
           <div className="am mb-4" style={{ color: PALE, fontSize: '0.65rem', opacity: 0.4, letterSpacing: '0.2em' }}>
             SELECT PERSONNEL FILE TO VIEW CAPABILITY ASSESSMENT →
           </div>
           <PersonnelComparison />
         </ASection>
 
-        <ASection id="timeline" label="08 — Event Timeline" stamp="DUAL TRACK">
+        <ASection id="timeline" label="09 — Event Timeline" stamp="DUAL TRACK">
           <div className="ab italic mb-4"
             style={{ color: PALE, opacity: 0.55, fontSize: '0.95rem', borderLeft: `2px solid ${WARN}30`, paddingLeft: '1rem' }}>
             Two tracks: what Kwame experienced, and what Ama experienced while he was searching. The gap between the tracks — everything she did that he didn't see — is the emotional engine of Act II. Select a beat to expand.
@@ -223,20 +232,20 @@ const AbodePage: React.FC = () => {
           <DualTimeline />
         </ASection>
 
-        <ASection id="art" label="09 — Visual Directive" stamp="ART BRIEF">
+        <ASection id="art" label="10 — Visual Directive" stamp="ART BRIEF">
           <ArtDirective />
         </ASection>
 
-        <ASection id="audio" label="10 — Audio Directive" stamp="SOUND BRIEF">
+        <ASection id="audio" label="11 — Audio Directive" stamp="SOUND BRIEF">
           <AudioDirective />
         </ASection>
 
-        <ASection id="research" label="11 — Research & Cultural Notes" stamp="REFERENCE">
+        <ASection id="research" label="12 — Research & Cultural Notes" stamp="REFERENCE">
           <MissionBrief label="Accuracy Commitment" text="This game is set in Ghana, made about Ghanaian people, and will be played by Ghanaian players. Every cultural detail — language, architecture, social dynamics, spiritual belief — must be treated with the same rigor as the gameplay systems. Cultural accuracy is not a polish step. It is foundational." />
           <ResearchPanel />
         </ASection>
 
-        <ASection id="locker" label="12 — Evidence Locker" stamp="ASSET REGISTRY">
+        <ASection id="locker" label="13 — Evidence Locker" stamp="ASSET REGISTRY">
           <EvidenceLocker />
         </ASection>
 

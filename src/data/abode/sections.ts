@@ -1,5 +1,6 @@
 export const SECTIONS = [
   { id: 'overview',    label: 'OVERVIEW' },
+  { id: 'history',     label: 'HISTORY' },
   { id: 'situation',   label: 'SITUATION' },
   { id: 'personnel',   label: 'PERSONNEL' },
   { id: 'systems',     label: 'SYSTEMS' },

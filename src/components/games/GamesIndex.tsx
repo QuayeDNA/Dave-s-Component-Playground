@@ -21,7 +21,7 @@ const GameUICard: React.FC<{ delay: number }> = ({ delay }) => {
       }}
     >
       {/* Six-accent bar at top */}
-      <div className="flex h-[3px] absolute top-0 left-0 right-0">
+      <div className="flex h-0.75 absolute top-0 left-0 right-0">
         {STYLE_ACCENTS.map((c, i) => (
           <div key={i} className="flex-1 transition-opacity duration-300 group-hover:opacity-100" style={{ background: c, opacity: 0.7 }} />
         ))}
@@ -44,7 +44,7 @@ const GameUICard: React.FC<{ delay: number }> = ({ delay }) => {
           background: 'radial-gradient(circle, rgba(0,245,255,0.04) 0%, transparent 70%)' }} />
       </div>
 
-      <div className="relative z-10 p-5 sm:p-8 md:p-12 min-h-[260px] sm:min-h-[320px] flex flex-col justify-between">
+      <div className="relative z-10 p-5 sm:p-8 md:p-12 min-h-65 sm:min-h-80 flex flex-col justify-between">
         {/* Top meta */}
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex gap-1.5">
@@ -90,7 +90,7 @@ const GameUICard: React.FC<{ delay: number }> = ({ delay }) => {
         style={{ background: 'radial-gradient(ellipse at 20% 75%, rgba(160,128,208,0.08), transparent 55%)' }} />
 
       {/* Bottom bar */}
-      <div className="absolute bottom-0 left-0 h-[2px] transition-all duration-500 ease-out group-hover:w-full"
+      <div className="absolute bottom-0 left-0 h-0.5 transition-all duration-500 ease-out group-hover:w-full"
         style={{ background: '#a080d0', width: '0%' }} />
     </motion.div>
   );
@@ -158,7 +158,7 @@ const IrregularCard: React.FC<{ delay: number }> = ({ delay }) => {
         </svg>
       </div>
 
-      <div className="relative z-10 p-5 sm:p-8 md:p-12 min-h-[300px] sm:min-h-[380px] flex flex-col justify-between">
+      <div className="relative z-10 p-5 sm:p-8 md:p-12 min-h-75 sm:min-h-95 flex flex-col justify-between">
         {/* Top meta */}
         <div className="flex items-center justify-between flex-wrap gap-2">
           <span
@@ -244,9 +244,9 @@ const IrregularCard: React.FC<{ delay: number }> = ({ delay }) => {
       />
 
       {/* Bottom bars */}
-      <div className="absolute bottom-0 left-0 h-[2px] opacity-15 w-full" style={{ background: ACCENT }} />
+      <div className="absolute bottom-0 left-0 h-0.5 opacity-15 w-full" style={{ background: ACCENT }} />
       <div
-        className="absolute bottom-0 left-0 h-[2px] transition-all duration-500 ease-out group-hover:w-full"
+        className="absolute bottom-0 left-0 h-0.5 transition-all duration-500 ease-out group-hover:w-full"
         style={{ background: ACCENT, width: '0%' }}
       />
     </motion.div>
@@ -295,7 +295,7 @@ const AbodeCard: React.FC<{ delay: number }> = ({ delay }) => {
       <div className="absolute bottom-0 left-0 w-5 h-5 border-b border-l pointer-events-none" style={{ borderColor: `${BORD}` }} />
       <div className="absolute bottom-0 right-0 w-5 h-5 border-b border-r pointer-events-none" style={{ borderColor: `${BORD}` }} />
 
-      <div className="relative z-10 p-5 sm:p-8 md:p-12 min-h-[300px] sm:min-h-[380px] flex flex-col justify-between">
+      <div className="relative z-10 p-5 sm:p-8 md:p-12 min-h-75 sm:min-h-95 flex flex-col justify-between">
         {/* Top meta — dossier header */}
         <div className="flex items-start justify-between flex-wrap gap-3">
           <div>
@@ -334,12 +334,12 @@ const AbodeCard: React.FC<{ delay: number }> = ({ delay }) => {
             className="leading-none mb-3"
             style={{
               fontFamily: '"Special Elite", cursive',
-              fontSize: 'clamp(2.6rem, 7vw, 5rem)',
+              fontSize: 'clamp(2.2rem, 5.5vw, 4rem)',
               color: PALE,
               letterSpacing: '0.02em',
             }}
           >
-            Abɔde
+            THE LONG ROAD HOME
           </h2>
           <p
             className="mb-3 sm:mb-4"
@@ -350,8 +350,7 @@ const AbodeCard: React.FC<{ delay: number }> = ({ delay }) => {
               opacity: 0.6,
               letterSpacing: '0.08em',
             }}
-          >
-            Homeland. A Ghanaian zombie survival story.
+          >            ABƆDE · AKAN / TWI: HOMELAND. A Ghanaian zombie survival story.
           </p>
           {/* Dashed separator */}
           <div className="mb-3" style={{ borderTop: `1px dashed ${BORD}`, paddingTop: '0.75rem' }}>
@@ -396,7 +395,7 @@ const AbodeCard: React.FC<{ delay: number }> = ({ delay }) => {
       />
 
       {/* Bottom dashed accent */}
-      <div className="absolute bottom-0 left-0 right-0 h-[1px]" style={{ background: `repeating-linear-gradient(90deg, ${G}40 0px, ${G}40 6px, transparent 6px, transparent 12px)` }} />
+      <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: `repeating-linear-gradient(90deg, ${G}40 0px, ${G}40 6px, transparent 6px, transparent 12px)` }} />
     </motion.div>
   );
 };
@@ -456,7 +455,7 @@ const GoldIronCard: React.FC<{ delay: number }> = ({ delay }) => {
         </svg>
       </div>
 
-      <div className="relative z-10 p-5 sm:p-8 md:p-12 min-h-[300px] sm:min-h-[380px] flex flex-col justify-between">
+      <div className="relative z-10 p-5 sm:p-8 md:p-12 min-h-75 sm:min-h-95 flex flex-col justify-between">
         {/* Top meta — codex header */}
         <div className="flex items-center justify-between flex-wrap gap-2">
           <span
@@ -482,7 +481,7 @@ const GoldIronCard: React.FC<{ delay: number }> = ({ delay }) => {
         <div className="mt-5 sm:mt-0">
           {/* Kente mini-divider */}
           <div className="flex items-center gap-2 mb-3 sm:mb-4">
-            <div className="h-[1px] flex-1" style={{ background: `${GOLD}25` }} />
+            <div className="h-px flex-1" style={{ background: `${GOLD}25` }} />
             <svg width="50" height="10" viewBox="0 0 50 10" style={{ opacity: 0.5 }}>
               <rect x="0"  y="3" width="5"  height="4" fill={GOLD} opacity="0.4"/>
               <rect x="7"  y="1" width="3"  height="8" fill={GOLD} opacity="0.6"/>
@@ -492,7 +491,7 @@ const GoldIronCard: React.FC<{ delay: number }> = ({ delay }) => {
               <polygon points="34,5 37,2 40,5 37,8" fill={GOLD} opacity="0.7"/>
               <rect x="43" y="3" width="5"  height="4" fill={GOLD} opacity="0.4"/>
             </svg>
-            <div className="h-[1px] flex-1" style={{ background: `${GOLD}25` }} />
+            <div className="h-px flex-1" style={{ background: `${GOLD}25` }} />
           </div>
 
           <h2
@@ -564,10 +563,10 @@ const GoldIronCard: React.FC<{ delay: number }> = ({ delay }) => {
           className="h-[3px] transition-all duration-500 ease-out group-hover:flex-1"
           style={{ background: GOLD, width: '0%', minWidth: 0, flex: '0 0 0%' }}
         />
-        <div className="h-[1px] flex-1 opacity-20" style={{ background: GOLD }} />
+        <div className="h-px flex-1 opacity-20" style={{ background: GOLD }} />
       </div>
       <div
-        className="absolute bottom-0 left-0 h-[2px] transition-all duration-500 ease-out group-hover:w-full"
+        className="absolute bottom-0 left-0 h-0.5 transition-all duration-500 ease-out group-hover:w-full"
         style={{ background: GOLD, width: '0%' }}
       />
     </motion.div>
@@ -623,7 +622,7 @@ const GamesIndex: React.FC = () => {
           >
             Three Worlds
           </h1>
-          <div className="w-16 h-[2px] bg-[#f5f0e8] opacity-20 mb-6" />
+          <div className="w-16 h-0.5 bg-[#f5f0e8] opacity-20 mb-6" />
           <p
             className="text-base sm:text-lg max-w-xl opacity-60 leading-relaxed"
             style={{ fontFamily: '"Crimson Pro", Georgia, serif', color: '#f5f0e8' }}

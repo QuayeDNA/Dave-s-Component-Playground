@@ -104,7 +104,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
       subItems: [
         { name: "Index", path: "/games" },
         { name: "Irregular", path: "/games/irregular" },
-        { name: "Abode", path: "/games/abode" },
+        { name: "The Long Road Home", path: "/games/abode" },
         { name: "Gold & Iron", path: "/games/gold-and-iron" },
       ],
     },

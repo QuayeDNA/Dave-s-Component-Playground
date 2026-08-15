@@ -73,8 +73,7 @@ const AbodeTrackerPage: React.FC = () => {
         <div className="mb-10">
           <div className="am mb-3" style={{ color: WARN, fontSize: '0.62rem', letterSpacing: '0.4em', opacity: 0.5 }}>
             {TITLE.romanised} · PRODUCTION TRACKER · DRAFT {TITLE.draft}
-          </div>
-          <div className="flex items-end justify-between gap-4 flex-wrap mb-6">
+          </div>          <div className="flex items-end justify-between gap-4 flex-wrap mb-6">
             <h1 className="at" style={{ color: PALE, fontSize: 'clamp(1.8rem, 5vw, 3rem)', letterSpacing: '0.08em', lineHeight: 1 }}>{TITLE.name}</h1>
             <div className="am" style={{ color: G, fontSize: '1.4rem', letterSpacing: '0.2em' }}>{overall}%</div>
           </div>

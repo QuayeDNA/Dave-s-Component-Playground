@@ -11,7 +11,7 @@ export const AudioDirective: React.FC = () => {
     <div className="space-y-8">
       <div>
         <div className="am mb-4" style={{ color: G, fontSize: '0.75rem', letterSpacing: '0.3em', opacity: 0.55 }}>[ZONE AUDIO BRIEF]</div>
-        <MissionBrief label="Overall Philosophy" text="Abɔde's sound design should make Ghana audible even in collapse. The music doesn't abandon its roots when the world falls apart. Highlife rhythms decay into something haunted. The collapse sounds like Ghana breaking — not like a generic Western zombie soundtrack." />
+        <MissionBrief label="Overall Philosophy" text="THE LONG ROAD HOME's sound design should make Ghana audible even in collapse. The music doesn't abandon its roots when the world falls apart. Highlife rhythms decay into something haunted. The collapse sounds like Ghana breaking — not like a generic Western zombie soundtrack." />
         <div className="space-y-1 mt-6">
           {AUDIO_ZONES.map(z => (
             <div key={z.zone}>

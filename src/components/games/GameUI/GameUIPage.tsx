@@ -1130,7 +1130,7 @@ const MainMenuPreview: React.FC<{ t: Th }> = ({ t }) => {
         <div style={{ fontFamily: t.disp, color: t.a, fontSize: 'clamp(1.6rem, 5vw, 2.4rem)', letterSpacing: '0.06em',
           textShadow: t.id === 'D' ? `0 0 20px ${t.a}, 0 0 40px ${t.a}60` : undefined,
           animation: t.id === 'D' ? 'gui-neon-pulse 2s ease infinite' : undefined }}>
-          {t.id === 'A' ? 'IRREGULAR' : t.id === 'B' ? 'Abɔde' : t.id === 'C' ? 'Gold & Iron' : t.id === 'D' ? 'VOID.EXE' : t.id === 'E' ? 'ASHEN KEEP' : 'HERO QUEST'}
+          {t.id === 'A' ? 'IRREGULAR' : t.id === 'B' ? 'THE LONG ROAD HOME' : t.id === 'C' ? 'Gold & Iron' : t.id === 'D' ? 'VOID.EXE' : t.id === 'E' ? 'ASHEN KEEP' : 'HERO QUEST'}
         </div>
       </motion.div>
 

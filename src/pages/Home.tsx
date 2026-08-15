@@ -18,7 +18,7 @@ const PLAYGROUND_LINKS = [
 
 const GAME_LINKS = [
   { label: 'Irregular', sub: 'Metroidvania · Shapeshifting · Identity', path: '/games/irregular', color: 'var(--t-accent-b)', num: '01' },
-  { label: 'Abɔde', sub: 'Survival · Ghana · Family', path: '/games/abode', color: 'var(--t-world-green)', num: '02' },
+  { label: 'The Long Road Home', sub: 'Survival · Ghana · Family', path: '/games/abode', color: 'var(--t-world-green)', num: '02' },
   { label: 'Gold & Iron', sub: 'Historical · Gold Coast · Saga', path: '/games/gold-and-iron', color: 'var(--t-gold)', num: '03' },
 ];
 

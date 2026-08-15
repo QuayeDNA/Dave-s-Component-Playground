@@ -105,7 +105,7 @@ const SECTIONS: Section[] = [
     borderColor: 'rgba(201,150,43,0.15)',
     items: [
       { label: 'Irregular', description: 'Sci-fi metroidvania — shapeshifting protagonist, geometric world, AI companions.', path: '/games/irregular', Icon: Sword, tag: 'Sci-Fi' },
-      { label: 'Abɔde', description: 'Survival strategy set in Ghana — family bonds, resource scarcity, dossier aesthetic.', path: '/games/abode', Icon: Globe, tag: 'Survival' },
+      { label: 'The Long Road Home', description: 'Survival strategy set in Ghana — family bonds, resource scarcity, dossier aesthetic.', path: '/games/abode', Icon: Globe, tag: 'Survival' },
       { label: 'Gold & Iron', description: 'Historical epic across the Gold Coast — illuminated chronicle presentation.', path: '/games/gold-and-iron', Icon: Gamepad2, tag: 'Historical' },
       { label: 'UI Showcase', description: '9 interactive game UI elements rendered in 6 distinct style directions.', path: '/games/ui', Icon: Palette, tag: '6 Styles' },
     ],
@@ -298,7 +298,7 @@ const Overview: React.FC = () => {
               Also building three original games
             </p>
             <p className="text-xs" style={{ color: 'rgba(255,255,255,0.28)' }}>
-              Irregular, Abɔde, and Gold &amp; Iron — design docs, world-building and UI concepts.
+              Irregular, The Long Road Home, and Gold &amp; Iron — design docs, world-building and UI concepts.
             </p>
           </div>
           <motion.button
