@@ -63,7 +63,7 @@ export const BEAT_STATUS: Record<string, { status: StoryStatus; notes?: string }
   k1: { status: 'finalized' }, k2: { status: 'finalized' }, k3: { status: 'finalized' }, k4: { status: 'finalized' },
   a1: { status: 'finalized' }, a2: { status: 'finalized' },
   k5: { status: 'finalized' }, k6: { status: 'finalized' }, k7: { status: 'finalized' }, k8: { status: 'finalized' },
-  a3: { status: 'draft' }, a4: { status: 'draft' }, a5: { status: 'draft' },
+  a3: { status: 'finalized' }, a4: { status: 'finalized' }, a5: { status: 'finalized' },
   k9: { status: 'finalized' }, k10: { status: 'finalized' }, k11: { status: 'finalized' },
   k12: { status: 'finalized', notes: 'Ending branches depend on moral system states.' },
 };
