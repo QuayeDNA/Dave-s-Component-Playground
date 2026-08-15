@@ -17,9 +17,9 @@ const PLAYGROUND_LINKS = [
 ];
 
 const GAME_LINKS = [
-  { label: 'Irregular', sub: 'Metroidvania · Shapeshifting · Identity', path: '/games/irregular', color: '#7eb8e8', num: '01' },
-  { label: 'Abɔde', sub: 'Survival · Ghana · Family', path: '/games/abode', color: '#7ec87e', num: '02' },
-  { label: 'Gold & Iron', sub: 'Historical · Gold Coast · Saga', path: '/games/gold-and-iron', color: '#c9962b', num: '03' },
+  { label: 'Irregular', sub: 'Metroidvania · Shapeshifting · Identity', path: '/games/irregular', color: 'var(--t-accent-b)', num: '01' },
+  { label: 'Abɔde', sub: 'Survival · Ghana · Family', path: '/games/abode', color: 'var(--t-world-green)', num: '02' },
+  { label: 'Gold & Iron', sub: 'Historical · Gold Coast · Saga', path: '/games/gold-and-iron', color: 'var(--t-gold)', num: '03' },
 ];
 
 const stagger = { animate: { transition: { staggerChildren: 0.06, delayChildren: 0.04 } }, initial: {} };
@@ -32,25 +32,25 @@ const HomePage: React.FC = () => {
   return (
     <div
       className="min-h-screen flex flex-col"
-      style={{ background: '#06080f', fontFamily: 'Inter, system-ui, sans-serif' }}
+      style={{ background: 'var(--t-navy-800)', fontFamily: 'var(--font-sans)' }}
     >
       {/* ── Brand strip ───────────────────────────────────── */}
       <div
         className="flex-none flex items-center justify-between px-5 sm:px-8 h-11 shrink-0"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+        style={{ borderBottom: '1px solid var(--t-line-soft)' }}
       >
         <div className="flex items-center gap-2">
           <div
             className="w-5 h-5 flex items-center justify-center text-[9px] font-black rounded-sm shrink-0"
-            style={{ background: '#4d8fc8', color: '#06080f' }}
+            style={{ background: 'var(--t-accent)', color: 'var(--t-navy-800)' }}
           >
             CP
           </div>
-          <span className="text-[11px] font-semibold tracking-[0.18em] uppercase" style={{ color: 'rgba(255,255,255,0.3)' }}>
+          <span className="text-[11px] font-semibold tracking-[0.18em] uppercase" style={{ color: 'var(--t-ink-muted)' }}>
             Component Playground
           </span>
         </div>
-        <span className="text-[10px] tabular-nums" style={{ color: 'rgba(255,255,255,0.15)', fontFamily: 'monospace' }}>
+        <span className="text-[10px] tabular-nums" style={{ color: 'var(--t-ink-dim)', fontFamily: 'var(--font-mono)' }}>
           2026
         </span>
       </div>
@@ -66,7 +66,7 @@ const HomePage: React.FC = () => {
         <motion.div
           className="relative flex flex-col overflow-hidden cursor-pointer"
           style={{
-            background: 'linear-gradient(140deg, #071830 0%, #050d1c 60%, #030810 100%)',
+            background: 'linear-gradient(140deg, var(--t-panel-navy-top) 0%, var(--t-panel-navy-mid) 60%, var(--t-panel-navy-deep) 100%)',
             flexBasis: 0,
             minWidth: 0,
             minHeight: 0,
@@ -80,12 +80,12 @@ const HomePage: React.FC = () => {
           {/* Desktop border */}
           <div
             className="absolute inset-y-0 right-0 w-px hidden lg:block"
-            style={{ background: 'rgba(255,255,255,0.05)' }}
+            style={{ background: 'var(--t-line-soft)' }}
           />
           {/* Mobile border */}
           <div
             className="absolute inset-x-0 bottom-0 h-px lg:hidden"
-            style={{ background: 'rgba(255,255,255,0.06)' }}
+            style={{ background: 'var(--t-line)' }}
           />
 
           <PlaygroundBg />
@@ -93,7 +93,7 @@ const HomePage: React.FC = () => {
           <div className="relative z-10 p-6 sm:p-8 lg:p-12 flex flex-col flex-1 justify-between overflow-y-auto">
             {/* Heading */}
             <div>
-              <p className="text-[10px] tracking-[0.35em] uppercase mb-4" style={{ color: '#4d8fc8', opacity: 0.6, fontFamily: 'monospace' }}>
+              <p className="text-[10px] tracking-[0.35em] uppercase mb-4" style={{ color: 'var(--t-accent)', opacity: 0.6, fontFamily: 'var(--font-mono)' }}>
                 Design · Build · Explore
               </p>
               <h1
@@ -102,7 +102,7 @@ const HomePage: React.FC = () => {
               >
                 The<br />Playground
               </h1>
-              <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.3)', maxWidth: 280 }}>
+              <p className="text-sm leading-relaxed" style={{ color: 'var(--t-ink-muted)', maxWidth: 280 }}>
                 A growing library of experimental UI components, animations, and interactive systems.
               </p>
             </div>
@@ -119,12 +119,12 @@ const HomePage: React.FC = () => {
                     className="group flex items-center gap-3 w-full text-left py-1.5"
                     onClick={(e) => { e.stopPropagation(); navigate(link.path); }}
                   >
-                    <link.Icon size={12} className="shrink-0" style={{ color: '#4d8fc8', opacity: 0.65 }} />
+                    <link.Icon size={12} className="shrink-0" style={{ color: 'var(--t-accent)', opacity: 0.65 }} />
                     <div>
-                      <div className="text-[13px] font-medium leading-tight group-hover:text-white transition-colors" style={{ color: 'rgba(255,255,255,0.68)' }}>
+                      <div className="text-[13px] font-medium leading-tight group-hover:text-white transition-colors" style={{ color: 'var(--t-ink-strong)' }}>
                         {link.label}
                       </div>
-                      <div className="text-[10px] leading-tight mt-0.5" style={{ color: 'rgba(255,255,255,0.22)' }}>
+                      <div className="text-[10px] leading-tight mt-0.5" style={{ color: 'var(--t-ink-faint)' }}>
                         {link.sub}
                       </div>
                     </div>
@@ -137,7 +137,7 @@ const HomePage: React.FC = () => {
             <div className="mt-6 lg:mt-8">
               <motion.div
                 className="inline-flex items-center gap-2 text-sm font-semibold"
-                style={{ color: '#4d8fc8' }}
+                style={{ color: 'var(--t-accent)' }}
                 whileHover={{ x: 5 }}
                 transition={{ type: 'spring', stiffness: 420, damping: 22 }}
               >
@@ -148,15 +148,15 @@ const HomePage: React.FC = () => {
 
           {/* Desktop accent sweep */}
           <motion.div
-            className="absolute bottom-0 left-0 h-[2px] hidden lg:block"
-            style={{ background: 'linear-gradient(90deg, #4d8fc8, #7eb8e8)' }}
+            className="absolute bottom-0 left-0 h-0.5 hidden lg:block"
+            style={{ background: 'linear-gradient(90deg, var(--t-accent), var(--t-accent-b))' }}
             animate={{ width: hovered === 'playground' ? '100%' : '0%' }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           />
           {/* Mobile top accent line */}
           <div
-            className="absolute top-0 left-0 w-full h-[2px] lg:hidden"
-            style={{ background: 'linear-gradient(90deg, #4d8fc8 0%, transparent 70%)' }}
+            className="absolute top-0 left-0 w-full h-0.5 lg:hidden"
+            style={{ background: 'linear-gradient(90deg, var(--t-accent) 0%, transparent 70%)' }}
           />
         </motion.div>
 
@@ -164,7 +164,7 @@ const HomePage: React.FC = () => {
         <motion.div
           className="relative flex flex-col overflow-hidden cursor-pointer"
           style={{
-            background: 'linear-gradient(140deg, #130c00 0%, #0c0800 60%, #07050a 100%)',
+            background: 'linear-gradient(140deg, var(--t-panel-ember-top) 0%, var(--t-panel-ember-mid) 60%, var(--t-panel-ember-deep) 100%)',
             flexBasis: 0,
             minWidth: 0,
             minHeight: 0,
@@ -180,16 +180,16 @@ const HomePage: React.FC = () => {
           <div className="relative z-10 p-6 sm:p-8 lg:p-12 flex flex-col flex-1 justify-between overflow-y-auto">
             {/* Heading */}
             <div>
-              <p className="text-[10px] tracking-[0.35em] uppercase mb-4" style={{ color: '#c9962b', opacity: 0.6, fontFamily: 'monospace' }}>
+              <p className="text-[10px] tracking-[0.35em] uppercase mb-4" style={{ color: 'var(--t-gold)', opacity: 0.6, fontFamily: 'var(--font-mono)' }}>
                 Game Design · Narratives · Worlds
               </p>
               <h1
                 className="leading-[0.88] mb-3"
-                style={{ fontSize: 'clamp(2.4rem, 6vw, 5.5rem)', fontWeight: 800, letterSpacing: '-0.025em', color: '#f5f0e8' }}
+                style={{ fontSize: 'clamp(2.4rem, 6vw, 5.5rem)', fontWeight: 800, letterSpacing: '-0.025em', color: 'var(--t-bone)' }}
               >
                 Three<br />Worlds
               </h1>
-              <p className="text-sm leading-relaxed" style={{ color: 'rgba(245,240,232,0.3)', maxWidth: 280 }}>
+              <p className="text-sm leading-relaxed" style={{ color: 'var(--t-bone-soft)', maxWidth: 280 }}>
                 Original 2D game concepts — each a different world, visual language, and emotional core.
               </p>
             </div>
@@ -208,7 +208,7 @@ const HomePage: React.FC = () => {
                   >
                     <span
                       className="text-[10px] mt-0.5 shrink-0 tabular-nums"
-                      style={{ color: game.color, opacity: 0.4, fontFamily: 'monospace', minWidth: '1.4rem' }}
+                      style={{ color: game.color, opacity: 0.4, fontFamily: 'var(--font-mono)', minWidth: '1.4rem' }}
                     >
                       {game.num}
                     </span>
@@ -218,14 +218,14 @@ const HomePage: React.FC = () => {
                         style={{
                           color: game.color,
                           opacity: 0.82,
-                          fontFamily: '"Bebas Neue", sans-serif',
+                          fontFamily: 'var(--font-display)',
                           fontSize: '1.05rem',
                           letterSpacing: '0.04em',
                         }}
                       >
                         {game.label}
                       </div>
-                      <div className="text-[11px] leading-tight mt-0.5" style={{ color: 'rgba(245,240,232,0.26)' }}>
+                      <div className="text-[11px] leading-tight mt-0.5" style={{ color: 'var(--t-bone-faint)' }}>
                         {game.sub}
                       </div>
                     </div>
@@ -238,7 +238,7 @@ const HomePage: React.FC = () => {
             <div className="mt-6 lg:mt-8">
               <motion.div
                 className="inline-flex items-center gap-2 text-sm font-semibold"
-                style={{ color: '#c9962b' }}
+                style={{ color: 'var(--t-gold)' }}
                 whileHover={{ x: 5 }}
                 transition={{ type: 'spring', stiffness: 420, damping: 22 }}
               >
@@ -249,15 +249,15 @@ const HomePage: React.FC = () => {
 
           {/* Desktop accent sweep */}
           <motion.div
-            className="absolute bottom-0 right-0 h-[2px] hidden lg:block"
-            style={{ background: 'linear-gradient(270deg, #c9962b, #e8b84b)' }}
+            className="absolute bottom-0 right-0 h-0.5 hidden lg:block"
+            style={{ background: 'linear-gradient(270deg, var(--t-gold), var(--t-gold-b))' }}
             animate={{ width: hovered === 'games' ? '100%' : '0%' }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           />
           {/* Mobile bottom accent */}
           <div
-            className="absolute bottom-0 left-0 w-full h-[2px] lg:hidden"
-            style={{ background: 'linear-gradient(90deg, #c9962b 0%, transparent 70%)' }}
+            className="absolute bottom-0 left-0 w-full h-0.5 lg:hidden"
+            style={{ background: 'linear-gradient(90deg, var(--t-gold) 0%, transparent 70%)' }}
           />
         </motion.div>
       </div>
@@ -271,9 +271,9 @@ const HomePage: React.FC = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
             className="flex-none h-7 items-center justify-center shrink-0 hidden lg:flex"
-            style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}
+            style={{ borderTop: '1px solid var(--t-line-faint)' }}
           >
-            <span className="text-[9px] tracking-[0.3em] uppercase" style={{ color: 'rgba(255,255,255,0.1)' }}>
+            <span className="text-[9px] tracking-[0.3em] uppercase" style={{ color: 'var(--t-line-strong)' }}>
               hover to explore &middot; click to enter
             </span>
           </motion.div>

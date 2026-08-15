@@ -384,7 +384,7 @@ export const NewtonsCradleWired: React.FC = () => {
     const liftR=(n:number)=>{for(let i=0;i<N;i++){pends[i].theta=0;pends[i].omega=0;}for(let i=N-n;i<N;i++){pends[i].theta=0.6;}};
     liftL(1);
 
-    const onLift=(e:Event)=>{const d=(e as CustomEvent).detail;d.side==='left'?liftL(d.n):liftR(d.n);};
+    const onLift=(e:Event)=>{const d=(e as CustomEvent).detail;if(d.side==='left'){liftL(d.n);}else{liftR(d.n);}};
     canvas.addEventListener('lift' as never, onLift as never);
 
     let last=performance.now(), raf:number;

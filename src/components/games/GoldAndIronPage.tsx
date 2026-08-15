@@ -538,7 +538,7 @@ const SoundOfTheSaga: React.FC = () => {
                         { label: 'In Combat', val: z.battle, full: true },
                         { label: 'Reference Tracks', val: z.ref },
                       ].map(item => (
-                        <div key={item.label} className={(item as any).full ? 'sm:col-span-2' : ''}>
+                        <div key={item.label} className={('full' in item && item.full) ? 'sm:col-span-2' : ''}>
                           <div className="gi-small mb-1" style={{ color: z.color, opacity: 0.5, fontSize: '0.55rem' }}>{item.label}</div>
                           <div className="gi-body leading-relaxed" style={{ color: PARCHMENT, opacity: 0.78, fontSize: '0.95rem' }}>{item.val}</div>
                         </div>

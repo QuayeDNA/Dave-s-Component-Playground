@@ -39,10 +39,10 @@ const PLAYGROUND_SECTIONS = [
 ];
 
 const GAME_ITEMS = [
-  { label: 'All Worlds', sub: 'Three game concepts', path: '/games', color: '#f5f0e8', num: '—' },
-  { label: 'Irregular', sub: 'Metroidvania · Shapeshifting', path: '/games/irregular', color: '#7eb8e8', num: '01' },
+  { label: 'All Worlds', sub: 'Three game concepts', path: '/games', color: 'var(--t-bone)', num: '—' },
+  { label: 'Irregular', sub: 'Metroidvania · Shapeshifting', path: '/games/irregular', color: 'var(--t-accent-b)', num: '01' },
   { label: 'Abɔde', sub: 'Survival · Ghana · Family', path: '/games/abode', color: '#7ec87e', num: '02' },
-  { label: 'Gold & Iron', sub: 'Historical · Gold Coast', path: '/games/gold-and-iron', color: '#c9962b', num: '03' },
+  { label: 'Gold & Iron', sub: 'Historical · Gold Coast', path: '/games/gold-and-iron', color: 'var(--t-gold)', num: '03' },
   { label: 'UI Showcase', sub: 'Game UI Elements · 6 Styles', path: '/games/ui', color: '#a080d0', num: '◈' },
 ];
 
@@ -88,8 +88,8 @@ const PlaygroundMega: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
             className="flex items-center gap-3 px-4 py-2.5"
             style={{ borderBottom: '1px solid rgba(77,143,200,0.1)' }}
           >
-            <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: '#4d8fc8' }} />
-            <span className="text-[10px] tracking-[0.3em] uppercase shrink-0" style={{ color: '#4d8fc8', opacity: 0.6, fontFamily: 'monospace' }}>
+            <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: 'var(--t-accent)' }} />
+            <span className="text-[10px] tracking-[0.3em] uppercase shrink-0" style={{ color: 'var(--t-accent)', opacity: 0.6, fontFamily: 'monospace' }}>
               UI Lab
             </span>
             {/* Search input */}
@@ -133,7 +133,7 @@ const PlaygroundMega: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
               {PLAYGROUND_SECTIONS.map((section) => (
                 <div key={section.label} className="px-2">
                   <div className="text-[9px] tracking-[0.28em] uppercase mb-3 px-2"
-                    style={{ color: '#4d8fc8', opacity: 0.45, fontFamily: 'monospace' }}>
+                    style={{ color: 'var(--t-accent)', opacity: 0.45, fontFamily: 'monospace' }}>
                     {section.label}
                   </div>
                   {section.items.map((item) => (
@@ -183,11 +183,11 @@ const GamesMega: React.FC<{ isOpen: boolean }> = ({ isOpen }) => (
         >
           <div
             className="w-1.5 h-1.5 rounded-full"
-            style={{ background: '#c9962b' }}
+            style={{ background: 'var(--t-gold)' }}
           />
           <span
             className="text-[10px] tracking-[0.3em] uppercase"
-            style={{ color: '#c99142', opacity: 0.6, fontFamily: 'monospace' }}
+            style={{ color: 'var(--t-gold-soft)', opacity: 0.6, fontFamily: 'monospace' }}
           >
             Three Worlds · Game Design
           </span>
@@ -310,7 +310,7 @@ export const Header: React.FC = () => {
   const headerBorder = isGamesRoute
     ? 'rgba(201,150,43,0.1)'
     : 'rgba(255,255,255,0.06)';
-  const activeAccent = isGamesRoute ? '#c99142' : '#4d8fc8';
+  const activeAccent = isGamesRoute ? 'var(--t-gold-soft)' : 'var(--t-accent)';
 
   useEffect(() => {
     setMobileOpen(false);
@@ -351,8 +351,8 @@ export const Header: React.FC = () => {
             style={{
               background: isGamesRoute
                 ? 'linear-gradient(135deg, #c9962b, #e8b84b)'
-                : '#4d8fc8',
-              color: '#06080f',
+                : 'var(--t-accent)',
+              color: 'var(--t-navy-800)',
             }}
           >
             CP
@@ -387,7 +387,7 @@ export const Header: React.FC = () => {
             >
               <span
                 className="w-1.5 h-1.5 rounded-full shrink-0 transition-colors"
-                style={{ background: playgroundActive || activeDropdown === 'playground' ? '#4d8fc8' : 'rgba(77,143,200,0.3)' }}
+                style={{ background: playgroundActive || activeDropdown === 'playground' ? 'var(--t-accent)' : 'rgba(77,143,200,0.3)' }}
               />
               Playground
               <ChevronDown
@@ -424,7 +424,7 @@ export const Header: React.FC = () => {
             >
               <span
                 className="w-1.5 h-1.5 rounded-full shrink-0 transition-colors"
-                style={{ background: gamesActive || activeDropdown === 'games' ? '#c9962b' : 'rgba(201,150,43,0.3)' }}
+                style={{ background: gamesActive || activeDropdown === 'games' ? 'var(--t-gold)' : 'rgba(201,150,43,0.3)' }}
               />
               Games
               <ChevronDown
@@ -493,7 +493,7 @@ export const Header: React.FC = () => {
                 <div key={section.label} className="pb-2">
                   <div
                     className="px-6 pt-3 pb-1 text-[9px] tracking-[0.28em] uppercase"
-                    style={{ color: '#4d8fc8', opacity: 0.45, fontFamily: 'monospace' }}
+                    style={{ color: 'var(--t-accent)', opacity: 0.45, fontFamily: 'monospace' }}
                   >
                     {section.label}
                   </div>

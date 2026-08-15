@@ -470,7 +470,7 @@ export default function ChatGPTModelSelector() {
             Sort models by:
           </h2>
           <div className="flex flex-wrap gap-2">
-            {["speed", "reasoning", "creativity", "technical", "cost"].map(
+            {(["speed", "reasoning", "creativity", "technical", "cost"] as const).map(
               (metric) => (
                 <button
                   key={metric}
@@ -479,7 +479,7 @@ export default function ChatGPTModelSelector() {
                       ? "bg-[#10a37f] text-white"
                       : "bg-[#2a2a2a] text-[#8e8ea0] hover:bg-[#343541] hover:text-[#ececf1]"
                   }`}
-                  onClick={() => setSortBy(metric as any)}
+                  onClick={() => setSortBy(metric)}
                 >
                   {metric.charAt(0).toUpperCase() + metric.slice(1)}
                 </button>

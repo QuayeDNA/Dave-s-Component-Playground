@@ -29,7 +29,7 @@ export const GravityWells: React.FC = () => {
     };
     const spawnParticle=(w:number,h:number):Particle=>{
       const edge=Math.floor(Math.random()*4);
-      let x=0,y=0,vx=(Math.random()-.5)*40,vy=(Math.random()-.5)*40;
+      let x=0,y=0; const vx=(Math.random()-.5)*40,vy=(Math.random()-.5)*40;
       if(edge===0){x=Math.random()*w;y=0;}
       else if(edge===1){x=w;y=Math.random()*h;}
       else if(edge===2){x=Math.random()*w;y=h;}

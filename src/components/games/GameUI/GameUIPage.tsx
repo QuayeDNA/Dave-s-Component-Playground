@@ -2174,7 +2174,7 @@ const LOG_TEMPLATES: { type: LogEntry['type']; msgs: string[] }[] = [
 const CombatLog: React.FC<{ t: Th }> = ({ t }) => {
   const [entries, setEntries] = useState<LogEntry[]>([]);
   const [paused, setPaused] = useState(false);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const logRef = useRef<HTMLDivElement>(null);
 
   const ts = () => {
     const d = new Date();
@@ -2195,11 +2195,14 @@ const CombatLog: React.FC<{ t: Th }> = ({ t }) => {
     return () => clearInterval(id);
   }, [paused, addEntry]);
 
-  // Scroll to bottom after React has painted — requestAnimationFrame
-  // ensures layout is complete before measuring scrollHeight.
+  // Pin the log's internal scroll to the bottom after React has painted —
+  // requestAnimationFrame ensures layout is complete before measuring
+  // scrollHeight. Scoped to the container only; it must never scroll
+  // the page itself.
   useEffect(() => {
     const raf = requestAnimationFrame(() => {
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      const el = logRef.current;
+      if (el) el.scrollTop = el.scrollHeight;
     });
     return () => cancelAnimationFrame(raf);
   }, [entries]);
@@ -2252,7 +2255,7 @@ const CombatLog: React.FC<{ t: Th }> = ({ t }) => {
         </div>
       </div>
       {/* Log entries */}
-      <div style={{ height: 160, overflowY: 'auto', padding: '6px 10px', display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <div ref={logRef} style={{ height: 160, overflowY: 'auto', padding: '6px 10px', display: 'flex', flexDirection: 'column', gap: 3 }}>
         {entries.length === 0 && (
           <div style={{ fontFamily: t.font, color: `${t.text}40`, fontSize: t.id === 'F' ? '0.35rem' : '0.65rem', textAlign: 'center', marginTop: 50, fontStyle: t.id === 'C' ? 'italic' : 'normal' }}>
             {t.id === 'B' ? '— Awaiting field events —' : t.id === 'C' ? 'The chronicle awaits…' : 'No events yet…'}
@@ -2277,8 +2280,6 @@ const CombatLog: React.FC<{ t: Th }> = ({ t }) => {
             </motion.div>
           ))}
         </AnimatePresence>
-        {/* Scroll anchor — always stays at the bottom of the list */}
-        <div ref={bottomRef} style={{ flexShrink: 0, height: 1 }} />
       </div>
     </div>
   );
