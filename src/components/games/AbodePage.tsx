@@ -63,7 +63,7 @@ const AbodePage: React.FC = () => {
         {/* ── TOP CLASSIFICATION STRIP ── */}
         <div className="relative z-10 shrink-0"
           style={{ borderBottom: `1px solid ${WARN}20`, background: `${WARN}08` }}>
-          <div className="max-w-5xl mx-auto px-6 py-2 flex items-center justify-between">
+          <div className="max-w-5xl mx-auto px-4 md:px-6 py-2 flex flex-wrap items-center justify-between gap-x-6 gap-y-1">
             <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }}
               onClick={() => navigate('/games')}
               className="flex items-center gap-2"
@@ -73,8 +73,8 @@ const AbodePage: React.FC = () => {
               <ArrowLeft size={10} />
               <span className="am" style={{ fontSize: '0.58rem', letterSpacing: '0.3em' }}>RETURN TO GAME INDEX</span>
             </motion.button>
-            <div className="flex items-center gap-6">
-              <div className="am" style={{ color: WARN, fontSize: '0.52rem', letterSpacing: '0.35em', opacity: 0.38 }}>
+            <div className="flex items-center gap-3 md:gap-6">
+              <div className="am hidden md:block" style={{ color: WARN, fontSize: '0.52rem', letterSpacing: '0.35em', opacity: 0.38 }}>
                 TOP SECRET // SCI // NOFORN · REF: GH-ZB-MENSAH-02
               </div>
               <motion.button
