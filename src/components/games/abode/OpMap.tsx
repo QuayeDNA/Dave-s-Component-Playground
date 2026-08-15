@@ -1,13 +1,35 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { G, WARN, PALE, BG, SURF, BORD } from '@/data/abode/theme';
+import { G, WARN, PALE, SURF, BORD } from '@/data/abode/theme';
 import { ZONES, Zone } from '@/data/abode/zones';
 import { IntelCard } from './ui';
+import opMapRaw from '@/assets/svgs/abode/opMap.svg?raw';
+import markerPin from '@/assets/svgs/abode/markerPin.svg';
 
-const GHANA_PATH = 'M 20 22 L 78 22 C 81 30 84 40 82 50 C 81 58 78 60 72 62 L 62 72 C 56 74 50 76 46 74 L 30 70 C 24 68 20 64 20 58 L 18 44 C 16 36 17 28 20 22 Z';
+const OP_MAP_SVG = opMapRaw
+  .replace('viewbox="0 0 1000 1000"', 'viewBox="0 0 1000 1000"')
+  .replace('<svg', '<svg style="display:block;width:100%;height:100%"')
+  .replace('width="1000"', '')
+  .replace('height="1000"', '');
+
+const GROUP_TO_ZONE: Record<string, string> = {
+  g3: 'tema',
+  g2: 'coast',
+  g4: 'kumasi',
+  g5: 'north',
+};
 
 export const OpMap: React.FC = () => {
   const [activeZone, setActiveZone] = useState<Zone | null>(null);
+  const [hoverZone, setHoverZone] = useState<Zone | null>(null);
+
+  const handleMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const groupId = (e.target as Element)?.closest('g[id]')?.id ?? '';
+    const zoneId = GROUP_TO_ZONE[groupId];
+    if (!zoneId) return;
+    const zone = ZONES.find(z => z.id === zoneId);
+    if (zone) setActiveZone(activeZone?.id === zone.id ? null : zone);
+  };
 
   return (
     <div>
@@ -17,29 +39,33 @@ export const OpMap: React.FC = () => {
           <span className="am" style={{ color: WARN, fontSize: '0.55rem', letterSpacing: '0.2em', opacity: 0.4 }}>DISTORTED FOR ILLUSTRATION</span>
         </div>
 
-        <svg viewBox="0 0 100 100" className="w-full" style={{ maxHeight: 440 }}>
-          <defs>
-            <pattern id="mapgrid" width="10" height="10" patternUnits="userSpaceOnUse">
-              <path d="M 10 0 L 0 0 0 10" fill="none" stroke={BORD} strokeOpacity="0.35" strokeWidth="0.3"/>
-            </pattern>
-          </defs>
-          <rect width="100" height="100" fill="url(#mapgrid)"/>
-          <path d={GHANA_PATH} fill={`${SURF}88`} stroke={BORD} strokeWidth="0.8" strokeDasharray="2 1.4" />
-          {ZONES.map(z => {
-            const selected = activeZone?.id === z.id;
-            return (
-              <g key={z.id} onClick={() => setActiveZone(selected ? null : z)} style={{ cursor: 'pointer' }}>
-                <circle cx={z.coords.x} cy={z.coords.y} r={selected ? 3.4 : 2.2}
-                  fill={z.statusColor} fillOpacity={selected ? 0.95 : 0.7} stroke={BG} strokeWidth="0.4" />
-                <line x1={z.coords.x - 6} y1={z.coords.y} x2={z.coords.x + 6} y2={z.coords.y} stroke={z.statusColor} strokeWidth="0.5" opacity="0.6"/>
-                <line x1={z.coords.x} y1={z.coords.y - 6} x2={z.coords.x} y2={z.coords.y + 6} stroke={z.statusColor} strokeWidth="0.5" opacity="0.6"/>
-                <text x={z.coords.x + 5} y={z.coords.y - 4} fill={PALE} fontSize="3" fontFamily="VT323, monospace" opacity="0.75" letterSpacing="0.3">
-                  {z.label.split(' / ')[0]} · {z.act}
-                </text>
-              </g>
-            );
-          })}
-        </svg>
+        <div className="w-full relative" id="opmap" onClick={handleMapClick}
+          style={{ aspectRatio: '1 / 1', maxWidth: 440, maxHeight: 440, margin: '0 auto' }}>
+          <div className="w-full h-full" dangerouslySetInnerHTML={{ __html: OP_MAP_SVG }} />
+          {ZONES.map(z => (
+            <div key={z.id} className="opin-wrap" style={{ left: `${z.coords.x}%`, top: `${z.coords.y}%` }}
+              onMouseEnter={() => setHoverZone(z)} onMouseLeave={() => setHoverZone(null)}>
+              <img src={markerPin} alt={z.label} className="opin" />
+              {hoverZone?.id === z.id && (
+                <div className="opin-tip">
+                  <span className="am" style={{ color: G, fontSize: '0.62rem', letterSpacing: '0.15em' }}>{z.label}</span>
+                  <span className="am" style={{ color: PALE, fontSize: '0.58rem', letterSpacing: '0.2em', opacity: 0.7 }}>{z.act}</span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <style>{`
+          #opmap #g4, #opmap #g5, #opmap #g3, #opmap #g2 { transform-box: fill-box; transform-origin: center; transition: transform .25s ease; cursor: pointer; }
+          #opmap #g4:hover { transform: scale(1.03); }
+          #opmap #g5:hover { transform: scale(1.03); }
+          #opmap #g3:hover { transform: scale(1.03); }
+          #opmap #g2:hover { transform: scale(1.03); }
+          #opmap .opin-wrap { position: absolute; width: 26px; transform: translate(-50%, -87.5%); cursor: default; }
+          #opmap .opin { width: 100%; display: block; transition: transform .2s ease; filter: drop-shadow(0 1px 2px rgba(0,0,0,.8)); }
+          #opmap .opin-wrap:hover .opin { transform: scale(1.2); }
+          #opmap .opin-tip { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: ${SURF}; border: 1px solid ${BORD}; padding: 4px 8px; white-space: nowrap; display: flex; flex-direction: column; align-items: center; gap: 1px; box-shadow: 0 2px 8px rgba(0,0,0,.5); pointer-events: none; }
+        `}</style>
 
         <div className="flex flex-wrap gap-4 mt-3 pt-3" style={{ borderTop: `1px dashed ${BORD}` }}>
           {ZONES.map(z => (

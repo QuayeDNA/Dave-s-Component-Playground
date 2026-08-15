@@ -17,7 +17,7 @@ export const ZONES: Zone[] = [
   {
     id: 'tema',
     label: 'TEMA / ACCRA', act: 'ACT I',
-    coords: { x: 38, y: 72 },
+    coords: { x: 66.6, y: 78.9 },
     status: 'FALLEN', statusColor: WARN,
     threat: 'HIGH — Active outbreak, collapsing infrastructure',
     resources: 'Military depot (looted), petrol station, pharmaceutical warehouse',
@@ -27,7 +27,7 @@ export const ZONES: Zone[] = [
   {
     id: 'coast',
     label: 'CAPE COAST ROAD', act: 'ACT I–II',
-    coords: { x: 24, y: 62 },
+    coords: { x: 48.3, y: 85.6 },
     status: 'CONTESTED', statusColor: '#e8c84a',
     threat: 'MODERATE — Abandoned vehicles, isolated threats, bandit activity',
     resources: 'Abandoned convoy supplies, fuel from stranded vehicles, roadside kiosks',
@@ -37,7 +37,7 @@ export const ZONES: Zone[] = [
   {
     id: 'kumasi',
     label: 'KUMASI DISTRICT', act: 'ACT II',
-    coords: { x: 42, y: 45 },
+    coords: { x: 43.0, y: 67.7 },
     status: 'OCCUPIED', statusColor: WARN,
     threat: 'HIGH — Human faction territory. Antagonist splinter group controls central market zone.',
     resources: 'Kumasi central market (contested), Komfo Anokye Teaching Hospital (partially operational), military barracks (hostile-held)',
@@ -47,7 +47,7 @@ export const ZONES: Zone[] = [
   {
     id: 'north',
     label: 'NORTHERN INTERIOR', act: 'ACT III',
-    coords: { x: 48, y: 22 },
+    coords: { x: 59.5, y: 24.9 },
     status: 'UNKNOWN', statusColor: '#888',
     threat: 'UNKNOWN — No reliable intelligence. Radio silence. The ground around the facility is different.',
     resources: 'Unknown. Possibly isolated community settlements.',
