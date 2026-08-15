@@ -17,6 +17,7 @@ import type { ResearchCat } from '@/data/abode/types';
 import { FieldNote, IntelCard, ManualEntry, MissionBrief } from './abode/ui';
 import { OpMap } from './abode/OpMap';
 import { EvidenceLocker } from './abode/EvidenceLocker';
+import heroImg from '@/assets/images/abode/HeroBg.png';
 
 // ── SECTION REGISTRY ──────────────────────────────────────────
 
@@ -574,24 +575,36 @@ const AbodePage: React.FC = () => {
       {/* ── HERO ── */}
       <div ref={heroRef} className="relative flex flex-col overflow-hidden" style={{ minHeight: '100vh' }}>
 
-        {/* Warm ambient glow — centered */}
-        <div className="absolute inset-0 pointer-events-none"
-          style={{ background: `radial-gradient(ellipse 52% 52% at 50% 48%, ${WARN}0a, transparent 65%), ${BG}` }} />
+        {/* ── HERO BACKGROUND — image + readability overlays ── */}
+        <div className="absolute inset-0 overflow-hidden">
+          <img src={heroImg} alt="Accra under collapse — Abode" className="w-full h-full object-cover object-center"
+            style={{ filter: 'saturate(0.85) contrast(1.05) brightness(0.82)' }} />
 
-        {/* Radar / sonar rings — pulsing outward from center */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-          {[300, 220, 148, 82].map((r, i) => (
-            <motion.div key={`pulse-${i}`} className="absolute rounded-full"
-              style={{ width: r * 2, height: r * 2, border: `1px solid ${WARN}`, opacity: 0 }}
-              animate={{ opacity: [0, 0.055, 0], scale: [0.88, 1, 1.10] }}
-              transition={{ duration: 5.5, delay: i * 1.4, repeat: Infinity, ease: 'easeOut' }} />
-          ))}
-          {[340, 265, 188, 116, 52].map((r, i) => (
-            <div key={`ring-${i}`} className="absolute rounded-full"
-              style={{ width: r * 2, height: r * 2, border: `1px solid ${BORD}`, opacity: 0.1 }} />
-          ))}
-          <div className="absolute inset-x-0" style={{ top: '50%', height: 1, background: BORD, opacity: 0.07 }} />
-          <div className="absolute inset-y-0" style={{ left: '50%', width: 1, background: BORD, opacity: 0.07 }} />
+          {/* Top scrim — darkens strip area for the classification bar */}
+          <div className="absolute inset-x-0 top-0" style={{ height: '38%', background: 'linear-gradient(to bottom, #0f0d0a 0%, #0f0d0a55 55%, transparent 100%)' }} />
+
+          {/* Center scrim — ensures headline legibility over bright sky */}
+          <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 62% 52% at 50% 48%, rgba(15,13,10,0.78) 0%, rgba(15,13,10,0.42) 45%, rgba(15,13,10,0.15) 70%, rgba(15,13,10,0.55) 100%)' }} />
+
+          {/* Bottom scrim — blends hero into content background */}
+          <div className="absolute inset-x-0 bottom-0" style={{ height: '42%', background: 'linear-gradient(to top, #0f0d0a 0%, #0f0d0a66 48%, transparent 100%)' }} />
+
+          {/* Warm ambient tint */}
+          <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(ellipse 52% 52% at 50% 48%, ${WARN}12, transparent 65%)` }} />
+
+          {/* Radar / sonar rings — pulsing outward from center */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+            {[300, 220, 148, 82].map((r, i) => (
+              <motion.div key={`pulse-${i}`} className="absolute rounded-full"
+                style={{ width: r * 2, height: r * 2, border: `1px solid ${WARN}`, opacity: 0 }}
+                animate={{ opacity: [0, 0.06, 0], scale: [0.88, 1, 1.10] }}
+                transition={{ duration: 5.5, delay: i * 1.4, repeat: Infinity, ease: 'easeOut' }} />
+            ))}
+            {[340, 265, 188, 116, 52].map((r, i) => (
+              <div key={`ring-${i}`} className="absolute rounded-full"
+                style={{ width: r * 2, height: r * 2, border: `1px solid ${PALE}`, opacity: 0.06 }} />
+            ))}
+          </div>
         </div>
 
         {/* ── TOP CLASSIFICATION STRIP ── */}
