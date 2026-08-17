@@ -88,6 +88,6 @@ export const TITLE = {
   subtitle: 'A father will walk across a fallen Ghana to bring his children home.',
   romanised: 'ABƆDE',
   translation: 'AKAN / TWI: HOMELAND',
-  operation: 'OPERATION: HOMELAND · GAME 02 OF 03',
+  operation: 'OPERATION: LONG ROAD HOME',
   draft: '0.3',
 };
