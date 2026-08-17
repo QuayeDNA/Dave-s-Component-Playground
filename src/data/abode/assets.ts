@@ -10,10 +10,10 @@ export interface AssetItem {
 }
 
 export const ASSETS: AssetItem[] = [
-  { id: 'a-con-tema',   category: 'Concept Art', name: 'Tema Industrial Area — Dusk', status: 'built', source: 'Reference: street photography of Tema industrial zone; 1950s plan drawings.', src: '/abode/concept-tema.png' },
-  { id: 'a-con-cape',   category: 'Concept Art', name: 'Cape Coast Road — Dawn', status: 'built', source: 'Reference: N1 highway photography; coastal vegetation studies.', src: '/abode/concept-cape-coast.png' },
-  { id: 'a-con-kumasi', category: 'Concept Art', name: 'Kumasi Market District', status: 'built', source: 'Reference: Kejetia market documentation; ochre palette study.', src: '/abode/concept-kumasi.png' },
-  { id: 'a-con-ark',    category: 'Concept Art', name: 'The Ark — Northern Facility', status: 'built', source: 'Reference: colonial-era teacher training colleges, Northern Region.', src: '/abode/concept-ark.png' },
+  { id: 'a-con-tema',   category: 'Concept Art', name: 'Tema Industrial Area — Dusk', status: 'final', source: 'Reference: street photography of Tema industrial zone; 1950s plan drawings.', src: '/abode/concept-tema.png' },
+  { id: 'a-con-cape',   category: 'Concept Art', name: 'Cape Coast Road — Dawn', status: 'final', source: 'Reference: N1 highway photography; coastal vegetation studies.', src: '/abode/concept-cape-coast.png' },
+  { id: 'a-con-kumasi', category: 'Concept Art', name: 'Kumasi Market District', status: 'final', source: 'Reference: Kejetia market documentation; ochre palette study.', src: '/abode/concept-kumasi.png' },
+  { id: 'a-con-ark',    category: 'Concept Art', name: 'The Ark — Northern Facility', status: 'final', source: 'Reference: colonial-era teacher training colleges, Northern Region.', src: '/abode/concept-ark.png' },
   { id: 'a-ch-kwame',   category: 'Character', name: 'Col. Kwame Mensah', status: 'concept', source: 'Dossier KM-001. Reference: retired officer portraits; 60s West African military dress.' },
   { id: 'a-ch-ama',     category: 'Character', name: 'Ama Mensah', status: 'concept', source: 'Dossier AM-002. Reference: contemporary Accra youth photography.' },
   { id: 'a-ch-kofi',    category: 'Character', name: 'Kofi Mensah', status: 'concept', source: 'Dossier KM-003. School uniform studies.' },
