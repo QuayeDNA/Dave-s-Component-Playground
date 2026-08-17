@@ -101,7 +101,7 @@ const AbodePage: React.FC = () => {
 
           <motion.h1 className="at"
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.2 }}
-            style={{ fontSize: 'clamp(2.6rem, 9vw, 5.5rem)', color: PALE, letterSpacing: '0.08em', lineHeight: 1, marginBottom: '0.35rem' }}>
+            style={{ fontSize: 'clamp(2.2rem, 9vw, 5.5rem)', color: PALE, letterSpacing: '0.08em', lineHeight: 1, textAlign: 'center', marginBottom: '0.35rem' }}>
             <span className="astatic">
               <span className="astatic-t">{TITLE.name}</span>
               <span className="astatic-g" aria-hidden="true">{TITLE.name}</span>
