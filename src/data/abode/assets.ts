@@ -23,7 +23,7 @@ export const ASSETS: AssetItem[] = [
   { id: 'a-con-ark',    category: 'Concept Art', name: 'The Ark — Northern Facility', status: 'final', source: 'Reference: colonial-era teacher training colleges, Northern Region.', src: '/abode/concept-ark.png' },
   { id: 'a-ch-kwame',   category: 'Character', name: 'Col. Kwame Mensah', status: 'final', source: 'Dossier KM-001. Reference: retired officer portraits; 60s West African military dress.', src: '/abode/ch-kwame.png' },
   { id: 'a-ch-ama',     category: 'Character', name: 'Ama Mensah', status: 'final', source: 'Dossier AM-002. Reference: contemporary Accra youth photography.', src: '/abode/ch-ama.png' },
-  { id: 'a-ch-kofi',    category: 'Character', name: 'Kofi Mensah', status: 'concept', source: 'Dossier KM-003. School uniform studies.' },
+  { id: 'a-ch-kofi',    category: 'Character', name: 'Kofi Mensah', status: 'final', source: 'Dossier KM-003. School uniform studies.', src: '/abode/ch-kofi.png' },
   { id: 'a-ch-opoku',   category: 'Character', name: 'Col. Yaw Opoku', status: 'concept', source: 'Dossier YO-004. Mirror framing against Kwame.' },
   { id: 'a-ui-dossier', category: 'UI', name: 'Dossier Frame + Stamp Set', status: 'inProduction', source: 'This bible page is the live UI mock.' },
   { id: 'a-ui-map',     category: 'UI', name: 'Field Map + Clue Tracker', status: 'inProduction', source: 'Spec: Intelligence Gathering system 4.0.' },
