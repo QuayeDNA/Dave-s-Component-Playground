@@ -1,5 +1,12 @@
 import type { AssetCategory, AssetStatus } from './types';
 
+// TODO: Migrate local image/audio assets in public/abode/ to Cloudinary.
+//   - Assets are currently served from public/abode/ (e.g. /abode/concept-tema.png).
+//   - As image count and resolution grow, Cloudinary will handle transforms, CDN delivery, and storage.
+//   - Migration plan: set up Cloudinary account, move files, update src paths to Cloudinary URLs,
+//     and remove local copies from public/abode/.
+//   - The AssetItem interface already supports absolute URLs in src — no component changes needed.
+
 export interface AssetItem {
   id: string;
   category: AssetCategory;
