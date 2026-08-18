@@ -1,18 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { G, PALE, SURF, BORD, BG } from '@/data/abode/theme';
 import { RESEARCH_ENTRIES, RESEARCH_CATEGORIES, RESEARCH_CATEGORY_COLORS } from '@/data/abode/research';
 import type { ResearchCat } from '@/data/abode/types';
+import { Dialog, DialogContent, DialogTitle, DialogClose } from '@/components/ui/dialog';
+
+const useIsMobile = () => {
+  const [mobile, setMobile] = useState(() => window.innerWidth < 768);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const handler = (e: MediaQueryListEvent) => setMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  return mobile;
+};
 
 export const ResearchPanel: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<ResearchCat | 'all'>('all');
   const [activeEntry, setActiveEntry] = useState<string | null>(null);
+  const [dialogEntry, setDialogEntry] = useState<string | null>(null);
+  const isMobile = useIsMobile();
 
   const categories = RESEARCH_CATEGORIES;
   const filtered = RESEARCH_ENTRIES.filter(e => activeCategory === 'all' || e.category === activeCategory);
   const entry = RESEARCH_ENTRIES.find(e => e.id === activeEntry);
+  const dialogItem = RESEARCH_ENTRIES.find(e => e.id === dialogEntry);
 
   const catColors = RESEARCH_CATEGORY_COLORS;
+
+  const handleEntryClick = (id: string) => {
+    if (isMobile) {
+      setDialogEntry(id);
+    } else {
+      setActiveEntry(activeEntry === id ? null : id);
+    }
+  };
 
   return (
     <div>
@@ -36,7 +59,7 @@ export const ResearchPanel: React.FC = () => {
           {filtered.map(e => {
             const color = catColors[e.category] || G;
             return (
-              <button key={e.id} onClick={() => setActiveEntry(activeEntry === e.id ? null : e.id)}
+              <button key={e.id} onClick={() => handleEntryClick(e.id)}
                 className="w-full text-left p-3 transition-all"
                 style={{ background: activeEntry === e.id ? `${color}10` : 'transparent', border: `1px solid ${activeEntry === e.id ? `${color}30` : 'transparent'}`, borderLeft: `2px solid ${activeEntry === e.id ? color : `${color}30`}` }}>
                 <div className="am mb-0.5" style={{ color, fontSize: '0.6rem', letterSpacing: '0.2em', opacity: 0.6 }}>{e.category}</div>
@@ -67,6 +90,35 @@ export const ResearchPanel: React.FC = () => {
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Mobile dialog for entries */}
+      <Dialog open={dialogItem != null} onOpenChange={(open) => { if (!open) setDialogEntry(null); }}>
+        <DialogContent
+          className="w-full max-w-2xl p-0 gap-0 rounded-none sm:rounded-none bg-[#1a1610] border border-[#3d3020] [&>button]:hidden"
+          style={{ boxShadow: '0 24px 80px rgba(0,0,0,0.6)' }}>
+          <div className="flex flex-col max-h-[85vh]">
+            <div className="flex items-center justify-between px-4 py-2.5 flex-shrink-0"
+              style={{ background: dialogItem ? `${catColors[dialogItem.category] || G}10` : 'transparent', borderBottom: `1px solid ${BORD}` }}>
+              <span className="am" style={{ color: dialogItem ? catColors[dialogItem.category] || G : PALE, fontSize: '0.6rem', letterSpacing: '0.25em', opacity: 0.75 }}>
+                {dialogItem ? `${dialogItem.category.toUpperCase()} · RESEARCH NOTE` : ''}
+              </span>
+              <DialogClose asChild>
+                <button aria-label="Close research note"
+                  className="am transition-all"
+                  style={{ color: PALE, fontSize: '0.7rem', letterSpacing: '0.15em', border: `1px solid ${BORD}`, padding: '0.15rem 0.6rem' }}>
+                  [ X ] CLOSE
+                </button>
+              </DialogClose>
+            </div>
+            {dialogItem && (
+              <div className="p-5 sm:p-6 overflow-y-auto">
+                <DialogTitle className="at mb-4" style={{ color: PALE, fontSize: '1.2rem', letterSpacing: '0.03em' }}>{dialogItem.title}</DialogTitle>
+                <p className="ab leading-relaxed" style={{ color: PALE, opacity: 0.8, fontSize: '1rem', lineHeight: 1.85 }}>{dialogItem.content}</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

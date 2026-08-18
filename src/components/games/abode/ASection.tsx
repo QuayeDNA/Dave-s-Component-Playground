@@ -7,7 +7,7 @@ export const ASection: React.FC<{ id?: string; label: string; stamp?: string; ch
     initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.5 }}>
     {/* Document section header — left accent bar + warm tint */}
-    <div className="flex items-stretch mb-8">
+    <div className="flex flex-wrap items-stretch mb-8">
       <div style={{ width: 4, background: `${WARN}55`, flexShrink: 0 }} />
       <div className="flex items-center flex-1 px-5 py-3"
         style={{ background: `${WARN}07`, borderTop: `1px solid ${BORD}`, borderBottom: `1px solid ${BORD}` }}>
@@ -16,7 +16,7 @@ export const ASection: React.FC<{ id?: string; label: string; stamp?: string; ch
         </span>
       </div>
       {stamp && (
-        <div className="flex items-center px-5" style={{
+        <div className="flex items-center px-3 sm:px-5 mt-0.5 sm:mt-0" style={{
           borderTop: `1px solid ${BORD}`, borderBottom: `1px solid ${BORD}`,
           borderRight: `1px solid ${BORD}`, flexShrink: 0,
         }}>

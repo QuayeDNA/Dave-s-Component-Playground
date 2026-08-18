@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { G, WARN, PALE, SURF, BORD, BG } from '@/data/abode/theme';
 import { BEATS, BEAT_COLORS, BEAT_TYPE_LABELS, BeatType } from '@/data/abode/beats';
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';
 
 export const DualTimeline: React.FC = () => {
   const [selectedBeat, setSelectedBeat] = useState<string | null>(null);
@@ -33,13 +34,13 @@ export const DualTimeline: React.FC = () => {
       </div>
 
       {/* Track labels */}
-      <div className="grid grid-cols-2 gap-4 mb-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-2">
         <div className="am" style={{ color: PALE, fontSize: '0.7rem', letterSpacing: '0.25em', opacity: 0.5 }}>▶ KWAME'S TRACK</div>
-        <div className="am" style={{ color: WARN, fontSize: '0.7rem', letterSpacing: '0.25em', opacity: 0.5 }}>▶ AMA'S TRACK <span style={{ fontSize: '0.6rem', opacity: 0.6 }}>[UNKNOWN TO KWAME UNTIL REUNION]</span></div>
+        <div className="am" style={{ color: WARN, fontSize: '0.7rem', letterSpacing: '0.25em', opacity: 0.5 }}>▶ AMA'S TRACK <span className="hidden sm:inline" style={{ fontSize: '0.6rem', opacity: 0.6 }}>[UNKNOWN TO KWAME UNTIL REUNION]</span></div>
       </div>
 
       {/* Dual track grid */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         {/* Kwame track */}
         <div className="space-y-2">
           {kwaBeats.map((b, i) => (
@@ -82,24 +83,40 @@ export const DualTimeline: React.FC = () => {
         </div>
       )}
 
-      {/* Beat detail */}
-      <AnimatePresence>
-        {beat && (
-          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            className="p-5 mt-2"
-            style={{ background: `${BEAT_COLORS[beat.type]}0a`, border: `1px solid ${BEAT_COLORS[beat.type]}30`, borderLeft: `3px solid ${BEAT_COLORS[beat.type]}` }}>
-            <div className="flex items-center gap-3 mb-2 flex-wrap">
-              <span className="am" style={{ color: BEAT_COLORS[beat.type], fontSize: '0.7rem', letterSpacing: '0.25em' }}>
-                {beat.track === 'kwame' ? 'KWAME' : 'AMA'} · ACT {beat.act} · {BEAT_TYPE_LABELS[beat.type]}
-              </span>
-              {!beat.known && <span className="astamp" style={{ fontSize: '0.55rem' }}>UNKNOWN TO KWAME</span>}
+      {/* Beat detail dialog */}
+      <Dialog open={beat != null} onOpenChange={(open) => { if (!open) setSelectedBeat(null); }}>
+        <DialogContent
+          className="w-full max-w-2xl p-0 gap-0 rounded-none sm:rounded-none bg-[#1a1610] border border-[#3d3020] [&>button]:hidden"
+          style={{ boxShadow: '0 24px 80px rgba(0,0,0,0.6)' }}>
+          <div className="flex flex-col max-h-[85vh]">
+            <div className="flex items-center justify-between px-4 py-2.5 flex-shrink-0"
+              style={{ background: beat ? `${BEAT_COLORS[beat.type]}10` : 'transparent', borderBottom: `1px solid ${BORD}` }}>
+              <div className="flex items-center gap-3 flex-wrap">
+                <span className="am" style={{ color: beat ? BEAT_COLORS[beat.type] : PALE, fontSize: '0.6rem', letterSpacing: '0.25em' }}>
+                  {beat ? `${beat.track === 'kwame' ? 'KWAME' : 'AMA'} · ACT ${beat.act} · ${BEAT_TYPE_LABELS[beat.type]}` : ''}
+                </span>
+                {beat && !beat.known && <span className="astamp" style={{ fontSize: '0.55rem' }}>UNKNOWN TO KWAME</span>}
+              </div>
+              <DialogClose asChild>
+                <button aria-label="Close beat detail"
+                  className="am transition-all"
+                  style={{ color: PALE, fontSize: '0.7rem', letterSpacing: '0.15em', border: `1px solid ${BORD}`, padding: '0.15rem 0.6rem' }}>
+                  [ X ] CLOSE
+                </button>
+              </DialogClose>
             </div>
-            <h4 className="at mb-1" style={{ color: PALE, fontSize: '1.2rem' }}>{beat.label}</h4>
-            <div className="am mb-3" style={{ color: PALE, fontSize: '0.65rem', opacity: 0.35 }}>{beat.location}</div>
-            <p className="ab leading-relaxed" style={{ color: PALE, opacity: 0.8, fontSize: '1rem' }}>{beat.description}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            {beat && (
+              <div className="p-5 sm:p-6 overflow-y-auto">
+                <DialogTitle className="at mb-1" style={{ color: PALE, fontSize: '1.25rem', letterSpacing: '0.03em' }}>{beat.label}</DialogTitle>
+                <DialogDescription className="am mb-4" style={{ color: PALE, fontSize: '0.65rem', opacity: 0.35 }}>
+                  {beat.location}
+                </DialogDescription>
+                <p className="ab leading-relaxed" style={{ color: PALE, opacity: 0.8, fontSize: '1rem', lineHeight: 1.8 }}>{beat.description}</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

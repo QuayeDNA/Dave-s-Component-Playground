@@ -4,7 +4,7 @@ import { G, WARN, PALE, BG, SURF, BORD } from '@/data/abode/theme';
 
 export const TodoPlaceholder: React.FC<{ title: string; notes?: string[] }> = ({ title, notes = [] }) => (
   <div style={{ background: SURF, border: `1px solid ${BORD}` }} className="relative overflow-hidden">
-    <div className="flex items-center justify-between px-4 py-2.5"
+    <div className="flex flex-wrap items-center justify-between px-4 py-2.5 gap-1"
       style={{ background: `${WARN}15`, borderBottom: `1px solid ${WARN}28` }}>
       <span className="at" style={{ color: WARN, fontSize: '0.75rem', letterSpacing: '0.22em' }}>ACCESS RESTRICTED</span>
       <span className="am" style={{ color: PALE, fontSize: '0.52rem', letterSpacing: '0.18em', opacity: 0.38 }}>
@@ -62,8 +62,8 @@ export const IntelCard: React.FC<{ category: string; content: string }> = ({ cat
 );
 
 export const ManualEntry: React.FC<{ number: string; title: string; body: string }> = ({ number, title, body }) => (
-  <motion.div className="mb-5 flex gap-4" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.35 }}>
-    <div className="am flex-shrink-0" style={{ color: G, fontSize: '1.1rem', opacity: 0.35, width: 36, textAlign: 'right' }}>{number}</div>
+  <motion.div className="mb-5 flex gap-3 sm:gap-4" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.35 }}>
+    <div className="am flex-shrink-0" style={{ color: G, fontSize: '1.1rem', opacity: 0.35, width: 28, textAlign: 'right' }}>{number}</div>
     <div>
       <div className="at mb-1" style={{ color: G, fontSize: '1rem', letterSpacing: '0.05em' }}>{title}</div>
       <div className="ab leading-relaxed" style={{ color: PALE, opacity: 0.72, fontSize: '1rem' }}>{body}</div>

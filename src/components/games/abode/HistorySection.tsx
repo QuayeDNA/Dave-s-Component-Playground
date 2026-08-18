@@ -23,14 +23,19 @@ export const HistorySection: React.FC = () => (
     {HISTORY_ENTRIES.map((e, i) => {
       const color = ERA_COLORS[e.era] || WARN;
       return (
-        <motion.div key={e.id} className="mb-4 flex gap-4"
+        <motion.div key={e.id} className="mb-4"
           initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.35, delay: i * 0.03 }}>
-          <div className="am flex-shrink-0 pt-4" style={{ color, fontSize: '0.7rem', letterSpacing: '0.2em', width: 86, textAlign: 'right', opacity: 0.85 }}>
+          <div className="am sm:hidden mb-2 pl-2" style={{ color, fontSize: '0.65rem', letterSpacing: '0.2em', opacity: 0.85 }}>
+            {e.era}
+          </div>
+          <div className="flex gap-4">
+          <div className="am flex-shrink-0 pt-4 hidden sm:block" style={{ color, fontSize: '0.7rem', letterSpacing: '0.2em', width: 86, textAlign: 'right', opacity: 0.85 }}>
             {e.era}
           </div>
           <div style={{ background: SURF, border: `1px solid ${BORD}`, borderLeft: `3px solid ${color}`, padding: '1.15rem 1.35rem', flex: 1 }}>
             <h4 className="at mb-1.5" style={{ color: PALE, fontSize: '1.15rem', letterSpacing: '0.04em' }}>{e.title}</h4>
             <p className="ab leading-relaxed" style={{ color: PALE, opacity: 0.72, fontSize: '0.98rem' }}>{e.body}</p>
+          </div>
           </div>
         </motion.div>
       );
