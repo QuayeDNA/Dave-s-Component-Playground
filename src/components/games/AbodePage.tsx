@@ -23,6 +23,7 @@ import { ArtDirective } from './abode/ArtDirective';
 import { AudioDirective } from './abode/AudioDirective';
 import { ResearchPanel } from './abode/ResearchPanel';
 import heroImg from '@/assets/images/abode/HeroBg.png';
+import { RedactionBar } from './abode/RedactionBar';
 
 // ─────────────────────────────────────────────────────────────
 // MAIN PAGE
@@ -35,7 +36,7 @@ const AbodePage: React.FC = () => {
   const heroOpacity = useTransform(scrollY, [0, 420], [1, 0]);
 
   return (
-    <div className="ag ascan" style={{ background: BG, minHeight: '100vh', color: PALE }}>
+    <div className="ag" style={{ background: BG, minHeight: '100vh', color: PALE }}>
       <style>{FONTS + CSS}</style>
 
       <StickyNav activeId={activeSection} />
@@ -102,12 +103,12 @@ const AbodePage: React.FC = () => {
           <motion.h1 className="at"
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.2 }}
             style={{ fontSize: 'clamp(2.2rem, 9vw, 5.5rem)', color: PALE, letterSpacing: '0.08em', lineHeight: 1, textAlign: 'center', marginBottom: '0.35rem' }}>
-            <span className="astatic">
-              <span className="astatic-t">{TITLE.name}</span>
-              <span className="astatic-g" aria-hidden="true">{TITLE.name}</span>
-              <span className="astatic-o" aria-hidden="true">{TITLE.name}</span>
-              <span className="astatic-n" aria-hidden="true">{TITLE.name}</span>
-            </span>
+            <RedactionBar revealed delay={0.9} duration={0.65} barColor="#0a0705">
+              <span className="attitle">
+                <span className="attitle-base">{TITLE.name}</span>
+                <span className="attitle-ghost" aria-hidden="true">{TITLE.name}</span>
+              </span>
+            </RedactionBar>
           </motion.h1>
 
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.52 }} transition={{ delay: 0.38 }}

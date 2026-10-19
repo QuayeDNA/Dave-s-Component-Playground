@@ -397,6 +397,200 @@ export const KWAME_PROMPTS: PromptStage[] = [
     **Output:**
     One clean, finished **landscape-format character reference sheet** containing all six poses in 2D hand-painted game art style, visually consistent with the attached styled reference and suitable for use as the definitive animation and model-consistency reference for the character.`,
   },
+
+  // ── STAGE 5: WALK ANIMATION SPRITE SHEET ────────────────────
+  {
+    stage: 5,
+    name: 'Walk Animation — Sprite Sheet',
+    description: 'Horizontal sprite sheet showing 8 key frames of a walk cycle. Used as animation reference and for direct sprite extraction.',
+    inputRequires: 'Stage 4 reference sheet as visual reference (upload as image in DALL-E 3)',
+    outputFilename: 'ch-kwame-walk-sheet.png',
+    aspectRatio: '1792x1024',
+    prompt: `**Walk-cycle sprite sheet, 2D hand-painted survival game art style. A single landscape-format image containing 8 sequential key frames of a walking animation for the EXACT SAME MAN shown in the attached reference sheet. Preserve his facial identity, age, ethnicity, skin tone, hairstyle, beard shape, body proportions, clothing design, and overall physical character precisely across every frame. This is a frame-by-frame animation reference — every frame must be immediately recognizable as the same person in continuous motion.**
+
+    **Subject (consistent across all frames):**
+    A 62-year-old Ghanaian man, West African, retired military colonel. Dark brown skin. Close-cropped grey natural hair, matching the attached reference exactly. Short, neatly maintained grey beard. Deep-set dark brown eyes beneath heavy lids, wide cheekbones, broad nose, strong aging jaw softened naturally by age. Preserve the same distinctive facial proportions and recognizable identity in every frame.
+
+    His expression across all frames is **controlled and neutral** — the face of a man walking through territory he is assessing. No fear, no urgency, no heroism. A steady, purposeful forward movement.
+
+    **Physical build (consistent across all frames):**
+    Medium-to-tall older Ghanaian male with a solid, naturally developed frame shaped by decades of military service. Thick neck, broad shoulders, substantial forearms, large hands. His body shows age naturally: mild abdominal softness, subtle loss of muscle definition, slightly rounded shoulders. He should convincingly look 62 in motion — his walk is steady but carries the weight of age. Not frail, not athletic. A deliberate, grounded gait.
+
+    **Walk cycle description:**
+    A natural, purposeful walk at a moderate steady pace — the walk of a man moving through urban terrain with awareness. Not a stroll, not a hurry. Military bearing shows in the upright spine and level chin, but the gait itself is civilian — relaxed arms, natural stride length, weight transferring smoothly from heel to toe.
+
+    The walk should feel **grounded and weighted** — each footfall has consequence. His age should be visible in the slightly reduced stride length, the careful placement of each step, the subtle stiffness in the hips. He moves like a man who knows his body's limits and respects them.
+
+    **8 key frames (left to right):**
+
+    Frame 1 — **CONTACT (Right):** Right foot forward, heel striking the ground, toes up. Left foot behind, toe on the ground, about to lift. Arms in natural counter-swing: left arm forward, right arm back. Body at neutral height.
+
+    Frame 2 — **DOWN (Right):** Right foot flat on the ground, bearing full weight. Body at its lowest point in the cycle — slight knee bend in the right leg. Left foot lifting off the ground behind. Arms at their widest swing point.
+
+    Frame 3 — **PASSING (Right):** Right foot planted, body rising. Left foot passing the right knee, moving forward. Arms crossing the body — both roughly at the sides. Body at mid-height, transitioning upward.
+
+    Frame 4 — **HIGH POINT:** Left foot forward, at its highest point before contact. Right foot on its toe, pushing off. Body at its highest point — full extension through the spine. Left arm swinging forward, right arm back.
+
+    Frame 5 — **CONTACT (Left):** Left foot forward, heel striking the ground, toes up. Right foot behind, toe on the ground. Arms in natural counter-swing: right arm forward, left arm back. Mirror of Frame 1.
+
+    Frame 6 — **DOWN (Left):** Left foot flat, bearing full weight. Body at lowest point — slight knee bend in the left leg. Right foot lifting behind. Arms at widest swing. Mirror of Frame 2.
+
+    Frame 7 — **PASSING (Left):** Left foot planted, body rising. Right foot passing the left knee, moving forward. Arms crossing the body. Mirror of Frame 3.
+
+    Frame 8 — **HIGH POINT (Return):** Right foot forward, at its highest point before contact. Left foot on its toe, pushing off. Body at full extension. Right arm forward, left arm back. Ready to loop back to Frame 1.
+
+    **Art style — 2D game direction (consistent across all frames):**
+    Hand-painted digital illustration in the style of a **2D side-scrolling survival game**. Each frame is a complete, self-contained painting of the character at that exact moment in the walk cycle. Not wireframe, not line art, not silhouette — fully rendered with the same painted texture and brushwork as the reference sheet.
+
+    Each frame must have a **clean, readable silhouette** that works at game-sprite scale. Outlines implied through colour contrast and value changes, not hard black line art. Forms defined by paint, not ink.
+
+    All frames use the **same flat, even lighting** — no strong directional shadows, designed for maximum clarity and sprite extraction. The character must look correct when any single frame is extracted and placed in the game.
+
+    Painterly detail is concentrated on the **face, hands, boots, shirt folds, belt, and watch** across all frames. Broader, softer brushwork on less important areas.
+
+    **Lighting:**
+    Soft, neutral, even illumination across every frame. A gentle warm key light from the upper-left provides subtle form definition without creating harsh shadows. Fill light from the opposite side ensures no area falls into complete darkness. Every frame must use identical lighting — the sheet is an animation reference, not a mood piece.
+
+    No dramatic spotlight, no cinematic color grading, no neon lighting, no exaggerated rim lighting.
+
+    **Background:**
+    Completely flat, neutral background across the entire sheet: muted warm grey with extremely subtle texture, like aged paper or a clean studio backdrop. No environment, furniture, architecture, scenery, props, weapons, vehicles, or contextual elements.
+
+    The background should remain visually quiet so every frame silhouette is immediately readable and frames can be easily extracted for sprite use.
+
+    **Layout and composition:**
+    Landscape-format sprite sheet. All 8 frames arranged in a **single horizontal row**, evenly spaced, reading left to right in chronological order. Each frame contains the full character from head to boots.
+
+    Frames are numbered 1–8 with small, light pencil-style text beneath each frame. Labels use a thin, understated sans-serif or handwriting font in low-opacity grey — functional, not decorative.
+
+    Each frame is vertically centred with consistent height. Characters are sized identically across all frames — no scaling, no perspective shift between frames. The sheet should feel like a film strip extracted from a single camera angle.
+
+    No decorative borders, no ornamental frames, no title card, no character name overlay on the sheet itself. The sheet is a functional animation reference document.
+
+    **Animation consistency priorities:**
+
+    1. Every frame must be immediately recognizable as the same person.
+    2. Smooth, natural weight transfer from frame to frame — no popping or jumping.
+    3. Consistent stride length and arm swing amplitude across all frames.
+    4. Visible age in the walk — slightly reduced stride, careful foot placement, subtle hip stiffness.
+    5. Military bearing visible in the upright spine and level chin, but the gait is civilian.
+    6. Arms swing in natural counter-rhythm to the legs — left arm forward when right leg forward.
+    7. Head stays level and stable throughout the cycle — eyes forward, scanning.
+    8. Clothing deforms naturally with movement — shirt folds shift, trouser fabric pulls at the knee, boot flex is visible.
+
+    **Color palette:**
+    Strictly restrained and consistent with the attached reference: warm dark-brown skin, desaturated military olive shirt and trousers, muted warm-grey background, bone-white undershirt, dark brown leather belt and boots, small neutral metallic details on the watch. No bright saturated colors. Every frame uses the identical palette.
+
+    **Gait character notes:**
+    This is not a generic walk cycle. The walk should communicate: a 62-year-old retired military officer who is fit enough to keep moving but whose body reminds him of his age with every step. His right side may be very slightly stiffer than his left — a suggestion of old injury or habit. His arms don't swing wildly — they move with controlled economy. His boots hit the ground flat and deliberate, not轻浮 or bouncy. He walks like a man who has walked a long way and expects to walk further.
+
+    **Overall feeling:**
+    Functional, consistent, sequential. The sheet should feel like a working animation reference pulled from a game studio's pipeline — **not a showcase illustration, not an action sequence, not a motion study art piece.** This is the definitive walk-cycle reference that animators will use to maintain consistency across all in-game walking animation.
+
+    **Negative constraints:**
+    No text beyond frame numbers, no character name title, no captions, no watermark, no border, no decorative frame, no insignia, no medals, no weapons, no modern tactical equipment, no sunglasses, no hat, no jewelry beyond the watch, no extra characters, no props, no background environment, no duplicated limbs, no extra fingers, malformed hands, malformed feet, distorted anatomy, floating limbs, exaggerated muscles, youthful appearance, cartoon proportions, glossy skin, plastic-looking clothing, exaggerated expression, heroic pose, dramatic perspective, wide-angle distortion, oversaturated colors, cel-shading, hard black outlines, anime style, photorealism, 3D render appearance, inconsistent proportions between frames, different lighting between frames, motion blur, speed lines, ghosting effects, transparency between frames.
+
+    **Output:**
+    One clean, finished **landscape-format walk-cycle sprite sheet** containing all 8 key frames in 2D hand-painted game art style, visually consistent with the attached reference sheet and suitable for use as the definitive walk-cycle animation reference and for direct sprite extraction.`,
+  },
+
+  // ── STAGE 6: RUN ANIMATION SPRITE SHEET ─────────────────────
+  {
+    stage: 6,
+    name: 'Run Animation — Sprite Sheet',
+    description: 'Horizontal sprite sheet showing 8 key frames of a run cycle. Used as animation reference and for direct sprite extraction.',
+    inputRequires: 'Stage 4 reference sheet as visual reference (upload as image in DALL-E 3)',
+    outputFilename: 'ch-kwame-run-sheet.png',
+    aspectRatio: '1792x1024',
+    prompt: `**Run-cycle sprite sheet, 2D hand-painted survival game art style. A single landscape-format image containing 8 sequential key frames of a running animation for the EXACT SAME MAN shown in the attached reference sheet. Preserve his facial identity, age, ethnicity, skin tone, hairstyle, beard shape, body proportions, clothing design, and overall physical character precisely across every frame. This is a frame-by-frame animation reference — every frame must be immediately recognizable as the same person in continuous urgent motion.**
+
+    **Subject (consistent across all frames):**
+    A 62-year-old Ghanaian man, West African, retired military colonel. Dark brown skin. Close-cropped grey natural hair, matching the attached reference exactly. Short, neatly maintained grey beard. Deep-set dark brown eyes beneath heavy lids, wide cheekbones, broad nose, strong aging jaw softened naturally by age. Preserve the same distinctive facial proportions and recognizable identity in every frame.
+
+    His expression across all frames is **focused, controlled, and alert** — the face of a man running because the situation demands it, not because he enjoys it. Jaw set, eyes forward, breathing controlled. No panic, no fear — disciplined urgency. This is a man who knows how to move under pressure, even if his body protests.
+
+    **Physical build (consistent across all frames):**
+    Medium-to-tall older Ghanaian male with a solid, naturally developed frame shaped by decades of military service. Thick neck, broad shoulders, substantial forearms, large hands. His body shows age naturally but is currently pushed harder than in the walk cycle. The run should show controlled exertion — heavier breathing implied through posture, more pronounced arm drive, longer stride. He should convincingly look 62 running — powerful for his age but visibly working for it.
+
+    **Run cycle description:**
+    A purposeful, ground-covering run — not a sprint, not a jog. The run of a man who needs to get somewhere fast and is using his training to do it efficiently. Military mechanics are visible: upright torso, arms driving at controlled angles, feet landing midfoot rather than heel-striking. But age shows in the slightly shorter stride compared to a younger runner, the heavier arm swing needed for momentum, the visible effort in maintaining pace.
+
+    The run should feel **urgent but controlled** — he is not fleeing in panic, he is moving with purpose. His body leans slightly forward from the ankles, not the waist. His center of gravity is ahead of his feet. He runs like a man who has run in combat zones and knows how to conserve energy while maintaining speed.
+
+    **8 key frames (left to right):**
+
+    Frame 1 — **CONTACT (Right):** Right foot forward, midfoot striking the ground beneath the center of mass. Left foot extended far behind, toe about to leave the ground. Body leaning slightly forward. Arms in strong counter-swing: left arm forward (bent at approximately 90 degrees), right arm driving back. Right knee slightly bent on impact. This is the moment of maximum ground contact.
+
+    Frame 2 — **FLIGHT (Rear):** Left foot has left the ground, trailing behind. Right foot pushing off, transitioning to toe-off. Body at mid-height, moving forward. Arms at their widest separation — left arm at its most forward point, right arm at its most rearward. The body is between foot contacts — a brief moment where both feet are off the ground (the "float" phase of a run).
+
+    Frame 3 — **PASSING (Right):** Right foot planted, body rising and moving forward. Left knee driving forward and upward, passing the right knee. Arms crossing — both roughly at the sides. Body at mid-height, transitioning upward. This is the moment of maximum compression in the supporting leg.
+
+    Frame 4 — **FLIGHT (Front):** Left foot forward, at its highest point before contact. Right foot has left the ground entirely — both feet airborne (the "flight" phase). Body at its highest point, fully extended. Left arm driving forward, right arm driving back. The moment of maximum extension and air time.
+
+    Frame 5 — **CONTACT (Left):** Left foot forward, midfoot striking the ground. Right foot extended far behind. Mirror of Frame 1. Arms in counter-swing: right arm forward, left arm driving back. The cycle's midpoint.
+
+    Frame 6 — **FLIGHT (Rear — Mirror):** Right foot trailing behind, lifting off. Left foot pushing off to toe-off. Arms at widest separation — right arm forward, left arm back. Mirror of Frame 2.
+
+    Frame 7 — **PASSING (Left):** Left foot planted, body rising. Right knee driving forward, passing the left knee. Arms crossing. Mirror of Frame 3.
+
+    Frame 8 — **FLIGHT (Front — Mirror):** Right foot forward, at highest point. Left foot airborne. Both feet off the ground. Left arm forward, right arm back. Full extension. Ready to loop back to Frame 1.
+
+    **Art style — 2D game direction (consistent across all frames):**
+    Hand-painted digital illustration in the style of a **2D side-scrolling survival game**. Each frame is a complete, self-contained painting of the character at that exact moment in the run cycle. Not wireframe, not line art, not silhouette — fully rendered with the same painted texture and brushwork as the reference sheet.
+
+    Each frame must have a **clean, readable silhouette** that works at game-sprite scale. The run silhouette is more dynamic than the walk — larger limb separations, more dramatic angles, clearer sense of forward momentum. Outlines implied through colour contrast and value changes, not hard black line art.
+
+    All frames use the **same flat, even lighting** — no strong directional shadows, designed for maximum clarity and sprite extraction. The character must look correct when any single frame is extracted and placed in the game.
+
+    Painterly detail is concentrated on the **face, hands, boots, shirt folds, belt, and watch** across all frames. The shirt should show more dynamic fabric movement than the walk cycle —tails lifting slightly, folds deepening with the stride. Broader, softer brushwork on less important areas.
+
+    **Lighting:**
+    Soft, neutral, even illumination across every frame. A gentle warm key light from the upper-left provides subtle form definition without creating harsh shadows. Fill light from the opposite side ensures no area falls into complete darkness. Every frame must use identical lighting — the sheet is an animation reference, not a mood piece.
+
+    No dramatic spotlight, no cinematic color grading, no neon lighting, no exaggerated rim lighting.
+
+    **Background:**
+    Completely flat, neutral background across the entire sheet: muted warm grey with extremely subtle texture, like aged paper or a clean studio backdrop. No environment, furniture, architecture, scenery, props, weapons, vehicles, or contextual elements.
+
+    The background should remain visually quiet so every frame silhouette is immediately readable and frames can be easily extracted for sprite use.
+
+    **Layout and composition:**
+    Landscape-format sprite sheet. All 8 frames arranged in a **single horizontal row**, evenly spaced, reading left to right in chronological order. Each frame contains the full character from head to boots.
+
+    Frames are numbered 1–8 with small, light pencil-style text beneath each frame. Labels use a thin, understated sans-serif or handwriting font in low-opacity grey — functional, not decorative.
+
+    Each frame is vertically centred with consistent height. Characters are sized identically across all frames — no scaling, no perspective shift between frames. The sheet should feel like a film strip extracted from a single camera angle.
+
+    No decorative borders, no ornamental frames, no title card, no character name overlay on the sheet itself. The sheet is a functional animation reference document.
+
+    **Animation consistency priorities:**
+
+    1. Every frame must be immediately recognizable as the same person.
+    2. Smooth, powerful weight transfer from frame to frame — the run has more momentum than the walk.
+    3. Consistent stride length, arm drive amplitude, and knee lift across all frames.
+    4. Visible age in the run — heavier effort, controlled but not effortless, slightly shorter stride than a young athlete.
+    5. Military running mechanics — upright torso, controlled arm angles, midfoot strike, efficient form.
+    6. Arms drive in strong counter-rhythm to the legs — left arm forward when right leg forward, bent at approximately 90 degrees.
+    7. Head stays level and stable throughout the cycle — eyes forward, jaw set, focused.
+    8. Clothing reacts dynamically — shirt tails lift with stride, trouser fabric pulls at knees and hips, boot flex is pronounced, watch strap catches light differently with arm angle.
+    9. Clear flight phases — both feet off the ground at Frames 4 and 8, distinguishing this from the walk cycle.
+    10. Forward lean from the ankles — not from the waist — communicates urgency without破坏 posture.
+
+    **Color palette:**
+    Strictly restrained and consistent with the attached reference: warm dark-brown skin, desaturated military olive shirt and trousers, muted warm-grey background, bone-white undershirt, dark brown leather belt and boots, small neutral metallic details on the watch. No bright saturated colors. Every frame uses the identical palette.
+
+    **Gait character notes:**
+    This is not a generic run cycle. The run should communicate: a 62-year-old retired military officer who can still move when he needs to, but whose body makes him pay for it. His right arm drive may be slightly less fluid than his left — a suggestion of old shoulder wear. His breathing would be heavier than a younger runner's, implied through the slightly hunched shoulders in the flight phases. His boots hit the ground with authority — he's not trying to be quiet, he's trying to get somewhere. He runs like a man who ran in ECOMOG, who ran in Monrovia, and who hasn't forgotten how even if his knees haven't forgiven him.
+
+    **Overall feeling:**
+    Functional, consistent, sequential. The sheet should feel like a working animation reference pulled from a game studio's pipeline — **not a showcase illustration, not an action sequence, not a motion study art piece.** This is the definitive run-cycle reference that animators will use to maintain consistency across all in-game running animation.
+
+    **Negative constraints:**
+    No text beyond frame numbers, no character name title, no captions, no watermark, no border, no decorative frame, no insignia, no medals, no weapons, no modern tactical equipment, no sunglasses, no hat, no jewelry beyond the watch, no extra characters, no props, no background environment, no duplicated limbs, no extra fingers, malformed hands, malformed feet, distorted anatomy, floating limbs, exaggerated muscles, youthful appearance, cartoon proportions, glossy skin, plastic-looking clothing, exaggerated expression, heroic action pose, dramatic perspective, wide-angle distortion, oversaturated colors, cel-shading, hard black outlines, anime style, photorealism, 3D render appearance, inconsistent proportions between frames, different lighting between frames, motion blur, speed lines, ghosting effects, transparency between frames, dust clouds, impact effects, ground debris.
+
+    **Output:**
+    One clean, finished **landscape-format run-cycle sprite sheet** containing all 8 key frames in 2D hand-painted game art style, visually consistent with the attached reference sheet and suitable for use as the definitive run-cycle animation reference and for direct sprite extraction.`,
+  },
 ];
 
 // ── CHARACTER: AMA MENSAH ────────────────────────────────────
