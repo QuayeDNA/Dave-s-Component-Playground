@@ -2,7 +2,7 @@ import { Suspense, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
-import { useSceneActive } from '../shared/SceneActiveContext';
+import { useSceneActive } from '../shared/sceneActive';
 
 function WarpStarField({ warp }: { warp: boolean }) {
   const ref = useRef<THREE.Points>(null!);

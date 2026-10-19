@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { G, WARN, PALE, BG, SURF, BORD } from '@/data/abode/theme';
+import { STATUS_COLORS, STATUS_LABELS } from './status';
 
 export const TodoPlaceholder: React.FC<{ title: string; notes?: string[] }> = ({ title, notes = [] }) => (
   <div style={{ background: SURF, border: `1px solid ${BORD}` }} className="relative overflow-hidden">
@@ -77,20 +78,6 @@ export const MissionBrief: React.FC<{ label: string; text: string }> = ({ label,
     <p className="ab italic leading-relaxed" style={{ color: PALE, opacity: 0.82, fontSize: '1.05rem' }}>{text}</p>
   </div>
 );
-
-export const STATUS_COLORS: Record<string, string> = {
-  concept: '#6a6258', inProgress: '#e8c84a', built: G, tested: '#8ab0b8', shipped: '#57d68a',
-  draft: '#6a6258', finalized: '#e8c84a', locked: G,
-  inProduction: '#e8c84a', final: '#8ab0b8', integrated: G,
-  planned: '#6a6258', active: '#e8c84a', completed: G,
-};
-
-export const STATUS_LABELS: Record<string, string> = {
-  concept: 'CONCEPT', inProgress: 'IN PROGRESS', built: 'BUILT', tested: 'TESTED', shipped: 'SHIPPED',
-  draft: 'DRAFT', finalized: 'FINALIZED', locked: 'LOCKED',
-  inProduction: 'IN PRODUCTION', final: 'FINAL', integrated: 'INTEGRATED',
-  planned: 'PLANNED', active: 'ACTIVE', completed: 'COMPLETED',
-};
 
 export const StatusChip: React.FC<{ status: string }> = ({ status }) => {
   const color = STATUS_COLORS[status] || PALE;

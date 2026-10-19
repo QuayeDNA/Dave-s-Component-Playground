@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { useCanvasSize, FullCanvas, CtrlBar, Knob, Btn } from './shared';
+import { useCanvasSize } from './useCanvasSize';
+import { FullCanvas, CtrlBar, Knob, Btn } from './shared';
 
 const ACCENT = '#34d399';
 
@@ -98,7 +99,7 @@ export const GravityWells: React.FC = () => {
     };
     tick();
     return()=>{cancelAnimationFrame(raf);canvas.removeEventListener('mousedown',onDown);window.removeEventListener('mousemove',onMove);window.removeEventListener('mouseup',onUp);};
-  },[]);
+  },[canvasRef, sizeRef]);
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
@@ -200,7 +201,7 @@ export const ElasticBilliards: React.FC = () => {
     };
     tick();
     return()=>{cancelAnimationFrame(raf);canvas.removeEventListener('mousedown',onDown);};
-  },[]);
+  },[canvasRef, sizeRef]);
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
@@ -278,7 +279,7 @@ export const DoublePendulum: React.FC = () => {
     };
     tick();
     return()=>cancelAnimationFrame(raf);
-  },[]);
+  },[canvasRef, sizeRef]);
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
@@ -404,7 +405,7 @@ export const OrbitalMechanics: React.FC = () => {
     };
     tick();
     return()=>{cancelAnimationFrame(raf);canvas.removeEventListener('mousedown',onDown);window.removeEventListener('mousemove',onMove);window.removeEventListener('mouseup',onUp);};
-    },[]);
+    },[canvasRef, sizeRef]);
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%'}}>

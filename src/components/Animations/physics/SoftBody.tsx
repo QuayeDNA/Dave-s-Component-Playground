@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { useCanvasSize, FullCanvas, CtrlBar, Knob, Btn } from './shared';
+import { useCanvasSize } from './useCanvasSize';
+import { FullCanvas, CtrlBar, Knob, Btn } from './shared';
 
 const ACCENT = '#a78bfa';
 
@@ -101,7 +102,7 @@ export const VerletRope: React.FC = () => {
     };
     tick();
     return ()=>{cancelAnimationFrame(raf);canvas.removeEventListener('mousedown',onDown);window.removeEventListener('mousemove',onMove);window.removeEventListener('mouseup',onUp);};
-  }, []);
+  }, [canvasRef, sizeRef]);
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
@@ -202,7 +203,7 @@ export const ClothSim: React.FC = () => {
     };
     tick();
     return()=>{cancelAnimationFrame(raf);canvas.removeEventListener('mousedown',onDown);window.removeEventListener('mousemove',onMove);window.removeEventListener('mouseup',onUp);};
-  },[]);
+  },[canvasRef, sizeRef]);
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
@@ -277,7 +278,7 @@ export const FluidRipple: React.FC = () => {
     };
     tick();
     return()=>{cancelAnimationFrame(raf);canvas.removeEventListener('mousedown',onDown);};
-  },[]);
+  },[canvasRef, sizeRef]);
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%'}}>

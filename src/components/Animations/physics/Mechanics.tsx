@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { useCanvasSize, FullCanvas, CtrlBar, Knob, Btn } from './shared';
+import { useCanvasSize } from './useCanvasSize';
+import { FullCanvas, CtrlBar, Knob, Btn } from './shared';
 
 const ACCENT = '#4d8fc8';
 const COLS   = ['#4d8fc8','#a78bfa','#34d399','#fb923c','#f472b6','#fbbf24','#7eecd9'];
@@ -77,7 +78,7 @@ export const BouncingBalls: React.FC = () => {
     };
     tick();
     return () => { cancelAnimationFrame(raf); canvas.removeEventListener('mousedown', onClick); };
-  }, []);
+  }, [canvasRef, sizeRef]);
 
   return (
     <div style={{ display:'flex', flexDirection:'column', height:'100%' }}>
@@ -154,7 +155,7 @@ export const ProjectileLauncherFixed: React.FC = () => {
     };
     tick();
     return ()=>{cancelAnimationFrame(raf);canvas.removeEventListener('fire' as never,fire as never);};
-  }, []);
+  }, [canvasRef, sizeRef]);
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
@@ -265,7 +266,7 @@ export const SpringPendulum: React.FC = () => {
     };
     tick();
     return ()=>{cancelAnimationFrame(raf);canvas.removeEventListener('mousedown',onDown);window.removeEventListener('mousemove',onMove);window.removeEventListener('mouseup',onUp);};
-  }, []);
+  }, [canvasRef, sizeRef]);
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
@@ -355,7 +356,7 @@ export const NewtonsCradle: React.FC = () => {
     };
     tick();
     return ()=>cancelAnimationFrame(raf);
-  }, []);
+  }, [canvasRef, sizeRef]);
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
@@ -418,7 +419,7 @@ export const NewtonsCradleWired: React.FC = () => {
     };
     tick();
     return ()=>{cancelAnimationFrame(raf);canvas.removeEventListener('lift' as never,onLift as never);};
-  }, []);
+  }, [canvasRef, sizeRef]);
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%'}}>

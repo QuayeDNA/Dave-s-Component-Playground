@@ -1,47 +1,5 @@
 import React, { useRef, useEffect, useState, ReactNode } from 'react';
 
-// ── Tiny 2-D vector helpers ──────────────────────────────────────────────────
-export interface V2 { x: number; y: number }
-export const v2     = (x: number, y: number): V2 => ({ x, y });
-export const v2add  = (a: V2, b: V2): V2 => ({ x: a.x + b.x, y: a.y + b.y });
-export const v2sub  = (a: V2, b: V2): V2 => ({ x: a.x - b.x, y: a.y - b.y });
-export const v2mul  = (a: V2, s: number): V2 => ({ x: a.x * s, y: a.y * s });
-export const v2len  = (a: V2): number => Math.sqrt(a.x * a.x + a.y * a.y);
-export const v2dist = (a: V2, b: V2): number => v2len(v2sub(a, b));
-export const v2norm = (a: V2): V2 => { const l = v2len(a) || 1e-9; return { x: a.x / l, y: a.y / l }; };
-export const v2dot  = (a: V2, b: V2): number => a.x * b.x + a.y * b.y;
-export const v2perp = (a: V2): V2 => ({ x: -a.y, y: a.x });
-export const v2lerp = (a: V2, b: V2, t: number): V2 => ({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
-export const lerp   = (a: number, b: number, t: number) => a + (b - a) * t;
-export const clamp  = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
-
-// ── Canvas size hook ─────────────────────────────────────────────────────────
-export interface CanvasRefs {
-  containerRef: React.RefObject<HTMLDivElement>;
-  canvasRef:    React.RefObject<HTMLCanvasElement>;
-  sizeRef:      React.MutableRefObject<{ w: number; h: number }>;
-}
-export function useCanvasSize(): CanvasRefs {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef    = useRef<HTMLCanvasElement>(null);
-  const sizeRef      = useRef({ w: 0, h: 0 });
-  useEffect(() => {
-    const ctr = containerRef.current;
-    const cvs = canvasRef.current;
-    if (!ctr || !cvs) return;
-    const sync = () => {
-      const w = ctr.clientWidth, h = ctr.clientHeight;
-      cvs.width = w; cvs.height = h;
-      sizeRef.current = { w, h };
-    };
-    sync();
-    const ro = new ResizeObserver(sync);
-    ro.observe(ctr);
-    return () => ro.disconnect();
-  }, []);
-  return { containerRef, canvasRef, sizeRef };
-}
-
 // ── Lazy mount (IntersectionObserver) ────────────────────────────────────────
 export const LazyMount: React.FC<{ children: ReactNode }> = ({ children }) => {
   const ref = useRef<HTMLDivElement>(null);

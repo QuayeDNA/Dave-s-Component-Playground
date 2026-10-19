@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { useCanvasSize, FullCanvas, CtrlBar, Knob, Btn, Tag } from './shared';
+import { useCanvasSize } from './useCanvasSize';
+import { FullCanvas, CtrlBar, Knob, Btn, Tag } from './shared';
 
 const ACCENT = '#fb923c';
 
@@ -95,7 +96,7 @@ export const Boids: React.FC = () => {
     };
     tick();
     return()=>cancelAnimationFrame(raf);
-  },[]);
+  },[canvasRef, sizeRef]);
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
@@ -189,7 +190,7 @@ export const FallingSand: React.FC = () => {
     };
     tick();
     return()=>{cancelAnimationFrame(raf);canvas.removeEventListener('mousedown',onDown);canvas.removeEventListener('mousemove',onMove);window.removeEventListener('mouseup',onUp);};
-  },[]);
+  },[canvasRef, sizeRef]);
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
@@ -273,7 +274,7 @@ export const FallingSandWired: React.FC = () => {
     };
     tick();
     return()=>{cancelAnimationFrame(raf);canvas.removeEventListener('clear' as never,onClear as never);canvas.removeEventListener('mousedown',onDown);canvas.removeEventListener('mousemove',onMove);window.removeEventListener('mouseup',onUp);};
-  },[]);
+  },[canvasRef, sizeRef]);
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
@@ -363,7 +364,7 @@ export const ReactionDiffusion: React.FC = () => {
     };
     tick();
     return()=>{cancelAnimationFrame(raf);canvas.removeEventListener('mousedown',onDown);};
-  },[]);
+  },[canvasRef, sizeRef]);
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
@@ -450,7 +451,7 @@ export const LangtonsAnt: React.FC = () => {
     };
     tick();
     return()=>cancelAnimationFrame(raf);
-  },[]);
+  },[canvasRef, sizeRef]);
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%'}}>

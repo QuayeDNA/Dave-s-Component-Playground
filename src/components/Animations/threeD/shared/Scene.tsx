@@ -1,7 +1,7 @@
 import React, { Suspense, useContext } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
-import { SceneActive } from './SceneActiveContext';
+import { SceneActive } from './sceneActive';
 
 // Bare Canvas with standard lighting. Render loop idles (`frameloop="never"`)
 // while the card is off-screen via the SceneActive context.
