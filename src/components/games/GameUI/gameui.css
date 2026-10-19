@@ -1,0 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+.gameui-page ::selection {
+  background: var(--t-world-violet);
+  color: var(--t-ember-900);
+}
