@@ -107,7 +107,7 @@ const SECTIONS: Section[] = [
       { label: 'Irregular', description: 'Sci-fi metroidvania — shapeshifting protagonist, geometric world, AI companions.', path: '/games/irregular', Icon: Sword, tag: 'Sci-Fi' },
       { label: 'The Long Road Home', description: 'Survival strategy set in Ghana — family bonds, resource scarcity, dossier aesthetic.', path: '/games/abode', Icon: Globe, tag: 'Survival' },
       { label: 'Gold & Iron', description: 'Historical epic across the Gold Coast — illuminated chronicle presentation.', path: '/games/gold-and-iron', Icon: Gamepad2, tag: 'Historical' },
-      { label: 'UI Showcase', description: '9 interactive game UI elements rendered in 6 distinct style directions.', path: '/games/ui', Icon: Palette, tag: '6 Styles' },
+      { label: 'UI Showcase', description: 'A four-world game UI lab, starting with a playable pixel JRPG.', path: '/games/ui', Icon: Palette, tag: '4 Worlds' },
     ],
   },
 ];

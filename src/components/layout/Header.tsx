@@ -43,7 +43,7 @@ const GAME_ITEMS = [
   { label: 'Irregular', sub: 'Metroidvania · Shapeshifting', path: '/games/irregular', color: 'var(--t-accent-b)', num: '01' },
   { label: 'The Long Road Home', sub: 'Survival · Ghana · Family', path: '/games/abode', color: '#7ec87e', num: '02' },
   { label: 'Gold & Iron', sub: 'Historical · Gold Coast', path: '/games/gold-and-iron', color: 'var(--t-gold)', num: '03' },
-  { label: 'UI Showcase', sub: 'Game UI Elements · 6 Styles', path: '/games/ui', color: '#a080d0', num: '◈' },
+  { label: 'UI Showcase', sub: 'Game UI Lab · 4 Worlds', path: '/games/ui', color: '#a080d0', num: '◈' },
 ];
 
 // ─── Playground mega-dropdown ──────────────────────────────────────────────────

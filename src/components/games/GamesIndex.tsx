@@ -2,9 +2,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import { UI_SYSTEM_ACCENTS } from './uiSystemAccents';
 
 // ─── UI Showcase Card ────────────────────────────────────────
-const STYLE_ACCENTS = ['#7eb8e8', '#7ec87e', '#c9962b', '#00f5ff', '#e05c2a', '#ffe866'];
 
 const GameUICard: React.FC<{ delay: number }> = ({ delay }) => {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ const GameUICard: React.FC<{ delay: number }> = ({ delay }) => {
     >
       {/* Six-accent bar at top */}
       <div className="flex h-0.75 absolute top-0 left-0 right-0">
-        {STYLE_ACCENTS.map((c, i) => (
+        {UI_SYSTEM_ACCENTS.map((c, i) => (
           <div key={i} className="flex-1 transition-opacity duration-300 group-hover:opacity-100" style={{ background: c, opacity: 0.7 }} />
         ))}
       </div>
@@ -36,7 +36,7 @@ const GameUICard: React.FC<{ delay: number }> = ({ delay }) => {
         }} />
         {/* Pixel art dots */}
         {[0,1,2,3,4].map(i => (
-          <div key={i} className="absolute" style={{ width: 6, height: 6, background: STYLE_ACCENTS[i % 6] + '28',
+          <div key={i} className="absolute" style={{ width: 6, height: 6, background: UI_SYSTEM_ACCENTS[i % 6] + '28',
             right: `${8 + i * 14}%`, top: `${20 + (i % 3) * 18}%`, imageRendering: 'pixelated' }} />
         ))}
         {/* Neon glow blob */}
@@ -48,7 +48,7 @@ const GameUICard: React.FC<{ delay: number }> = ({ delay }) => {
         {/* Top meta */}
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex gap-1.5">
-            {STYLE_ACCENTS.map((c, i) => (
+            {UI_SYSTEM_ACCENTS.map((c, i) => (
               <div key={i} className="w-3 h-3" style={{ background: c + '60', border: `1px solid ${c}` }} />
             ))}
           </div>
@@ -66,13 +66,13 @@ const GameUICard: React.FC<{ delay: number }> = ({ delay }) => {
           <p className="mb-3 opacity-40"
             style={{ fontFamily: '"Space Mono", monospace', fontSize: 'clamp(0.6rem, 1.5vw, 0.7rem)',
               color: '#a080d0', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
-            // Six style directions · Nine interactive elements
+            // Four worlds · Four interface languages
           </p>
           <p className="leading-relaxed max-w-lg opacity-70"
             style={{ fontFamily: '"Space Mono", monospace', fontSize: 'clamp(0.7rem, 1.8vw, 0.8rem)',
               color: '#c8c0e8', lineHeight: 1.8 }}>
-            HUD bars, inventory grids, achievement toasts, dialogue systems, screen templates — all rendered
-            in six distinct visual languages from pixel-art to neon void.
+            HUD bars, inventory grids, combat logs, and cockpit gauges — four interface languages,
+            starting with a playable pixel JRPG.
           </p>
         </div>
 
