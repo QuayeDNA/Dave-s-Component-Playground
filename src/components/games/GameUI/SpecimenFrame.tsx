@@ -72,7 +72,7 @@ export const SpecimenFrame: React.FC<SpecimenFrameProps> = ({
         background: 'var(--t-panel-ember-mid)',
       }}
     >
-      <div className="h-[2px] w-full" style={{ background: accent }} aria-hidden="true" />
+      <div className="h-0.5 w-full" style={{ background: accent }} aria-hidden="true" />
       {children}
     </div>
 
@@ -92,7 +92,7 @@ export const SpecimenFrame: React.FC<SpecimenFrameProps> = ({
         <button
           type="button"
           onClick={onReset}
-          className="border px-3 py-2 text-[9px] uppercase tracking-[0.2em] transition-colors hover:text-[var(--t-bone)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--t-world-violet)]"
+          className="border px-3 py-2 text-[9px] uppercase tracking-[0.2em] transition-colors hover:text-(--t-bone) focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-(--t-world-violet)"
           style={{
             fontFamily: 'var(--font-mono)',
             color: 'var(--t-bone-soft)',

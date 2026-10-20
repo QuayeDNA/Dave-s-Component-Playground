@@ -1,0 +1,608 @@
+.stage {
+  --speed: 0;
+  --arc: 0;
+  --needle: -120deg;
+  --boost-pct: 100%;
+  --road: 0px;
+
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  container-type: inline-size;
+  font-size: clamp(10px, 1.5cqw, 18px);
+  font-family: 'Rajdhani', sans-serif;
+  color: #f5f0e8;
+  user-select: none;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(218, 78, 125, 0.22), transparent 32%),
+    radial-gradient(circle at 50% 46%, #17101e 0%, #0a0710 58%, #040307 100%);
+}
+
+.stage:focus-visible {
+  outline: 2px solid #da4e7d;
+  outline-offset: -2px;
+}
+
+.stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0, 0, 0, 0.18) 3px),
+    radial-gradient(circle, transparent 42%, rgba(0, 0, 0, 0.7) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.sky {
+  position: absolute;
+  inset: 0 0 42%;
+  background:
+    radial-gradient(ellipse at 50% 100%, rgba(218, 78, 125, 0.26), transparent 58%),
+    linear-gradient(to bottom, rgba(10, 7, 16, 0), rgba(10, 7, 16, 0.9));
+}
+
+.road {
+  position: absolute;
+  inset: 42% 0 0;
+  background-image:
+    linear-gradient(rgba(218, 78, 125, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 240, 232, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, transparent 47%, rgba(245, 240, 232, 0.3) 48%, rgba(245, 240, 232, 0.3) 52%, transparent 53%);
+  background-size: 100% 42px, 9% 100%, 100% 100%;
+  background-position-y: var(--road), 0, 0;
+  transform: perspective(330px) rotateX(54deg);
+  transform-origin: top center;
+  mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 82%, transparent);
+}
+
+.speedLines {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 0 48%, rgba(218, 78, 125, 0.2) 49%, transparent 50% 100%),
+    repeating-linear-gradient(90deg, transparent 0 7%, rgba(245, 240, 232, 0.06) 7.2%, transparent 7.6%);
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.hud {
+  position: absolute;
+  top: 1.2em;
+  left: 1.2em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.lap {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.78em;
+  letter-spacing: 0.16em;
+  color: #f5f0e8;
+}
+
+.lap strong {
+  color: #da4e7d;
+}
+
+.times {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 0.15em 1.2em;
+  padding: 0.5em 0.65em;
+  border: 1px solid rgba(245, 240, 232, 0.16);
+  background: rgba(4, 3, 7, 0.6);
+  font-size: 0.52em;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: rgba(245, 240, 232, 0.62);
+}
+
+.times span {
+  display: block;
+  margin-top: 0.2em;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.25em;
+  letter-spacing: 0.06em;
+  color: #f5f0e8;
+}
+
+.times [data-best='true'] span {
+  color: #6cf08a;
+}
+
+.topRight {
+  position: absolute;
+  top: 1.2em;
+  right: 1.2em;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25em;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.speedReadout {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.3em;
+  line-height: 0.9;
+  color: #f5f0e8;
+  text-shadow: 0 0 0.8em rgba(218, 78, 125, 0.45);
+}
+
+.speedUnit {
+  font-size: 0.55em;
+  letter-spacing: 0.2em;
+  color: rgba(245, 240, 232, 0.58);
+}
+
+.gearReadout {
+  margin-top: 0.35em;
+  font-size: 0.55em;
+  letter-spacing: 0.18em;
+  color: rgba(245, 240, 232, 0.66);
+}
+
+.gearReadout strong {
+  margin-left: 0.4em;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.45em;
+  color: #da4e7d;
+}
+
+.progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0.22em;
+  background: rgba(245, 240, 232, 0.1);
+  z-index: 6;
+}
+
+.progress i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #da4e7d, #e8b84b);
+  transition: width 100ms linear;
+}
+
+.message {
+  position: absolute;
+  left: 50%;
+  bottom: 1em;
+  max-width: 82%;
+  transform: translateX(-50%);
+  overflow: hidden;
+  padding: 0.42em 0.9em;
+  border: 1px solid rgba(218, 78, 125, 0.28);
+  background: rgba(4, 3, 7, 0.74);
+  font-size: 0.55em;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #f5f0e8;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.dash {
+  position: absolute;
+  left: 1.2em;
+  right: 13em;
+  bottom: 1em;
+  display: flex;
+  align-items: flex-end;
+  gap: 1em;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.gauge {
+  --gauge-radius: 4.1em;
+
+  position: relative;
+  width: 11em;
+  height: 8.4em;
+  flex: none;
+  border: 1px solid rgba(245, 240, 232, 0.16);
+  background:
+    radial-gradient(circle at 50% 60%, rgba(218, 78, 125, 0.12), transparent 60%),
+    rgba(4, 3, 7, 0.72);
+}
+
+.gaugeSvg {
+  position: absolute;
+  inset: 0.4em;
+  width: calc(100% - 0.8em);
+  height: calc(100% - 0.8em);
+}
+
+.gaugeBase {
+  fill: none;
+  stroke: rgba(245, 240, 232, 0.16);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 66.67 100;
+}
+
+.gaugeArc {
+  fill: none;
+  stroke: #da4e7d;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: var(--arc) 100;
+  filter: drop-shadow(0 0 2px rgba(218, 78, 125, 0.8));
+}
+
+.ticks {
+  position: absolute;
+  inset: 0;
+}
+
+.tick {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1px;
+  height: 5px;
+  margin-left: -0.5px;
+  background: rgba(245, 240, 232, 0.38);
+  transform: rotate(var(--angle)) translateY(calc(-1 * var(--gauge-radius)));
+  transform-origin: 50% 0;
+}
+
+.tick[data-major='true'] {
+  height: 8px;
+  background: rgba(245, 240, 232, 0.72);
+}
+
+.needle {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: 2px;
+  height: 36%;
+  transform: translate(-50%, -100%) rotate(var(--needle));
+  transform-origin: 50% 100%;
+  background: linear-gradient(to top, #da4e7d, #ffb0c7);
+  box-shadow: 0 0 0.6em rgba(218, 78, 125, 0.8);
+}
+
+.gaugeHub {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: 0.5em;
+  height: 0.5em;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #f5f0e8;
+  box-shadow: 0 0 0 0.2em rgba(218, 78, 125, 0.35);
+}
+
+.gaugeSpeed {
+  position: absolute;
+  left: 50%;
+  bottom: 0.4em;
+  transform: translateX(-50%);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.1em;
+  letter-spacing: 0.06em;
+  color: #f5f0e8;
+}
+
+.gaugeSpeed span {
+  margin-left: 0.2em;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.55em;
+  letter-spacing: 0.12em;
+  color: rgba(245, 240, 232, 0.6);
+}
+
+.gearBox {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.25em;
+  padding-bottom: 0.4em;
+}
+
+.gearLabel,
+.boostLabel {
+  font-size: 0.52em;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(245, 240, 232, 0.58);
+}
+
+.gearValue {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.5em;
+  line-height: 0.9;
+  color: #f5f0e8;
+}
+
+.boostBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35em;
+  padding-bottom: 0.4em;
+}
+
+.boostTrack {
+  position: relative;
+  width: 0.65em;
+  height: 5.4em;
+  border: 1px solid rgba(245, 240, 232, 0.2);
+  background: rgba(245, 240, 232, 0.08);
+  overflow: hidden;
+}
+
+.boostFill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--boost-pct);
+  background: linear-gradient(to top, #3ec7ff, #6cf08a);
+  box-shadow: 0 0 0.8em rgba(62, 199, 255, 0.5);
+}
+
+.leds {
+  position: absolute;
+  top: 0.55em;
+  left: 50%;
+  display: flex;
+  gap: 0.22em;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.led {
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 50%;
+  opacity: 0.18;
+}
+
+.led[data-lit='true'] {
+  opacity: 1;
+}
+
+.controls {
+  position: absolute;
+  right: 1.2em;
+  bottom: 1em;
+  display: flex;
+  gap: 0.4em;
+  z-index: 6;
+}
+
+.controls button {
+  border: 1px solid rgba(245, 240, 232, 0.26);
+  background: rgba(4, 3, 7, 0.72);
+  padding: 0.55em 0.75em;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.56em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(245, 240, 232, 0.84);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    border-color 100ms ease,
+    background 100ms ease,
+    color 100ms ease;
+}
+
+.controls button[data-held='true'] {
+  border-color: #da4e7d;
+  background: rgba(218, 78, 125, 0.18);
+  color: #f5f0e8;
+}
+
+.controls button:hover {
+  border-color: #e8b84b;
+  color: #fff;
+}
+
+.controls button:focus-visible {
+  outline: 2px solid #e8b84b;
+  outline-offset: 2px;
+}
+
+.controls button[data-control='boost'] {
+  color: #6cf08a;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1em;
+  background: rgba(4, 3, 7, 0.82);
+  backdrop-filter: blur(2px);
+  text-align: center;
+  z-index: 10;
+}
+
+.overlayInner {
+  max-width: 28em;
+}
+
+.overlayKicker {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.56em;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #6cf08a;
+}
+
+.overlayTitle {
+  margin-top: 0.5em;
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.35rem, 4cqw, 2.6rem);
+  line-height: 1;
+  letter-spacing: 0.08em;
+  color: #f5f0e8;
+}
+
+.overlayText {
+  margin-top: 0.8em;
+  font-size: 0.68em;
+  line-height: 1.6;
+  letter-spacing: 0.08em;
+  color: rgba(245, 240, 232, 0.76);
+}
+
+.overlayStats {
+  display: flex;
+  justify-content: center;
+  gap: 1.6em;
+  margin-top: 1.2em;
+  font-size: 0.55em;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(245, 240, 232, 0.66);
+}
+
+.overlayStats strong {
+  display: block;
+  margin-top: 0.35em;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.5em;
+  color: #f5f0e8;
+}
+
+.overlayButton {
+  margin-top: 1.4em;
+  border: 1px solid #da4e7d;
+  background: transparent;
+  padding: 0.7em 1.2em;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.6em;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #f5f0e8;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.overlayButton:hover {
+  background: rgba(218, 78, 125, 0.16);
+}
+
+.overlayButton:focus-visible {
+  outline: 2px solid #e8b84b;
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .stage {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+@container (max-width: 560px) {
+  .hud {
+    top: 0.7em;
+    left: 0.7em;
+  }
+
+  .topRight {
+    top: 0.7em;
+    right: 0.7em;
+  }
+
+  .times {
+    grid-template-columns: 1fr;
+    gap: 0.1em;
+    font-size: 0.46em;
+  }
+
+  .speedReadout {
+    font-size: 1.8em;
+  }
+
+  .dash {
+    left: 0.7em;
+    right: 9em;
+    bottom: 0.7em;
+    gap: 0.5em;
+  }
+
+  .gauge {
+    --gauge-radius: 2.6em;
+
+    width: 7.4em;
+    height: 5.8em;
+  }
+
+  .gaugeSpeed {
+    font-size: 0.85em;
+  }
+
+  .gearValue {
+    font-size: 1.8em;
+  }
+
+  .boostTrack {
+    height: 3.6em;
+  }
+
+  .leds {
+    gap: 0.15em;
+  }
+
+  .led {
+    width: 0.35em;
+    height: 0.35em;
+  }
+
+  .controls {
+    right: 0.7em;
+    bottom: 0.7em;
+  }
+
+  .controls button {
+    padding: 0.55em;
+    font-size: 0.5em;
+  }
+
+  .message {
+    bottom: 6.6em;
+    font-size: 0.5em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress i,
+  .controls button,
+  .overlayButton {
+    transition: none;
+  }
+
+  .road {
+    background-position-y: 0;
+  }
+
+  .speedLines {
+    display: none;
+  }
+}

@@ -3,30 +3,50 @@ import { Section } from '../GamePageShell';
 import { DemoErrorBoundary } from './DemoErrorBoundary';
 import { GameLabShell } from './GameLabShell';
 import { PixelRpgDemo } from './demos/PixelRpg/PixelRpgDemo';
-import { PIXEL_RPG_SPECIMEN } from './specs';
+import { RacingDemo } from './demos/Racing/RacingDemo';
+import { SurvivalPackDemo } from './demos/SurvivalPack/SurvivalPackDemo';
+import { TacticalShooterDemo } from './demos/TacticalShooter/TacticalShooterDemo';
+import { SPECIMENS } from './specs';
 import { SpecimenFrame } from './SpecimenFrame';
 import './gameui.css';
 
 const ACCENT = 'var(--t-world-violet)';
 
+const DEMO_BY_ID: Record<string, React.ComponentType> = {
+  'pixel-rpg': PixelRpgDemo,
+  'abode-backpack': SurvivalPackDemo,
+  wardline: TacticalShooterDemo,
+  'apex-dash': RacingDemo,
+};
+
 const NOTES = [
   {
     label: 'PALETTE',
-    body: 'Sky cyan, slime green, a navy command box, and white pixel text. The stage never borrows the house palette.',
+    body: 'Four stage palettes, one house frame. The chrome stays ember, bone, and violet while each specimen owns its own colors.',
   },
   {
     label: 'TYPE',
-    body: 'Press Start 2P at one scale. Hierarchy comes from spacing, color, and the box, not from extra font sizes.',
+    body: 'Press Start 2P, Special Elite, Rajdhani, and Orbitron are stage voices. House chrome speaks Bebas, Crimson, and Space Mono.',
   },
   {
     label: 'MOTION',
-    body: 'Bob, shake, and typewriter. Every one of them collapses cleanly under reduced motion.',
+    body: 'Bob, shake, muzzle flash, and speed lines. Every loop collapses to a still frame under reduced motion.',
+  },
+  {
+    label: 'INPUT',
+    body: 'Pointer, drag, keyboard, and hold controls. Each specimen has a working keyboard path and a touch path.',
   },
 ];
 
 const GameUIPage: React.FC = () => {
-  const [resetKey, setResetKey] = useState(0);
-  const specimen = PIXEL_RPG_SPECIMEN;
+  const [resetKeys, setResetKeys] = useState<Record<string, number>>({});
+
+  const resetSpecimen = (id: string): void => {
+    setResetKeys((current) => ({
+      ...current,
+      [id]: (current[id] ?? 0) + 1,
+    }));
+  };
 
   return (
     <GameLabShell
@@ -35,33 +55,46 @@ const GameUIPage: React.FC = () => {
       subtitle="Four worlds. Four interface languages. One component lab."
       accent={ACCENT}
     >
-      <Section label="01 — SPECIMEN" accentColor={ACCENT}>
-        <SpecimenFrame
-          id={specimen.id}
-          index={specimen.index}
-          total={specimen.total}
-          title={specimen.title}
-          genre={specimen.genre}
-          accent={specimen.accent}
-          description={specimen.description}
-          inputHints={specimen.inputHints}
-          onReset={() => setResetKey((current) => current + 1)}
-        >
-          <DemoErrorBoundary key={resetKey} title={specimen.title} accent={specimen.accent}>
-            <PixelRpgDemo key={resetKey} />
-          </DemoErrorBoundary>
-        </SpecimenFrame>
+      <Section label="01 — SPECIMENS" accentColor={ACCENT}>
+        {SPECIMENS.map((specimen) => {
+          const resetKey = resetKeys[specimen.id] ?? 0;
+          const Demo = DEMO_BY_ID[specimen.id];
+
+          return (
+            <div key={specimen.id} className="mb-16 last:mb-0">
+              <SpecimenFrame
+                id={specimen.id}
+                index={specimen.index}
+                total={specimen.total}
+                title={specimen.title}
+                genre={specimen.genre}
+                accent={specimen.accent}
+                description={specimen.description}
+                inputHints={specimen.inputHints}
+                onReset={() => resetSpecimen(specimen.id)}
+              >
+                <DemoErrorBoundary
+                  key={`${specimen.id}-${resetKey}`}
+                  title={specimen.title}
+                  accent={specimen.accent}
+                >
+                  {Demo ? <Demo key={resetKey} /> : null}
+                </DemoErrorBoundary>
+              </SpecimenFrame>
+            </div>
+          );
+        })}
 
         <p
-          className="mt-5 text-[9px] uppercase tracking-[0.22em]"
+          className="mt-6 text-[9px] uppercase tracking-[0.22em]"
           style={{ fontFamily: 'var(--font-mono)', color: 'var(--t-bone-faint)' }}
         >
-          Next specimens: Abəde Backpack · Wardline · Apex Dash.
+          Four specimens live · deeper mechanics next.
         </p>
       </Section>
 
       <Section label="02 — DESIGN NOTES" accentColor={ACCENT}>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {NOTES.map((note) => (
             <div
               key={note.label}
@@ -99,8 +132,8 @@ const GameUIPage: React.FC = () => {
           <span style={{ fontFamily: 'var(--font-mono)', color: ACCENT }}>
             WHAT TO STEAL —{' '}
           </span>
-          Show cost and consequence before commitment. HP, MP, potions, and the enemy's intent
-          are all visible before the player chooses.
+          Make cost visible before commitment. HP, MP, weight, ammo, armor, and lap time are all
+          on screen before the player acts.
         </p>
       </Section>
     </GameLabShell>

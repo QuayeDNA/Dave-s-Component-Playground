@@ -29,7 +29,7 @@ export const GameLabShell: React.FC<GameLabShellProps> = ({
         background: `radial-gradient(ellipse at 18% 0%, color-mix(in srgb, ${accent} 14%, transparent) 0%, transparent 55%)`,
       }}
     />
-    <div className="relative z-10 mx-auto w-full max-w-[1100px] px-5 pb-16 pt-7 sm:px-8 sm:pb-20 sm:pt-10">
+    <div className="relative z-10 mx-auto w-full max-w-275 px-5 pb-16 pt-7 sm:px-8 sm:pb-20 sm:pt-10">
       <Link
         to="/games"
         className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] opacity-70 transition-opacity hover:opacity-100"
@@ -83,7 +83,7 @@ export const GameLabShell: React.FC<GameLabShellProps> = ({
         >
           {subtitle}
         </p>
-        <div className="absolute bottom-0 left-0 right-0 flex h-[3px]" aria-hidden="true">
+        <div className="absolute bottom-0 left-0 right-0 flex h-0.75" aria-hidden="true">
           {UI_SYSTEM_ACCENTS.map((color) => (
             <span key={color} className="flex-1" style={{ background: color, opacity: 0.75 }} />
           ))}

@@ -558,9 +558,9 @@ const GoldIronCard: React.FC<{ delay: number }> = ({ delay }) => {
 
       {/* Bottom ornamental bar */}
       <div className="absolute bottom-0 left-0 right-0 flex items-center" style={{ height: '3px' }}>
-        <div className="h-[1px] flex-1 opacity-20" style={{ background: GOLD }} />
+        <div className="h-px flex-1 opacity-20" style={{ background: GOLD }} />
         <div
-          className="h-[3px] transition-all duration-500 ease-out group-hover:flex-1"
+          className="h-0.75 transition-all duration-500 ease-out group-hover:flex-1"
           style={{ background: GOLD, width: '0%', minWidth: 0, flex: '0 0 0%' }}
         />
         <div className="h-px flex-1 opacity-20" style={{ background: GOLD }} />

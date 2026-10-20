@@ -37,7 +37,7 @@ export class DemoErrorBoundary extends React.Component<
             border: '1px solid var(--t-line-strong)',
           }}
         >
-          <div className="h-[2px] w-full" style={{ background: this.props.accent }} aria-hidden="true" />
+          <div className="h-0.5 w-full" style={{ background: this.props.accent }} aria-hidden="true" />
           <div className="p-8 sm:p-12">
             <p
               className="text-[9px] uppercase tracking-[0.3em]"
@@ -64,7 +64,7 @@ export class DemoErrorBoundary extends React.Component<
             <button
               type="button"
               onClick={this.reload}
-              className="mt-6 border px-4 py-2 text-[10px] uppercase tracking-[0.2em] transition-colors hover:text-[var(--t-bone)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--t-world-violet)]"
+              className="mt-6 border px-4 py-2 text-[10px] uppercase tracking-[0.2em] transition-colors hover:text-(--t-bone) focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-(--t-world-violet)"
               style={{
                 fontFamily: 'var(--font-mono)',
                 color: 'var(--t-bone-soft)',
