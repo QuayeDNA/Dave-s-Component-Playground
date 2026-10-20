@@ -29,8 +29,8 @@ export const SURVIVAL_PACK_SPECIMEN: SpecimenSpec = {
   genre: 'DIEGETIC SURVIVAL',
   accent: 'var(--t-world-gold)',
   description:
-    'A weight-limited pack, a pile of salvage, and a walk speed you can feel. Every kilogram is a decision.',
-  inputHints: ['CLICK / TAP TO MOVE', 'DRAG BETWEEN ZONES', 'TAB + ENTER'],
+    'A physical pack you can inspect pocket by pocket: every kilogram shifts the scale, and every missing essential shows on the bug-out sheet.',
+  inputHints: ['CLICK A TAG', 'DRAG TO A POCKET', 'USE · STOW · DROP'],
 };
 
 export const TACTICAL_SHOOTER_SPECIMEN: SpecimenSpec = {
@@ -41,8 +41,13 @@ export const TACTICAL_SHOOTER_SPECIMEN: SpecimenSpec = {
   genre: 'TACTICAL SHOOTER',
   accent: 'var(--t-world-green)',
   description:
-    'A projected-nameplate firefight: aim the line, manage the magazine, and keep your armor between you and the dark.',
-  inputHints: ['POINTER / A D TO AIM', 'CLICK / F TO FIRE', 'R RELOAD · P PAUSE'],
+    'A projected-nameplate firefight: hostiles telegraph their shots, armor absorbs the first hits, and every magazine counts.',
+  inputHints: [
+    'POINTER / A D TO AIM',
+    'CLICK / F TO FIRE',
+    'R RELOAD · P PAUSE',
+    'KILL THE AIMING HOSTILE',
+  ],
 };
 
 export const RACING_SPECIMEN: SpecimenSpec = {

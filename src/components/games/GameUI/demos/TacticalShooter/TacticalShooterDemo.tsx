@@ -13,6 +13,10 @@ const FIRE_ANGLE = 4;
 const YAW_LIMIT = 55;
 const PIXELS_PER_DEGREE = 1.15;
 const ENEMY_FIRE_MS = 2400;
+const AIM_WINDUP_MS = 650;
+const FIRE_COOLDOWN_MS = 90;
+const ENEMY_MIN_DAMAGE = 6;
+const ENEMY_MAX_DAMAGE = 10;
 
 interface Enemy {
   id: number;
@@ -21,6 +25,14 @@ interface Enemy {
   hp: number;
   maxHp: number;
   alive: boolean;
+}
+
+interface FloatNumber {
+  id: number;
+  x: number;
+  top: number;
+  value: string;
+  kind: 'hit' | 'kill' | 'player';
 }
 
 const INITIAL_ENEMIES: Enemy[] = [
@@ -87,25 +99,53 @@ export const TacticalShooterDemo: React.FC = () => {
   const [muzzle, setMuzzle] = useState(false);
   const [hitmarker, setHitmarker] = useState(false);
   const [damageFlash, setDamageFlash] = useState(false);
+  const [aimingEnemyId, setAimingEnemyId] = useState<number | null>(null);
+  const [hitEnemyId, setHitEnemyId] = useState<number | null>(null);
+  const [floats, setFloats] = useState<FloatNumber[]>([]);
+  const [shots, setShots] = useState({ fired: 0, hit: 0 });
 
   const enemiesRef = useRef(enemies);
   const yawRef = useRef(yaw);
   const pausedRef = useRef(paused);
   const deadRef = useRef(dead);
+  const aimingRef = useRef<number | null>(aimingEnemyId);
+  const aimingTokenRef = useRef(0);
+  const ammoRef = useRef(ammo);
+  const reloadingRef = useRef(reloading);
+  const lastFireAtRef = useRef(0);
+  const floatIdRef = useRef(0);
 
   enemiesRef.current = enemies;
   yawRef.current = yaw;
   pausedRef.current = paused;
   deadRef.current = dead;
+  aimingRef.current = aimingEnemyId;
+  ammoRef.current = ammo;
+  reloadingRef.current = reloading;
 
   const clearTransientTimers = useCallback(() => {
     timeouts.current.forEach((timer) => window.clearTimeout(timer));
     timeouts.current = [];
+    aimingTokenRef.current += 1;
+    reloadingRef.current = false;
     if (reloadTimer.current !== null) {
       window.clearInterval(reloadTimer.current);
       reloadTimer.current = null;
     }
   }, []);
+
+  const spawnFloat = useCallback(
+    (x: number, top: number, value: string, kind: FloatNumber['kind']) => {
+      const id = floatIdRef.current + 1;
+      floatIdRef.current = id;
+      setFloats((current) => [...current.slice(-5), { id, x, top, value, kind }]);
+      const timer = window.setTimeout(() => {
+        setFloats((current) => current.filter((float) => float.id !== id));
+      }, 850);
+      timeouts.current.push(timer);
+    },
+    [],
+  );
 
   useEffect(
     () => () => {
@@ -119,7 +159,7 @@ export const TacticalShooterDemo: React.FC = () => {
 
   useEffect(() => {
     enemyFireTimer.current = window.setInterval(() => {
-      if (pausedRef.current || deadRef.current) return;
+      if (pausedRef.current || deadRef.current || aimingRef.current !== null) return;
 
       const visible = enemiesRef.current.filter(
         (enemy) => enemy.alive && enemyIsVisible(enemy.angle, yawRef.current),
@@ -127,17 +167,42 @@ export const TacticalShooterDemo: React.FC = () => {
       if (visible.length === 0) return;
 
       const shooter = visible[Math.floor(Math.random() * visible.length)];
-      const damage = 4 + Math.floor(Math.random() * 5);
+      const token = aimingTokenRef.current + 1;
+      aimingTokenRef.current = token;
+      setAimingEnemyId(shooter.id);
+      setMessage(`HOSTILE ${shooter.id + 1} AIMING · KILL TO CANCEL`);
 
-      setPlayer((current) => {
-        const armor = Math.max(0, current.armor - damage);
-        const overflow = Math.max(0, damage - current.armor);
-        const hp = Math.max(0, current.hp - overflow);
-        return { hp, armor };
-      });
-      setDamageFlash(true);
-      setMessage(`HOSTILE ${shooter.id + 1} RETURN FIRE · -${damage}`);
-      const timer = window.setTimeout(() => setDamageFlash(false), 260);
+      const timer = window.setTimeout(() => {
+        if (token !== aimingTokenRef.current) return;
+
+        setAimingEnemyId(null);
+        if (pausedRef.current || deadRef.current) return;
+
+        const current = enemiesRef.current.find((enemy) => enemy.id === shooter.id);
+        if (!current?.alive) return;
+
+        const chance = clamp(0.86 - current.distance * 0.007, 0.45, 0.86);
+        if (Math.random() > chance) {
+          setMessage(`HOSTILE ${shooter.id + 1} MISSED · ROUNDS OVERHEAD`);
+          return;
+        }
+
+        const damage =
+          ENEMY_MIN_DAMAGE +
+          Math.floor(Math.random() * (ENEMY_MAX_DAMAGE - ENEMY_MIN_DAMAGE + 1));
+
+        setPlayer((currentPlayer) => {
+          const armor = Math.max(0, currentPlayer.armor - damage);
+          const overflow = Math.max(0, damage - currentPlayer.armor);
+          const hp = Math.max(0, currentPlayer.hp - overflow);
+          return { hp, armor };
+        });
+        setDamageFlash(true);
+        spawnFloat(50, 58, `-${damage}`, 'player');
+        setMessage(`HOSTILE ${shooter.id + 1} HIT · -${damage}`);
+        const flashTimer = window.setTimeout(() => setDamageFlash(false), 260);
+        timeouts.current.push(flashTimer);
+      }, AIM_WINDUP_MS);
       timeouts.current.push(timer);
     }, ENEMY_FIRE_MS);
 
@@ -147,7 +212,7 @@ export const TacticalShooterDemo: React.FC = () => {
         enemyFireTimer.current = null;
       }
     };
-  }, []);
+  }, [spawnFloat]);
 
   useEffect(() => {
     if (player.hp > 0 || dead) return;
@@ -158,6 +223,9 @@ export const TacticalShooterDemo: React.FC = () => {
     setMuzzle(false);
     setHitmarker(false);
     setDamageFlash(false);
+    setAimingEnemyId(null);
+    setHitEnemyId(null);
+    setFloats([]);
     setMessage('SIGNAL LOST · RESTART TO REDEPLOY');
     clearTransientTimers();
   }, [player.hp, dead, clearTransientTimers]);
@@ -170,21 +238,30 @@ export const TacticalShooterDemo: React.FC = () => {
 
   const fire = (heading = yaw): void => {
     if (paused || dead) return;
-    if (reloading) {
+
+    const now = performance.now();
+    if (now - lastFireAtRef.current < FIRE_COOLDOWN_MS) return;
+    lastFireAtRef.current = now;
+
+    if (reloadingRef.current) {
       setMessage('RELOADING · HOLD THE LINE');
       return;
     }
-    if (ammo.mag <= 0) {
+    if (ammoRef.current.mag <= 0) {
       setMessage('MAGAZINE EMPTY · R TO RELOAD');
       return;
     }
 
-    setAmmo((current) => ({ ...current, mag: current.mag - 1 }));
+    const nextAmmo = { ...ammoRef.current, mag: ammoRef.current.mag - 1 };
+    ammoRef.current = nextAmmo;
+    setAmmo(nextAmmo);
+    setShots((current) => ({ ...current, fired: current.fired + 1 }));
+
     setMuzzle(true);
     const muzzleTimer = window.setTimeout(() => setMuzzle(false), 90);
     timeouts.current.push(muzzleTimer);
 
-    const target = enemies
+    const target = enemiesRef.current
       .filter((enemy) => enemy.alive && enemyIsVisible(enemy.angle, heading))
       .sort((a, b) => Math.abs(a.angle - heading) - Math.abs(b.angle - heading))[0];
 
@@ -193,46 +270,66 @@ export const TacticalShooterDemo: React.FC = () => {
       return;
     }
 
+    const wasAiming = aimingRef.current === target.id;
     const nextHp = Math.max(0, target.hp - 34);
     const killed = nextHp <= 0;
-
-    setEnemies((current) =>
-      current.map((enemy) =>
-        enemy.id === target.id ? { ...enemy, hp: nextHp, alive: !killed } : enemy,
-      ),
+    const nextEnemies = enemiesRef.current.map((enemy) =>
+      enemy.id === target.id ? { ...enemy, hp: nextHp, alive: !killed } : enemy,
     );
+    enemiesRef.current = nextEnemies;
+    setEnemies(nextEnemies);
+    setShots((current) => ({ ...current, hit: current.hit + 1 }));
+
     setHitmarker(true);
     const hitTimer = window.setTimeout(() => setHitmarker(false), 220);
     timeouts.current.push(hitTimer);
 
+    setHitEnemyId(target.id);
+    const hitFlashTimer = window.setTimeout(() => setHitEnemyId(null), 140);
+    timeouts.current.push(hitFlashTimer);
+
+    const hitX = enemyScreenX(target.angle, heading);
+
     if (killed) {
+      if (wasAiming) {
+        aimingTokenRef.current += 1;
+        aimingRef.current = null;
+        setAimingEnemyId(null);
+      }
       setKills((current) => current + 1);
-      setMessage(`HOSTILE ${target.id + 1} DOWN · REDEPLOYING`);
+      spawnFloat(hitX, 42, 'DOWN', 'kill');
+      setMessage(
+        wasAiming
+          ? `HOSTILE ${target.id + 1} DOWN · SHOT CANCELED`
+          : `HOSTILE ${target.id + 1} DOWN · REDEPLOYING`,
+      );
       const respawnTimer = window.setTimeout(() => {
-        setEnemies((current) =>
-          current.map((enemy) =>
-            enemy.id === target.id ? { ...enemy, hp: enemy.maxHp, alive: true } : enemy,
-          ),
+        const next = enemiesRef.current.map((enemy) =>
+          enemy.id === target.id ? { ...enemy, hp: enemy.maxHp, alive: true } : enemy,
         );
+        enemiesRef.current = next;
+        setEnemies(next);
       }, RESPAWN_MS);
       timeouts.current.push(respawnTimer);
       return;
     }
 
+    spawnFloat(hitX, 42, '-34', 'hit');
     setMessage(`HIT · HOSTILE ${target.id + 1} · ${nextHp} HP`);
   };
 
   const startReload = (): void => {
-    if (paused || dead || reloading) return;
-    if (ammo.mag >= MAG_SIZE) {
+    if (paused || dead || reloadingRef.current) return;
+    if (ammoRef.current.mag >= MAG_SIZE) {
       setMessage('MAGAZINE FULL');
       return;
     }
-    if (ammo.reserve <= 0) {
+    if (ammoRef.current.reserve <= 0) {
       setMessage('NO RESERVE AMMO');
       return;
     }
 
+    reloadingRef.current = true;
     setReloading(true);
     setReloadProgress(0);
     setMessage('RELOADING');
@@ -251,11 +348,16 @@ export const TacticalShooterDemo: React.FC = () => {
         reloadTimer.current = null;
       }
 
-      setAmmo((current) => {
-        const needed = MAG_SIZE - current.mag;
-        const loaded = Math.min(needed, current.reserve);
-        return { mag: current.mag + loaded, reserve: current.reserve - loaded };
-      });
+      const currentAmmo = ammoRef.current;
+      const needed = MAG_SIZE - currentAmmo.mag;
+      const loaded = Math.min(needed, currentAmmo.reserve);
+      const nextAmmo = {
+        mag: currentAmmo.mag + loaded,
+        reserve: currentAmmo.reserve - loaded,
+      };
+      ammoRef.current = nextAmmo;
+      setAmmo(nextAmmo);
+      reloadingRef.current = false;
       setReloading(false);
       setReloadProgress(0);
       setMessage('MAGAZINE READY');
@@ -264,6 +366,11 @@ export const TacticalShooterDemo: React.FC = () => {
 
   const togglePause = (): void => {
     if (dead) return;
+    if (!paused) {
+      aimingTokenRef.current += 1;
+      aimingRef.current = null;
+      setAimingEnemyId(null);
+    }
     setPaused((current) => !current);
   };
 
@@ -275,14 +382,25 @@ export const TacticalShooterDemo: React.FC = () => {
   const resetRun = (): void => {
     clearTransientTimers();
     setPlayer({ hp: MAX_HP, armor: MAX_ARMOR });
-    setAmmo({ mag: MAG_SIZE, reserve: MAX_RESERVE });
+    const nextAmmo = { mag: MAG_SIZE, reserve: MAX_RESERVE };
+    ammoRef.current = nextAmmo;
+    setAmmo(nextAmmo);
+    reloadingRef.current = false;
+    lastFireAtRef.current = 0;
     setKills(0);
+    setShots({ fired: 0, hit: 0 });
     setYaw(0);
-    setEnemies(INITIAL_ENEMIES.map((enemy) => ({ ...enemy })));
+    const nextEnemies = INITIAL_ENEMIES.map((enemy) => ({ ...enemy }));
+    enemiesRef.current = nextEnemies;
+    setEnemies(nextEnemies);
     setReloading(false);
     setReloadProgress(0);
     setPaused(false);
     setDead(false);
+    aimingRef.current = null;
+    setAimingEnemyId(null);
+    setHitEnemyId(null);
+    setFloats([]);
     setMessage('Hold the line.');
     setMuzzle(false);
     setHitmarker(false);
@@ -337,6 +455,7 @@ export const TacticalShooterDemo: React.FC = () => {
   const visibleEnemies = enemies.filter(
     (enemy) => enemy.alive && enemyIsVisible(enemy.angle, yaw),
   );
+  const accuracy = shots.fired === 0 ? 0 : Math.round((shots.hit / shots.fired) * 100);
 
   return (
     <div
@@ -396,11 +515,17 @@ export const TacticalShooterDemo: React.FC = () => {
         </div>
       </div>
 
-      <div className={styles.ammo} aria-label={`Magazine ${ammo.mag}, reserve ${ammo.reserve}`}>
+      <div
+        className={styles.ammo}
+        data-low={ammo.mag <= 6}
+        data-empty={ammo.mag === 0}
+        aria-label={`Magazine ${ammo.mag}, reserve ${ammo.reserve}, kills ${kills}, accuracy ${accuracy} percent`}
+      >
         <strong>{ammo.mag}</strong>
         <span>/ {ammo.reserve} RESERVE</span>
         <div className={styles.kills}>
           KILLS <strong>{kills}</strong>
+          <span className={styles.accuracy}>ACC {accuracy}%</span>
         </div>
       </div>
 
@@ -411,6 +536,8 @@ export const TacticalShooterDemo: React.FC = () => {
           <div
             key={enemy.id}
             className={styles.enemy}
+            data-aiming={aimingEnemyId === enemy.id}
+            data-hit={hitEnemyId === enemy.id}
             style={{ left: `${x}%` }}
             aria-hidden="true"
           >
@@ -427,7 +554,19 @@ export const TacticalShooterDemo: React.FC = () => {
         );
       })}
 
-      <div className={styles.crosshair} aria-hidden="true">
+      {floats.map((float) => (
+        <span
+          key={float.id}
+          className={styles.float}
+          data-kind={float.kind}
+          style={{ left: `${float.x}%`, top: `${float.top}%` }}
+          aria-hidden="true"
+        >
+          {float.value}
+        </span>
+      ))}
+
+      <div className={styles.crosshair} data-firing={muzzle} aria-hidden="true">
         <span className={styles.crosshairLines} />
       </div>
       <div className={styles.muzzle} data-on={muzzle} aria-hidden="true" />

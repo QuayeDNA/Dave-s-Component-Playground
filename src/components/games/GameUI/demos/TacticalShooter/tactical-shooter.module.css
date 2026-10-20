@@ -78,7 +78,7 @@
   align-items: center;
   gap: 0.15em;
   transform: translateX(-50%);
-  font-size: 0.5em;
+  font-size: 0.55em;
   letter-spacing: 0.1em;
   color: rgba(216, 245, 223, 0.62);
 }
@@ -117,7 +117,7 @@
   top: 1.3em;
   right: 1.3em;
   font-family: 'Orbitron', sans-serif;
-  font-size: 0.58em;
+  font-size: 0.62em;
   letter-spacing: 0.18em;
   color: rgba(216, 245, 223, 0.72);
   z-index: 3;
@@ -151,7 +151,7 @@
   grid-template-columns: 2.6em 1fr 2.1em;
   align-items: center;
   gap: 0.35em;
-  font-size: 0.56em;
+  font-size: 0.6em;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(216, 245, 223, 0.72);
@@ -207,14 +207,14 @@
 }
 
 .ammo span {
-  font-size: 0.6em;
+  font-size: 0.64em;
   letter-spacing: 0.16em;
   color: rgba(216, 245, 223, 0.66);
 }
 
 .kills {
   margin-top: 0.5em;
-  font-size: 0.56em;
+  font-size: 0.6em;
   letter-spacing: 0.2em;
   color: rgba(216, 245, 223, 0.72);
 }
@@ -226,6 +226,23 @@
   color: #e8b84b;
 }
 
+.accuracy {
+  margin-left: 0.9em;
+  font-size: 0.92em;
+  letter-spacing: 0.12em;
+  color: rgba(216, 245, 223, 0.55);
+}
+
+.ammo[data-low='true'] strong {
+  color: #ffab8f;
+  text-shadow: 0 0 0.6em rgba(224, 92, 42, 0.45);
+}
+
+.ammo[data-empty='true'] strong {
+  color: #ff5c42;
+  text-shadow: 0 0 0.7em rgba(255, 92, 66, 0.8);
+}
+
 .crosshair {
   position: absolute;
   left: 50%;
@@ -235,6 +252,15 @@
   transform: translate(-50%, -50%);
   z-index: 3;
   pointer-events: none;
+  transition: transform 80ms ease;
+}
+
+.crosshair[data-firing='true'] {
+  transform: translate(-50%, -50%) scale(1.24);
+}
+
+.crosshair[data-firing='true']::before {
+  border-color: rgba(232, 184, 75, 0.82);
 }
 
 .crosshair::before {
@@ -283,15 +309,19 @@
 }
 
 .nameplate {
-  padding: 0.3em 0.5em;
+  padding: 0.34em 0.58em;
   border: 1px solid rgba(126, 200, 126, 0.38);
   background: rgba(3, 8, 5, 0.8);
-  font-size: 0.46em;
+  font-size: 0.54em;
   letter-spacing: 0.13em;
   text-transform: uppercase;
   white-space: nowrap;
   text-align: center;
   color: #d8f5df;
+  transition:
+    border-color 100ms ease,
+    background 100ms ease,
+    color 100ms ease;
 }
 
 .nameplate i {
@@ -316,6 +346,31 @@
   filter: drop-shadow(0 0 1.1em rgba(126, 200, 126, 0.42));
   transform: scale(var(--scale, 1));
   transform-origin: center bottom;
+  transition:
+    color 90ms ease,
+    filter 90ms ease;
+}
+
+.enemy[data-aiming='true'] .nameplate {
+  border-color: #e05c2a;
+  background: rgba(40, 10, 5, 0.9);
+  color: #ffd9c9;
+}
+
+.enemy[data-aiming='true'] .nameplate::after {
+  content: ' · AIMING';
+  color: #ff9a72;
+}
+
+.enemy[data-aiming='true'] .silhouette {
+  color: #e05c2a;
+  filter: drop-shadow(0 0 1.2em rgba(224, 92, 42, 0.75));
+}
+
+.enemy[data-hit='true'] .silhouette {
+  color: #fff;
+  opacity: 1;
+  filter: brightness(2.4) drop-shadow(0 0 1.4em rgba(255, 255, 255, 0.9));
 }
 
 .message {
@@ -328,7 +383,7 @@
   padding: 0.45em 0.9em;
   border: 1px solid rgba(126, 200, 126, 0.28);
   background: rgba(3, 8, 5, 0.76);
-  font-size: 0.58em;
+  font-size: 0.62em;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   text-overflow: ellipsis;
@@ -352,7 +407,7 @@
   background: rgba(3, 8, 5, 0.72);
   padding: 0.55em 0.75em;
   font-family: 'Rajdhani', sans-serif;
-  font-size: 0.56em;
+  font-size: 0.6em;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -450,6 +505,44 @@
   opacity: 1;
 }
 
+.float {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.62em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #ffe6a8;
+  text-shadow: 0 0.1em 0.4em rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+  z-index: 6;
+  animation: floatUp 850ms ease-out forwards;
+}
+
+.float[data-kind='kill'] {
+  color: #ff8a6a;
+  font-size: 0.7em;
+}
+
+.float[data-kind='player'] {
+  color: #ff5c42;
+  font-size: 0.7em;
+}
+
+@keyframes floatUp {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -30%) scale(0.8);
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -180%) scale(1.06);
+  }
+}
+
 .overlay {
   position: absolute;
   inset: 0;
@@ -485,7 +578,7 @@
 
 .overlayText {
   margin-top: 0.8em;
-  font-size: 0.68em;
+  font-size: 0.72em;
   line-height: 1.6;
   letter-spacing: 0.08em;
   color: rgba(216, 245, 223, 0.76);
@@ -560,7 +653,11 @@
 
   .message {
     bottom: 3.9em;
-    font-size: 0.54em;
+    font-size: 0.58em;
+  }
+
+  .nameplate {
+    font-size: 0.6em;
   }
 
   .controls {
@@ -570,13 +667,16 @@
 
   .controls button {
     padding: 0.6em;
-    font-size: 0.52em;
+    font-size: 0.56em;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .compassTrack,
   .enemy,
+  .silhouette,
+  .crosshair,
+  .nameplate,
   .vital i b,
   .nameplate i b,
   .reloadBar,
@@ -587,5 +687,9 @@
 
   .muzzle[data-on='true'] {
     opacity: 0.55;
+  }
+
+  .float {
+    display: none;
   }
 }

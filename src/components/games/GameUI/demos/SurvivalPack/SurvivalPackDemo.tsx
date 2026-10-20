@@ -1,46 +1,35 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from '../../shared/useReducedMotion';
+import {
+  CAPACITY,
+  INITIAL_ITEMS,
+  REQUIREMENTS,
+  ZONE_INFO,
+  ZONE_ORDER,
+  balancePercent,
+  firstOpenZone,
+  isFunctional,
+  isOffBalance,
+  loadLabel,
+  placementError,
+  readinessCount,
+  requirementMet,
+  totalWeight,
+  walkSpeed,
+  type Item,
+  type Kind,
+  type Zone,
+} from './inventory';
 import styles from './survival-pack.module.css';
 
-type Zone = 'pack' | 'ground';
-
-interface Item {
-  id: number;
-  name: string;
-  weight: number;
-  zone: Zone;
-  rotation: string;
-  kind: string;
-}
-
-const CAPACITY = 8;
-
-const INITIAL_ITEMS: Item[] = [
-  { id: 0, name: 'Canned beans', weight: 0.8, zone: 'pack', rotation: '-2deg', kind: 'food' },
-  { id: 1, name: 'Torch', weight: 0.6, zone: 'pack', rotation: '0deg', kind: 'tool' },
-  { id: 2, name: 'Bandages', weight: 0.2, zone: 'pack', rotation: '2deg', kind: 'med' },
-  { id: 3, name: 'Radio', weight: 1.4, zone: 'pack', rotation: '-1deg', kind: 'tool' },
-  { id: 4, name: 'Water', weight: 1.0, zone: 'pack', rotation: '1deg', kind: 'water' },
-  { id: 5, name: 'Crowbar', weight: 2.5, zone: 'ground', rotation: '-2deg', kind: 'tool' },
-  { id: 6, name: 'Machete', weight: 1.8, zone: 'ground', rotation: '0deg', kind: 'tool' },
-  { id: 7, name: 'Shells', weight: 0.4, zone: 'ground', rotation: '2deg', kind: 'ammo' },
-  { id: 8, name: 'Rope', weight: 1.2, zone: 'ground', rotation: '-1deg', kind: 'tool' },
-  { id: 9, name: 'Medkit', weight: 1.5, zone: 'ground', rotation: '1deg', kind: 'med' },
-];
-
-const packWeightOf = (items: Item[]): number =>
-  items
-    .filter((item) => item.zone === 'pack')
-    .reduce((total, item) => total + item.weight, 0);
-
 export const SurvivalPackDemo: React.FC = () => {
-  const stageRef = useRef<HTMLDivElement>(null);
   const shakeTimer = useRef<number | null>(null);
-  const lastDragAt = useRef(0);
   const [items, setItems] = useState<Item[]>(INITIAL_ITEMS);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [highlight, setHighlight] = useState<Kind | null>(null);
   const [overZone, setOverZone] = useState<Zone | null>(null);
   const [shake, setShake] = useState(false);
-  const [message, setMessage] = useState('Pack light. Move what you need.');
+  const [message, setMessage] = useState('Pack for the night. Six essentials. Eight kilos.');
   const reducedMotion = useReducedMotion();
 
   useEffect(
@@ -52,58 +41,162 @@ export const SurvivalPackDemo: React.FC = () => {
     [],
   );
 
-  const packWeight = packWeightOf(items);
-  const load = packWeight / CAPACITY;
-  const loadLabel = load < 0.5 ? 'LIGHT' : load < 0.85 ? 'LOADED' : 'HEAVY';
-  const walkSpeed = Math.round(100 - Math.max(0, load - 0.5) * 80);
-  const packItems = items.filter((item) => item.zone === 'pack');
-  const groundItems = items.filter((item) => item.zone === 'ground');
+  const weight = totalWeight(items);
+  const load = weight / CAPACITY;
+  const loadState = loadLabel(load);
+  const speed = walkSpeed(items);
+  const offBalance = isOffBalance(items);
+  const balance = balancePercent(items);
+  const readiness = readinessCount(items);
+  const ready = readiness === REQUIREMENTS.length;
+  const selectedItem = selectedId === null ? null : items.find((item) => item.id === selectedId) ?? null;
+  const activeLight = items.some(
+    (item) => item.zone !== 'ground' && item.kind === 'light' && item.active && isFunctional(item),
+  );
+  const needleAngle = -90 + Math.min(1, load) * 180;
+
+  const reject = (nextMessage: string) => {
+    setMessage(nextMessage);
+    if (reducedMotion) return;
+    setShake(true);
+    if (shakeTimer.current !== null) {
+      window.clearTimeout(shakeTimer.current);
+    }
+    shakeTimer.current = window.setTimeout(() => {
+      setShake(false);
+      shakeTimer.current = null;
+    }, 420);
+  };
 
   const moveItem = (id: number, to: Zone) => {
     const item = items.find((candidate) => candidate.id === id);
     if (!item || item.zone === to) return;
 
-    if (to === 'pack' && packWeight + item.weight > CAPACITY + 1e-6) {
-      const excess = Math.max(0, packWeight + item.weight - CAPACITY);
-      setMessage(`Too heavy. Drop ${excess.toFixed(1)} kg before packing the ${item.name.toLowerCase()}.`);
-      if (!reducedMotion) {
-        setShake(true);
-        if (shakeTimer.current !== null) {
-          window.clearTimeout(shakeTimer.current);
-        }
-        shakeTimer.current = window.setTimeout(() => {
-          setShake(false);
-          shakeTimer.current = null;
-        }, 420);
-      }
+    const error = placementError(item, to, items);
+    if (error) {
+      reject(error);
       return;
     }
 
     setItems((current) =>
-      current.map((candidate) =>
-        candidate.id === id ? { ...candidate, zone: to } : candidate,
-      ),
+      current.map((candidate) => (candidate.id === id ? { ...candidate, zone: to } : candidate)),
     );
     setMessage(
-      `${item.name} moved to ${to === 'pack' ? 'the backpack' : 'the ground'}. Walk speed ${Math.round(
-        100 - Math.max(0, (to === 'pack' ? packWeight + item.weight : packWeight - item.weight) / CAPACITY - 0.5) * 80,
-      )}%.`,
+      `${item.name} moved to ${
+        to === 'ground' ? 'the ground' : `the ${ZONE_INFO[to].label.toLowerCase()}`
+      }.`,
     );
   };
 
-  const handleItemClick = (item: Item) => {
-    if (Date.now() - lastDragAt.current < 400) return;
-    moveItem(item.id, item.zone === 'pack' ? 'ground' : 'pack');
+  const packItem = (id: number) => {
+    const item = items.find((candidate) => candidate.id === id);
+    if (!item) return;
+
+    const zone = firstOpenZone(item, items);
+    if (!zone) {
+      const nextWeight = weight + item.weight;
+      reject(
+        nextWeight > CAPACITY
+          ? `Too heavy. Drop ${(nextWeight - CAPACITY).toFixed(1)} kg first.`
+          : 'No room left.',
+      );
+      return;
+    }
+
+    moveItem(id, zone);
   };
 
-  const startDrag = (event: React.DragEvent<HTMLButtonElement>, item: Item) => {
+  const activateItem = (id: number) => {
+    const item = items.find((candidate) => candidate.id === id);
+    if (!item) return;
+
+    if (item.zone === 'ground') {
+      setMessage(`Pick up the ${item.name.toLowerCase()} first.`);
+      return;
+    }
+    if (!item.usable) {
+      setMessage(`${item.name} is not something you can use here.`);
+      return;
+    }
+    if (item.quantity <= 0) {
+      setMessage(`${item.name} is spent.`);
+      return;
+    }
+    if (item.condition <= 0) {
+      setMessage(`${item.name} is dead.`);
+      return;
+    }
+
+    if (item.kind === 'light' || item.kind === 'signal') {
+      const drain = item.kind === 'light' ? 10 : 15;
+      const nextCondition = Math.max(0, item.condition - drain);
+      const nextActive = nextCondition > 0 ? !item.active : false;
+
+      setItems((current) =>
+        current.map((candidate) =>
+          candidate.id === id
+            ? { ...candidate, condition: nextCondition, active: nextActive }
+            : candidate,
+        ),
+      );
+
+      if (nextCondition === 0) {
+        setMessage(
+          item.kind === 'light'
+            ? 'The torch dies. The dark comes back.'
+            : 'The radio goes quiet.',
+        );
+      } else if (nextActive) {
+        setMessage(
+          item.kind === 'light'
+            ? 'The torch spills a weak circle of light.'
+            : 'A voice under the static: "...shelter... hold..."',
+        );
+      } else {
+        setMessage(item.kind === 'light' ? 'You click the torch off.' : 'You kill the radio.');
+      }
+      return;
+    }
+
+    if (item.kind === 'water') {
+      setItems((current) =>
+        current.map((candidate) => (candidate.id === id ? { ...candidate, quantity: 0 } : candidate)),
+      );
+      setMessage('You drink. The canteen is empty.');
+      return;
+    }
+
+    if (item.kind === 'food') {
+      setItems((current) =>
+        current.map((candidate) => (candidate.id === id ? { ...candidate, quantity: 0 } : candidate)),
+      );
+      setMessage('You eat. The tin is empty.');
+      return;
+    }
+
+    if (item.kind === 'med') {
+      const nextQuantity = Math.max(0, item.quantity - 1);
+      setItems((current) =>
+        current.map((candidate) =>
+          candidate.id === id ? { ...candidate, quantity: nextQuantity } : candidate,
+        ),
+      );
+      setMessage(
+        nextQuantity > 0
+          ? `Wound dressed. ${nextQuantity} left.`
+          : item.name === 'Medkit'
+            ? 'The medkit is empty.'
+            : 'The last bandage is gone.',
+      );
+      return;
+    }
+
+    setMessage(`${item.name} has no use here.`);
+  };
+
+  const handleDragStart = (event: React.DragEvent<HTMLButtonElement>, item: Item) => {
     event.dataTransfer.setData('text/plain', String(item.id));
     event.dataTransfer.effectAllowed = 'move';
-    lastDragAt.current = Date.now();
-  };
-
-  const endDrag = () => {
-    lastDragAt.current = Date.now();
   };
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>, zone: Zone) => {
@@ -121,100 +214,335 @@ export const SurvivalPackDemo: React.FC = () => {
   const handleDrop = (event: React.DragEvent<HTMLDivElement>, zone: Zone) => {
     event.preventDefault();
     setOverZone(null);
-    lastDragAt.current = Date.now();
-    const id = Number(event.dataTransfer.getData('text/plain'));
+    const raw = event.dataTransfer.getData('text/plain');
+    if (!raw) return;
+    const id = Number(raw);
     if (Number.isInteger(id)) moveItem(id, zone);
   };
 
-  const renderItem = (item: Item) => (
-    <button
-      key={item.id}
-      type="button"
-      className={styles.item}
-      style={{ '--r': item.rotation } as React.CSSProperties}
-      draggable
-      onDragStart={(event) => startDrag(event, item)}
-      onDragEnd={endDrag}
-      onClick={() => handleItemClick(item)}
-      aria-label={`${item.name}, ${item.weight.toFixed(1)} kilograms, in ${
-        item.zone === 'pack' ? 'the backpack' : 'the ground'
-      }. Activate to move it to ${item.zone === 'pack' ? 'the ground' : 'the backpack'}.`}
-    >
-      {item.name}
-      <small>
-        {item.weight.toFixed(1)} kg · {item.kind}
-      </small>
-    </button>
-  );
+  const selectItem = (id: number) => {
+    setSelectedId((current) => (current === id ? null : id));
+  };
 
-  const renderZone = (zone: Zone, title: string, contents: Item[]) => (
-    <div
-      className={styles.zone}
-      data-over={overZone === zone}
-      data-shake={zone === 'pack' && shake}
-      onDragOver={(event) => handleDragOver(event, zone)}
-      onDragLeave={handleDragLeave}
-      onDrop={(event) => handleDrop(event, zone)}
-    >
-      <div className={styles.zoneHead}>
-        <h3>{title}</h3>
-        <span className={styles.count}>
-          {contents.length} {contents.length === 1 ? 'item' : 'items'}
+  const renderItem = (item: Item) => {
+    const selected = selectedId === item.id;
+    const spent = !isFunctional(item);
+    const quantityLabel =
+      item.quantity <= 0 ? 'empty' : item.condition <= 0 ? 'spent' : `x${item.quantity}`;
+
+    return (
+      <button
+        key={item.id}
+        type="button"
+        className={styles.item}
+        data-kind={item.kind}
+        data-selected={selected}
+        data-highlight={highlight === item.kind}
+        data-empty={spent}
+        data-active={item.active}
+        style={{ '--r': item.rotation } as React.CSSProperties}
+        draggable
+        onDragStart={(event) => handleDragStart(event, item)}
+        onDragEnd={() => setOverZone(null)}
+        onClick={() => selectItem(item.id)}
+        aria-pressed={selected}
+        aria-label={`${item.name}, ${item.weight.toFixed(1)} kilograms, ${item.quantity} left, condition ${item.condition} percent, in ${ZONE_INFO[item.zone].label}. ${
+          item.zone === 'ground' ? 'Select to pack.' : 'Select to inspect, use, or move.'
+        }`}
+      >
+        <span className={styles.itemName}>{item.name}</span>
+        <small>
+          {item.weight.toFixed(1)} kg · {quantityLabel}
+        </small>
+        {item.active ? <span className={styles.activeDot} aria-hidden="true" /> : null}
+      </button>
+    );
+  };
+
+  const renderZone = (zone: Zone, className: string) => {
+    const info = ZONE_INFO[zone];
+    const contents = items.filter((item) => item.zone === zone);
+    const emptySlots = Number.isFinite(info.capacity)
+      ? Math.max(0, info.capacity - contents.length)
+      : 0;
+
+    return (
+      <div
+        className={`${styles.zone} ${className}`}
+        data-over={overZone === zone}
+        role="group"
+        aria-label={`${info.label}, ${contents.length}${
+          Number.isFinite(info.capacity) ? ` of ${info.capacity}` : ''
+        } items`}
+        onDragOver={(event) => handleDragOver(event, zone)}
+        onDragLeave={handleDragLeave}
+        onDrop={(event) => handleDrop(event, zone)}
+      >
+        <div className={styles.zoneHead}>
+          <h3>{info.label}</h3>
+          <span className={styles.count}>
+            {Number.isFinite(info.capacity)
+              ? `${contents.length}/${info.capacity}`
+              : `${contents.length} items`}
+          </span>
+        </div>
+
+        <div className={styles.slots}>
+          {contents.map(renderItem)}
+          {Array.from({ length: emptySlots }).map((_, index) => (
+            <span
+              key={`empty-${zone}-${index}`}
+              className={styles.emptySlot}
+              aria-hidden="true"
+            />
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const checklist = (
+    <aside className={styles.checklist} aria-label="Bug-out checklist">
+      <div className={styles.clip} aria-hidden="true" />
+      <div className={styles.checklistHead}>
+        <h3>BUG-OUT</h3>
+        <span>
+          {readiness}/{REQUIREMENTS.length}
         </span>
       </div>
 
-      <div className={styles.items}>
-        {contents.length > 0 ? (
-          contents.map(renderItem)
-        ) : (
-          <p className={styles.empty}>
-            {zone === 'pack' ? 'The pack is empty.' : 'Nothing left on the ground.'}
-          </p>
-        )}
+      <div className={styles.checkRows}>
+        {REQUIREMENTS.map((requirement) => {
+          const met = requirementMet(items, requirement);
+          const active = highlight === requirement.kind;
+
+          return (
+            <button
+              key={requirement.id}
+              type="button"
+              className={styles.checkRow}
+              data-met={met}
+              data-active={active}
+              aria-pressed={active}
+              onClick={() =>
+                setHighlight((current) => (current === requirement.kind ? null : requirement.kind))
+              }
+            >
+              <span className={styles.checkBox} aria-hidden="true">
+                {met ? '✓' : ''}
+              </span>
+              <span className={styles.checkLabel}>{requirement.label}</span>
+              <span className={styles.checkStatus}>{met ? 'PACKED' : 'MISSING'}</span>
+            </button>
+          );
+        })}
       </div>
 
-      {zone === 'pack' && (
-        <div className={styles.status}>
-          <div className={styles.statusLine}>
-            <span className={styles.weight}>
-              {packWeight.toFixed(1)} / {CAPACITY.toFixed(1)} kg
-            </span>
-            <span>
-              {loadLabel} · WALK {walkSpeed}%
-            </span>
-          </div>
-          <div
-            className={styles.bar}
-            data-heavy={load >= 0.85}
-            role="progressbar"
-            aria-label="Backpack weight"
-            aria-valuemin={0}
-            aria-valuemax={CAPACITY}
-            aria-valuenow={Number(packWeight.toFixed(1))}
-            aria-valuetext={`${packWeight.toFixed(1)} of ${CAPACITY} kilograms`}
-          >
-            <b style={{ width: `${Math.min(100, load * 100)}%` }} />
-          </div>
+      <div className={styles.stamp} data-ready={ready} aria-hidden="true">
+        {ready ? 'READY' : 'NOT READY'}
+      </div>
+      <p className={styles.srOnly}>
+        {readiness} of {REQUIREMENTS.length} essentials packed.{' '}
+        {ready ? 'Ready to move.' : 'Not ready to move.'}
+      </p>
+    </aside>
+  );
+
+  const scale = (
+    <div className={styles.scale}>
+      <span className={styles.hook} aria-hidden="true" />
+      <div
+        className={styles.gauge}
+        role="progressbar"
+        aria-label="Carried weight"
+        aria-valuemin={0}
+        aria-valuemax={CAPACITY}
+        aria-valuenow={Number(weight.toFixed(1))}
+        aria-valuetext={`${weight.toFixed(1)} of ${CAPACITY} kilograms carried`}
+      >
+        <div className={styles.dial} aria-hidden="true">
+          {Array.from({ length: 9 }).map((_, index) => (
+            <span
+              key={index}
+              className={styles.tick}
+              style={{ '--angle': `${-90 + index * 22.5}deg` } as React.CSSProperties}
+            />
+          ))}
+          <span
+            className={styles.needle}
+            style={{ '--angle': `${needleAngle}deg` } as React.CSSProperties}
+          />
+          <span className={styles.hub} />
         </div>
-      )}
+        <div className={styles.scaleReadout}>
+          {weight.toFixed(1)}
+          <small> / {CAPACITY} kg</small>
+        </div>
+      </div>
+      <div className={styles.balance} data-off={offBalance}>
+        <span className={styles.balanceTrack} aria-hidden="true">
+          <b style={{ left: `${balance}%` }} />
+        </span>
+        <span>{offBalance ? 'OFF-BALANCE' : 'BALANCED'}</span>
+      </div>
     </div>
   );
 
-  return (
+  const status = (
+    <div className={styles.status}>
+      <div className={styles.statusTop}>
+        <span className={styles.weight}>
+          {weight.toFixed(1)} / {CAPACITY.toFixed(1)} kg
+        </span>
+        <span>
+          {loadState} · WALK {speed}%
+        </span>
+      </div>
+      <div className={styles.statusMeta}>
+        <span>{offBalance ? 'OFF-BALANCE' : 'BALANCED'}</span>
+        <span>
+          {readiness}/{REQUIREMENTS.length} ESSENTIALS
+        </span>
+      </div>
+    </div>
+  );
+
+  const itemCard = selectedItem ? (
     <div
-      ref={stageRef}
-      className={styles.stage}
-      role="group"
-      aria-label="Abəde Backpack inventory demo"
-      tabIndex={0}
+      className={styles.itemCard}
+      role="region"
+      aria-label={`Selected item: ${selectedItem.name}`}
     >
-      <div className={styles.wrap}>
-        {renderZone('pack', 'Backpack', packItems)}
-        {renderZone('ground', 'On the ground', groundItems)}
-        <div className={styles.message} role="status" aria-live="polite">
-          {message}
+      <div className={styles.cardMain}>
+        <span className={styles.cardKind} data-kind={selectedItem.kind}>
+          {selectedItem.kind}
+        </span>
+        <h3>{selectedItem.name}</h3>
+        <p className={styles.cardMeta}>
+          {selectedItem.weight.toFixed(1)} kg ·{' '}
+          {selectedItem.quantity > 0 ? `${selectedItem.quantity} left` : 'empty'} ·{' '}
+          {selectedItem.condition}% condition
+        </p>
+        <p className={styles.cardNote}>{selectedItem.note}</p>
+        <div className={styles.condition} aria-hidden="true">
+          <b style={{ width: `${selectedItem.condition}%` }} />
         </div>
       </div>
+
+      <div className={styles.cardActions}>
+        {selectedItem.usable ? (
+          <button
+            type="button"
+            className={styles.action}
+            onClick={() => activateItem(selectedItem.id)}
+            aria-disabled={
+              selectedItem.zone === 'ground' || !isFunctional(selectedItem) ? true : undefined
+            }
+            data-disabled={selectedItem.zone === 'ground' || !isFunctional(selectedItem)}
+            title={
+              selectedItem.zone === 'ground'
+                ? 'Pick it up first.'
+                : !isFunctional(selectedItem)
+                  ? 'It is spent.'
+                  : undefined
+            }
+          >
+            USE
+          </button>
+        ) : null}
+
+        {selectedItem.zone === 'ground' ? (
+          <button type="button" className={styles.action} onClick={() => packItem(selectedItem.id)}>
+            PACK
+          </button>
+        ) : (
+          <button
+            type="button"
+            className={styles.action}
+            onClick={() => moveItem(selectedItem.id, 'ground')}
+          >
+            DROP
+          </button>
+        )}
+
+        <label className={styles.stow}>
+          <span>STOW IN</span>
+          <select
+            value={selectedItem.zone}
+            onChange={(event) => moveItem(selectedItem.id, event.target.value as Zone)}
+          >
+            {ZONE_ORDER.map((zone) => {
+              const error = placementError(selectedItem, zone, items);
+              return (
+                <option
+                  key={zone}
+                  value={zone}
+                  disabled={zone !== selectedItem.zone && error !== null}
+                >
+                  {ZONE_INFO[zone].label}
+                </option>
+              );
+            })}
+          </select>
+        </label>
+
+        <button
+          type="button"
+          className={styles.close}
+          onClick={() => setSelectedId(null)}
+          aria-label="Close item details"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+  ) : null;
+
+  return (
+    <div className={styles.shell}>
+      <div
+        className={styles.stage}
+        data-lit={activeLight}
+        role="group"
+        aria-label="Abəde Backpack inventory demo"
+        tabIndex={0}
+      >
+        <div className={styles.wrap}>
+          <div className={styles.packArea}>
+            {scale}
+
+            <div className={styles.packColumn}>
+              <div className={styles.pack} data-shake={shake}>
+                {renderZone('lid', styles.lid)}
+                {renderZone('main', styles.main)}
+                <div className={styles.pockets}>
+                  {renderZone('left', styles.pocket)}
+                  {renderZone('right', styles.pocket)}
+                </div>
+                {renderZone('belt', styles.belt)}
+              </div>
+
+              <div className={styles.hands}>
+                {renderZone('handLeft', styles.hand)}
+                {renderZone('handRight', styles.hand)}
+              </div>
+
+              {status}
+            </div>
+          </div>
+
+          <div className={styles.side}>
+            {checklist}
+            {renderZone('ground', styles.ground)}
+          </div>
+
+          <div className={styles.message} role="status" aria-live="polite">
+            {message}
+          </div>
+        </div>
+      </div>
+
+      {itemCard}
     </div>
   );
 };
