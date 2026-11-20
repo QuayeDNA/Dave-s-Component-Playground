@@ -4,13 +4,13 @@ import {
   AUDIO_ZONES,
   BEAT_COLORS,
   BEAT_LABELS,
+  CONCEPT_GALLERY,
   DESIGN_PRINCIPLES,
   LORE_ENTRIES,
   MECHANICS,
   NAV_SECTIONS,
   PALETTE,
   SOUND_DESIGN,
-  SOURCE_BOARD,
   TIMELINE_BEATS,
   ZONES,
   characters,
@@ -88,11 +88,13 @@ export default function IrregularPage() {
   const [category, setCategory] = useState('all');
   const [access, setAccess] = useState('all');
   const [modal, setModal] = useState<string | null>(null);
+  const [art, setArt] = useState<string | null>(null);
 
   const activeSection = NAV_SECTIONS.find((s) => s.id === active) ?? NAV_SECTIONS[0];
   const zone = ZONES.find((z) => z.id === selectedZone) ?? ZONES[0];
   const character = characters.find((c) => c.id === selectedChar) ?? characters[0];
   const selectedLore = LORE_ENTRIES.find((l) => l.id === modal) ?? null;
+  const selectedArt = CONCEPT_GALLERY.find((piece) => piece.id === art) ?? null;
 
   const lore = useMemo(() => {
     const q = query.toLowerCase();
@@ -114,7 +116,10 @@ export default function IrregularPage() {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setModal(null);
+      if (event.key === 'Escape') {
+        setModal(null);
+        setArt(null);
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -216,18 +221,6 @@ export default function IrregularPage() {
                   </div>
                 </div>
               </div>
-              <svg className="hero-art" viewBox="0 0 300 300" fill="none">
-                <path d="M150 18 264 84v132l-114 66L36 216V84L150 18Z" stroke="#7eb8e8" strokeWidth="1.2" />
-                <path d="M150 53 234 101v98l-84 48-84-48v-98l84-48Z" stroke="#7eb8e8" opacity=".45" />
-                <path d="M150 91 201 120v60l-51 29-51-29v-60l51-29Z" stroke="#c8b8f0" opacity=".8" />
-                <circle cx="150" cy="150" r="9" fill="#7eb8e8" />
-                <path
-                  d="M150 18v73M264 84l-63 36M264 216l-63-36M150 282v-73M36 216l63-36M36 84l63 36"
-                  stroke="#7eb8e8"
-                  opacity=".25"
-                />
-                <circle cx="150" cy="150" r="126" stroke="#7eb8e8" opacity=".12" strokeDasharray="3 8" />
-              </svg>
             </div>
 
             <div className="grid stats-grid" id="overviewStats">
@@ -711,9 +704,25 @@ export default function IrregularPage() {
             <div className="panel concept-board" style={{ marginBottom: 16 }}>
               <div className="panel-head">
                 <h3>Concept archive</h3>
-                <span className="tag">SOURCE BOARD / ASSET 001</span>
+                <span className="tag">11 REFERENCES / OPEN TO INSPECT</span>
               </div>
-              <img src={SOURCE_BOARD} alt="Geometria character and environment concept art board" />
+              <div className="concept-gallery">
+                {CONCEPT_GALLERY.map((piece) => (
+                  <button
+                    className="concept-card"
+                    key={piece.id}
+                    onClick={() => setArt(piece.id)}
+                    aria-label={`Inspect ${piece.title}`}
+                  >
+                    <img src={piece.image} alt={piece.title} loading="lazy" />
+                    <span className="concept-overlay">
+                      <span className="concept-cat">{piece.category}</span>
+                      <strong>{piece.title}</strong>
+                      <span className="concept-meta">{piece.meta}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="panel" style={{ marginBottom: 16 }}>
@@ -870,6 +879,31 @@ export default function IrregularPage() {
           </section>
         </div>
       </main>
+
+      <div
+        className={`modal-backdrop lightbox-backdrop ${selectedArt ? 'open' : ''}`}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) setArt(null);
+        }}
+      >
+        {selectedArt ? (
+          <div className="modal lightbox">
+            <div className="modal-head">
+              <div>
+                <div className="eyebrow">
+                  {selectedArt.category.toUpperCase()} / VISUAL ARCHIVE
+                </div>
+                <h2 style={{ margin: '10px 0 4px' }}>{selectedArt.title}</h2>
+                <p className="lightbox-meta">{selectedArt.meta}</p>
+              </div>
+              <button className="modal-close" aria-label="Close" onClick={() => setArt(null)}>
+                ×
+              </button>
+            </div>
+            <img className="lightbox-image" src={selectedArt.image} alt={selectedArt.title} />
+          </div>
+        ) : null}
+      </div>
 
       <div
         className={`modal-backdrop ${selectedLore ? 'open' : ''}`}

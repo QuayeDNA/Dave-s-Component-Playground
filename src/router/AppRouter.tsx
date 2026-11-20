@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react';
 import ErrorBoundary from './ErrorBoundary';
 import { Layout } from '../components/layout/Layout';
 import { GameLayout } from '../components/layout/GameLayout';
+import IrregularLoader from '../components/games/IrregularLoader';
 
 const ChatGPTModelSelector = lazy(() => import('@/components/GPTModelRedesign/GptModel'));
 
@@ -169,7 +170,7 @@ const AppRouter: React.FC = () => {
 
               {/* Games — warm amber loader */}
               <Route path="games" element={<Suspense fallback={<GamesFallback />}><GamesIndex /></Suspense>} />
-              <Route path="games/irregular" element={<Suspense fallback={<GamesFallback />}><IrregularPage /></Suspense>} />
+              <Route path="games/irregular" element={<Suspense fallback={<IrregularLoader />}><IrregularPage /></Suspense>} />
               <Route path="games/abode" element={<Suspense fallback={<GamesFallback />}><AbodePage /></Suspense>} />
               <Route path="games/abode/dev-tracker" element={<Suspense fallback={<GamesFallback />}><AbodeTrackerPage /></Suspense>} />
               <Route path="games/gold-and-iron" element={<Suspense fallback={<GamesFallback />}><GoldAndIronPage /></Suspense>} />

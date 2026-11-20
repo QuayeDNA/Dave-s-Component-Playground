@@ -338,3 +338,43 @@ export const LORE_ENTRIES = [
       "Unlocked when the first family member is found. Details on each family member's personality, what they experienced during captivity, and how their relationship with Hexa changes as a result. The partner, Prism, is a rare Hexagon-Circle hybrid — a being who exists between shapes. This is why the Irregulars specifically targeted them.",
   },
 ];
+
+export type ConceptPiece = {
+  id: string;
+  title: string;
+  category: string;
+  meta: string;
+  image: string;
+};
+
+const ENVIRONMENT_TITLES: Record<string, string> = {
+  'circle-plains': 'Circle Plains',
+  'triangle-peaks': 'Triangle Peaks',
+  'square-citadel': 'Square Citadel',
+  'hexagon-archive': 'Hexagon Archive',
+  'void-core': 'The Void Core',
+};
+
+export const CONCEPT_GALLERY: ConceptPiece[] = [
+  {
+    id: 'source-board',
+    title: 'Character & World Concept Board',
+    category: 'Concept Board',
+    meta: 'Master reference / 10 integrated assets',
+    image: SOURCE_BOARD,
+  },
+  ...characters.map((c, index) => ({
+    id: `character-${c.id}`,
+    title: c.name,
+    category: 'Character Portrait',
+    meta: `${c.type} / Portrait 0${index + 1}`,
+    image: c.image,
+  })),
+  ...Object.entries(environments).map(([id, image], index) => ({
+    id: `environment-${id}`,
+    title: ENVIRONMENT_TITLES[id] ?? id,
+    category: 'Environment Concept',
+    meta: `Zone study / 0${index + 1}`,
+    image,
+  })),
+];

@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&display=swap');
+
+.irregular-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  background-color: #07101a;
+  background-image:
+    radial-gradient(ellipse at 50% 38%, rgba(80, 139, 180, 0.16), transparent 55%),
+    radial-gradient(ellipse at 80% 0%, rgba(80, 139, 180, 0.1), transparent 36%),
+    linear-gradient(rgba(126, 184, 232, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(126, 184, 232, 0.025) 1px, transparent 1px);
+  background-size: auto, auto, 42px 42px, 42px 42px;
+  color: #f5f0e8;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.irregular-loader-coin {
+  width: 84px;
+  height: 84px;
+  perspective: 600px;
+  display: grid;
+  place-items: center;
+}
+
+.irregular-loader-hex {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  animation: irregular-coin-spin 2.4s linear infinite;
+  filter: drop-shadow(0 0 18px rgba(126, 184, 232, 0.55));
+}
+
+.irregular-loader-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+
+.irregular-loader-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.26em;
+  color: #7eb8e8;
+}
+
+.irregular-loader-status {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #8b9baa;
+  animation: irregular-loader-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes irregular-coin-spin {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
+@keyframes irregular-loader-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .irregular-loader-hex,
+  .irregular-loader-status {
+    animation: none;
+  }
+}
